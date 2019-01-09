@@ -136,6 +136,7 @@ enum uint_8 BehaviorClass {
   SelfTestTouch,
 
   // dispatch
+  DispatcherAdaptive,
   DispatcherPassThrough,
   DispatcherQueue,
   DispatcherRandom,

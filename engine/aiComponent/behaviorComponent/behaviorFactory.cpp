@@ -101,6 +101,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/devBehaviors/selfTest/behaviorSelfTestScreenAndBackpack.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/devBehaviors/selfTest/behaviorSelfTestSoundCheck.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/devBehaviors/selfTest/behaviorSelfTestTouch.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/dispatch/behaviorDispatcherAdaptive.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/dispatch/behaviorDispatcherPassThrough.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/dispatch/behaviorDispatcherQueue.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/dispatch/behaviorDispatcherRandom.h"
@@ -760,6 +761,12 @@ ICozmoBehaviorPtr BehaviorFactory::CreateBehavior(const Json::Value& config)
       break;
     }
     
+    case BehaviorClass::DispatcherAdaptive:
+    {
+      newBehavior = ICozmoBehaviorPtr(new BehaviorDispatcherAdaptive(config));
+      break;
+    }
+
     case BehaviorClass::DispatcherPassThrough:
     {
       newBehavior = ICozmoBehaviorPtr(new BehaviorDispatcherPassThrough(config));
