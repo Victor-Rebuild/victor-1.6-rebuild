@@ -15,7 +15,6 @@
     "ReactToMotorCalibration",
     "ReactToPlacedOnSlope",
     "ReactToUnexpectedMovement",
-    "ReactToUnexpectedMovementInAir",
-    "Wait" // TMP - should remove
+    "ReactToUnexpectedMovementInAir"
   ]
 }

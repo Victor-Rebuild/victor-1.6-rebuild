@@ -1,0 +1,11 @@
+diff a/resources/config/engine/behaviorComponent/behaviors/victorBehaviorTree/reactions/mandatoryPhysicalReactions.json b/resources/config/engine/behaviorComponent/behaviors/victorBehaviorTree/reactions/mandatoryPhysicalReactions.json	(rejected hunks)
+@@ -15,7 +15,7 @@
+     "ReactToUncalibratedHeadAndLift",
+     "ReactToMotorCalibration",
+     "ReactToPlacedOnSlope",
+-    "ReactToUnexpectedMovement",
+-    "Wait" // TMP - should remove
++    "ReactToUnexpectedMovement"
++    //"Wait" // TMP - should remove
+   ]
+ }
