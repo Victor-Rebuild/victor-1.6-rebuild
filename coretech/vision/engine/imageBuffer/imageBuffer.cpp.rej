@@ -1,0 +1,15 @@
+diff a/coretech/vision/engine/imageBuffer/imageBuffer.cpp b/coretech/vision/engine/imageBuffer/imageBuffer.cpp	(rejected hunks)
+@@ -15,11 +15,12 @@
+ #include "coretech/vision/engine/imageBuffer/conversions/imageConversions.h"
+ #include "coretech/vision/engine/image.h"
+ #include "coretech/vision/engine/imageCache.h"
+-#include "coretech/vision/engine/neonMacros.h"
++#include "coretech/vision/engine/debayer.h"
+ 
+ #include "opencv2/core.hpp"
+ #include "opencv2/imgproc.hpp"
+ 
++
+ #include <unistd.h>
+ 
+ namespace Anki {
