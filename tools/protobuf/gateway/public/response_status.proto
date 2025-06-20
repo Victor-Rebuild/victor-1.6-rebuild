@@ -18,6 +18,8 @@ syntax = "proto3";
 
 package Anki.Vector.external_interface;
 
+option go_package = "Anki.Vector.external_interface";
+
 // A shared response message sent back as part of most requests.
 // This will indicate the generic state of the request.
 message ResponseStatus {
