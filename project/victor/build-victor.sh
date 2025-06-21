@@ -292,21 +292,21 @@ if [[ ! -f ${CMAKE_EXE} ]]; then
   exit 1
 fi
 
-#if [ -z "${GOROOT+x}" ]; then
+# if [ -z "${GOROOT+x}" ]; then
 #    GO_EXE=`${TOPLEVEL}/tools/build/tools/ankibuild/go.py`
 #    export GOROOT=$(dirname $(dirname $GO_EXE))
-#else
+# else
 #    GO_EXE=$GOROOT/bin/go
-#fi
-#export GOPATH=${TOPLEVEL}/cloud/go:${TOPLEVEL}/generated/cladgo:${TOPLEVEL}/generated/go:${TOPLEVEL}/tools/message-buffers/support/go
+# fi
+export GOPATH=${TOPLEVEL}/cloud/go:${TOPLEVEL}/generated/cladgo:${TOPLEVEL}/generated/go:${TOPLEVEL}/tools/message-buffers/support/go
 
-#if [ ! -f ${GO_EXE} ]; then
+# if [ ! -f ${GO_EXE} ]; then
 #  echo "Missing Go executable: ${GO_EXE}"
 #  echo "Fetch the required Go version by running ${TOPLEVEL}/tools/build/tools/ankibuild/go.py"
 #  exit 1
-#fi
+# fi
 
-#${TOPLEVEL}/tools/build/tools/ankibuild/go.py --check-version $GO_EXE
+# ${TOPLEVEL}/tools/build/tools/ankibuild/go.py --check-version $GO_EXE
 
 #
 # Remove assets in build directory if requested. This will force the
@@ -323,6 +323,11 @@ if [ $RM_BUILD_ASSETS -eq 1 ]; then
     rm -rf${RM_VERBOSE_ARG} ${BUILD_DIR}/data/assets
 fi
 
+if [ -z "${GO_EXE+x}" ]; then
+    ${TOPLEVEL}/project/build-scripts/download-go.sh ${GO_VERSION}
+    GO_EXE="${HOME}/.anki/go/dist/${GO_VERSION}/go/bin/go"
+fi
+
 #
 # grab Go dependencies ahead of generating source lists
 #
@@ -337,21 +342,21 @@ if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ] || [ $CONFIGURE -eq 1 ] ; then
     METABUILD_INPUTS=`find . -name BUILD.in`
 
     # Process BUILD.in files (creates list of Go projects to fetch)
-    #PATH="$(dirname $GO_EXE):$PATH" ${BUILD_TOOLS}/metabuild/metabuild.py --go-output \
-    #  -o ${GEN_SRC_DIR} \
-    #  ${METABUILD_INPUTS}
+    PATH="$(dirname $GO_EXE):$PATH" ${BUILD_TOOLS}/metabuild/metabuild.py --go-output \
+     -o ${GEN_SRC_DIR} \
+     ${METABUILD_INPUTS}
 fi
 
-#if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ]; then
+# if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ]; then
 #  echo "Getting Go dependencies"
-  # Check out specified revisions of repositories we've versioned
-  # Append a dummy dir to the GOPATH so that `go get` doesn't barf
-  # on nonexistent clad files
+#   # Check out specified revisions of repositories we've versioned
+#   # Append a dummy dir to the GOPATH so that `go get` doesn't barf
+#   # on nonexistent clad files
 #  GODUMMY=${TOPLEVEL}/cloud/dummy
 #  (cd ${TOPLEVEL}; PATH="$(dirname $GO_EXE):$PATH" GOPATH="$GOPATH:$GODUMMY" ./godeps.js execute ${GEN_SRC_DIR})
-#else
+# else
 #  echo "Ignore Go dependencies"
-#fi
+# fi
 
 # Set protobuf location
 HOST=`uname -a | awk '{print tolower($1);}' | sed -e 's/darwin/mac/'`
@@ -375,11 +380,6 @@ else
 fi
 if [[ $BUILD_PROTOC_PLUGIN -eq 1 ]]; then
     ${TOPLEVEL}/tools/protobuf/plugin/make.sh
-fi
-
-if [ -z "${GO_EXE+x}" ]; then
-    ${TOPLEVEL}/project/build-scripts/download-go.sh ${GO_VERSION}
-    GO_EXE="${HOME}/.anki/go/dist/${GO_VERSION}/go/bin/go"
 fi
 
 if [ -z "${UPX_EXE+x}" ]; then
@@ -482,6 +482,8 @@ if [ $CONFIGURE -eq 1 ]; then
         -DANKI_GO_BIN_PATH=${GOBIN} \
         -DCMAKE_BUILD_TYPE=${CONFIGURATION} \
         -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} \
+        -DGOPATH=${GOPATH} \
+        -DGOROOT=${GOROOT} \
         -DPROTOBUF_HOME=${PROTOBUF_HOME} \
         -DANKI_BUILD_SHA=${ANKI_BUILD_SHA} \
         -DANKI_BUILD_BRANCH=${ANKI_BUILD_BRANCH} \

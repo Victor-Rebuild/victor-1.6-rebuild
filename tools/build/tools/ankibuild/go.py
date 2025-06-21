@@ -11,10 +11,10 @@ import subprocess
 import sys
 
 # ankibuild
-from . import toolget
+import toolget
 
 GO = 'go'
-DEFAULT_VERSION = '1.16.4'
+DEFAULT_VERSION = '1.24.4'
 
 def get_go_version_from_command(go_exe):
     version = None
