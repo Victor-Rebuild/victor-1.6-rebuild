@@ -241,7 +241,7 @@ UnityDASDll/UnityDASDll/bin/*
 
 # Anki specific
 # kercre123 - turn this into a submodule
-#EXTERNALS
+EXTERNALS
 TAGS
 .subtreeconfig
 

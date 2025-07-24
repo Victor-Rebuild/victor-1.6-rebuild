@@ -20,9 +20,33 @@ if [[ ! -d .anki ]]; then
     mv anki-deps .anki
 fi
 
+if [[ ${UNAME} == "Darwin" ]]; then
+    echo "Checking out macOS branch..."
+    cd ~/.anki
+    if [[ $(uname -a) == *"arm64"* ]]; then
+        git checkout macos-arm
+    else
+        git checkout macos
+    fi
+    git lfs install
+    git lfs pull
+else
+    if [[ $(uname -a) == *"aarch64"* ]]; then
+       cd ~/.anki
+       git checkout arm64-linux
+    fi
+fi
+
 cd "${VICDIR}"
 
 git lfs update --force
+
+if [[ ! -d EXTERNALS/ ]]; then
+    echo "Downloading EXTERNALS folder contents..."
+    wget https://modder.my.to/1.6-externals.tar.gz
+    tar xzf 1.6-externals.tar.gz
+    rm 1.6-externals.tar.gz
+fi
 
 echo "Building victor..."
 
