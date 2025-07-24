@@ -61,8 +61,12 @@ vlog "Build output dirs"
 mkdir -p generated
 mkdir -p _build
 
-vlog "Fetch & extract external dependencies. This may take 1-5 min."
-./project/buildScripts/dependencies.py -v --deps-file DEPS --externals-dir EXTERNALS
+if [[ ${DONT_ANIM} != "1" ]]; then
+  vlog "Extract and encode animation and sound assets. This will take a few seconds."
+	./project/buildScripts/dependencies.py -v --deps-file DEPS --externals-dir EXTERNALS
+else
+	vlog "Not extracting animation assets"
+fi
 
 vlog "Configure audio library"
 ./lib/audio/configure.py

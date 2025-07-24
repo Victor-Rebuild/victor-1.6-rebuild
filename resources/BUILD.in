@@ -6,9 +6,9 @@ asset_project(
                 ('assets', 'RewardedActions/RewardedActions.json'),
                 ('assets', 'cubeFirmware/cube.dfu'),
                 ('assets', 'LocalizedStrings/**/*.json'),
-                ('externals/anki-thirdparty/sensory', 'sensorySpeechRecModels/hey_vector/**/*.raw'),
-                ('externals/anki-thirdparty/sensory', 'sensorySpeechRecModels/alexa/**/*.raw'),
-                ('externals/anki-thirdparty/pryon_lite', 'pryonSpeechRecModels/**/*.bin'),
+                ('externals/deps/sensory', 'sensorySpeechRecModels/hey_vector/**/*.raw'),
+                ('externals/deps/sensory', 'sensorySpeechRecModels/alexa/**/*.raw'),
+                ('externals/deps/pryon_lite', 'pryonSpeechRecModels/**/*.bin'),
                 ('externals/animation-assets', 'animations/**/*.bin'),
                 ('externals/animation-assets', 'animationGroups/**/*.json'),
                 ('externals/animation-assets', 'sprites/**/*.png'),
@@ -44,12 +44,12 @@ asset_project(
     srcs = [],
     platform_srcs = [
         ('vicos', subdir_glob([
-            ('externals/local-audio-assets/victor_robot/victor_linux', '**/*')
+            ('externals/victor-audio-assets/victor_robot/victor_linux', '**/*')
             ],
             prefix = 'sound')
         ),
         ('mac', subdir_glob([
-            ('externals/local-audio-assets/victor_robot/dev_mac', '**/*')
+            ('externals/victor-audio-assets/victor_robot/dev_mac', '**/*')
             ],
             prefix = 'sound')
         ),
@@ -110,12 +110,12 @@ asset_project(
     srcs = [],
     platform_srcs = [
         ('mac', subdir_glob([
-            ('externals/anki-thirdparty/acapela/AcapelaTTS_for_Mac_V9.450','**/*'),
+            ('externals/deps/acapela/AcapelaTTS_for_Mac_V9.450','**/*'),
             ],
             prefix = 'tts')
         ),
         ('vicos', subdir_glob([
-            ('externals/anki-thirdparty/acapela/Voices_for_Android_iOS_LinuxEmbedded','**/*'),
+            ('externals/deps/acapela/Voices_for_Android_iOS_LinuxEmbedded','**/*'),
             ],
             prefix = 'tts')
         ),

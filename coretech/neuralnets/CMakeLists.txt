@@ -47,7 +47,7 @@ set(COMMON_FLAGS
 
 set(PLATFORM_DEFINITIONS "")
 
-set(TENSORFLOW_PATH ${ANKI_EXTERNAL_DIR}/tensorflow)
+set(TENSORFLOW_PATH ${ANKI_EXTERNAL_DIR}/deps/tensorflow)
 
 if(NEURAL_NET_PLATFORM STREQUAL "TensorFlow")
 
@@ -63,7 +63,7 @@ if(NEURAL_NET_PLATFORM STREQUAL "TensorFlow")
     )
     
     set(PLATFORM_INCLUDES
-      ${ANKI_EXTERNAL_DIR}/opencv/vicos/include
+      ${ANKI_EXTERNAL_DIR}/deps/opencv/vicos/include
       ${TENSORFLOW_PATH}/tensorflow/contrib/makefile/gen_VICOS/proto
       ${TENSORFLOW_PATH}/tensorflow/contrib/makefile/gen_VICOS/protobuf/armeabi-v7a/include
       ${TENSORFLOW_PATH}/tensorflow/contrib/makefile/gen_VICOS/downloads/eigen

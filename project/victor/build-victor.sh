@@ -43,6 +43,7 @@ CMAKE_TARGET=""
 EXPORT_COMPILE_COMMANDS=0
 IGNORE_EXTERNAL_DEPENDENCIES=0
 BUILD_SHARED_LIBS=1
+DONT_ANIM=1
 
 CONFIGURATION=Debug
 PLATFORM=vicos
@@ -167,7 +168,7 @@ fi
 
 if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ]; then
   echo "Attempting to run fetch-build-deps.sh"
-  ${TOPLEVEL}/project/victor/scripts/fetch-build-deps.sh
+  DONT_ANIM=$DONT_ANIM ${TOPLEVEL}/project/victor/scripts/fetch-build-deps.sh
 else
   echo "Ignore external dependencies"
 fi
@@ -291,21 +292,21 @@ if [ ! -f ${CMAKE_EXE} ]; then
   exit 1
 fi
 
-if [ -z "${GOROOT+x}" ]; then
-    GO_EXE=`${TOPLEVEL}/tools/build/tools/ankibuild/go.py`
-    export GOROOT=$(dirname $(dirname $GO_EXE))
-else
-    GO_EXE=$GOROOT/bin/go
-fi
-export GOPATH=${TOPLEVEL}/cloud/go:${TOPLEVEL}/generated/cladgo:${TOPLEVEL}/generated/go:${TOPLEVEL}/tools/message-buffers/support/go
+#if [ -z "${GOROOT+x}" ]; then
+#    GO_EXE=`${TOPLEVEL}/tools/build/tools/ankibuild/go.py`
+#    export GOROOT=$(dirname $(dirname $GO_EXE))
+#else
+#    GO_EXE=$GOROOT/bin/go
+#fi
+#export GOPATH=${TOPLEVEL}/cloud/go:${TOPLEVEL}/generated/cladgo:${TOPLEVEL}/generated/go:${TOPLEVEL}/tools/message-buffers/support/go
 
-if [ ! -f ${GO_EXE} ]; then
-  echo "Missing Go executable: ${GO_EXE}"
-  echo "Fetch the required Go version by running ${TOPLEVEL}/tools/build/tools/ankibuild/go.py"
-  exit 1
-fi
+#if [ ! -f ${GO_EXE} ]; then
+#  echo "Missing Go executable: ${GO_EXE}"
+#  echo "Fetch the required Go version by running ${TOPLEVEL}/tools/build/tools/ankibuild/go.py"
+#  exit 1
+#fi
 
-${TOPLEVEL}/tools/build/tools/ankibuild/go.py --check-version $GO_EXE
+#${TOPLEVEL}/tools/build/tools/ankibuild/go.py --check-version $GO_EXE
 
 #
 # Remove assets in build directory if requested. This will force the
@@ -341,20 +342,20 @@ if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ] || [ $CONFIGURE -eq 1 ] ; then
       ${METABUILD_INPUTS}
 fi
 
-if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ]; then
-  echo "Getting Go dependencies"
+#if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ]; then
+#  echo "Getting Go dependencies"
   # Check out specified revisions of repositories we've versioned
   # Append a dummy dir to the GOPATH so that `go get` doesn't barf
   # on nonexistent clad files
-  GODUMMY=${TOPLEVEL}/cloud/dummy
-  (cd ${TOPLEVEL}; PATH="$(dirname $GO_EXE):$PATH" GOPATH="$GOPATH:$GODUMMY" ./godeps.js execute ${GEN_SRC_DIR})
-else
-  echo "Ignore Go dependencies"
-fi
+#  GODUMMY=${TOPLEVEL}/cloud/dummy
+#  (cd ${TOPLEVEL}; PATH="$(dirname $GO_EXE):$PATH" GOPATH="$GOPATH:$GODUMMY" ./godeps.js execute ${GEN_SRC_DIR})
+#else
+#  echo "Ignore Go dependencies"
+#fi
 
 # Set protobuf location
 HOST=`uname -a | awk '{print tolower($1);}' | sed -e 's/darwin/mac/'`
-PROTOBUF_HOME=${TOPLEVEL}/EXTERNALS/protobuf/${HOST}
+PROTOBUF_HOME=${TOPLEVEL}/EXTERNALS/deps/protobuf/${HOST}
 
 # Build protocCppPlugin if needed
 if [[ ! -x ${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin ]]; then
@@ -372,16 +373,16 @@ if [[ $BUILD_PROTOC_PLUGIN -eq 1 ]]; then
 fi
 
 # Build/Install the protoc generators for go
-GOBIN="${TOPLEVEL}/cloud/go/bin"
-if [[ ! -x $GOBIN/protoc-gen-go ]] || [[ ! -x $GOBIN/protoc-gen-grpc-gateway ]]; then
-    echo "Building/Installing protoc-gen-go and protoc-gen-grpc-gateway"
-    GOBIN=$GOBIN \
-    CC=/usr/bin/cc \
-    CXX=/usr/bin/c++ \
-    "${GOROOT}/bin/go" install \
-    github.com/golang/protobuf/protoc-gen-go \
-    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-fi
+#GOBIN="${TOPLEVEL}/cloud/go/bin"
+#if [[ ! -x $GOBIN/protoc-gen-go ]] || [[ ! -x $GOBIN/protoc-gen-grpc-gateway ]]; then
+#    echo "Building/Installing protoc-gen-go and protoc-gen-grpc-gateway"
+#    GOBIN=$GOBIN \
+#    CC=/usr/bin/cc \
+#    CXX=/usr/bin/c++ \
+#    "${GOROOT}/bin/go" install \
+#    github.com/golang/protobuf/protoc-gen-go \
+#    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+#fi
 
 #
 # generate source file lists
