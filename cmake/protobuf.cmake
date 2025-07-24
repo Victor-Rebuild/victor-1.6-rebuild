@@ -9,11 +9,11 @@ set(PROTOBUF_LIBS
 )
 
 if (VICOS)
-  set(PROTOBUF_LIB_PATH "${ANKI_EXTERNAL_DIR}/protobuf/vicos/lib")
-  set(PROTOBUF_INCLUDE_PATH "${ANKI_EXTERNAL_DIR}/protobuf/vicos/include")
+  set(PROTOBUF_LIB_PATH "${ANKI_EXTERNAL_DIR}/deps/protobuf/vicos/lib")
+  set(PROTOBUF_INCLUDE_PATH "${ANKI_EXTERNAL_DIR}/deps/protobuf/vicos/include")
 elseif (MACOSX)
-  set(PROTOBUF_LIB_PATH "${ANKI_EXTERNAL_DIR}/protobuf/mac/lib")
-  set(PROTOBUF_INCLUDE_PATH "${ANKI_EXTERNAL_DIR}/protobuf/mac/include")
+  set(PROTOBUF_LIB_PATH "${ANKI_EXTERNAL_DIR}/deps/protobuf/mac/lib")
+  set(PROTOBUF_INCLUDE_PATH "${ANKI_EXTERNAL_DIR}/deps/protobuf/mac/include")
 endif()
 
 foreach(LIB ${PROTOBUF_LIBS})

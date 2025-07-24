@@ -375,7 +375,6 @@ function(check_licenses)
                 "-Wl" "-ldl" "-fsanitize=address"
                 ankiutil                     # hack: because of other hacks
                 Controller CppController ode # webots
-                opus                         # cloud
                 gtest                        # special case, imported library can't have our checks
                 babile                       # special case, imported library can't have our checks
                 libtensorflow-lite.a         # handled elsewhere

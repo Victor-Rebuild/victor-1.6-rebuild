@@ -1,9 +1,9 @@
 if (VICOS)
-  set(LIBSODIUM_INCLUDE_PATH "${ANKI_EXTERNAL_DIR}/libsodium/vicos/include")
-  set(LIBSODIUM_LIB_PATH "${ANKI_EXTERNAL_DIR}/libsodium/vicos/lib")
+  set(LIBSODIUM_INCLUDE_PATH "${ANKI_EXTERNAL_DIR}/deps/libsodium/vicos/include")
+  set(LIBSODIUM_LIB_PATH "${ANKI_EXTERNAL_DIR}/deps/libsodium/vicos/lib")
 elseif (MACOSX)
-  set(LIBSODIUM_INCLUDE_PATH "${ANKI_EXTERNAL_DIR}/libsodium/mac/include")
-  set(LIBSODIUM_LIB_PATH "${ANKI_EXTERNAL_DIR}/libsodium/mac/lib")
+  set(LIBSODIUM_INCLUDE_PATH "${ANKI_EXTERNAL_DIR}/deps/libsodium/mac/include")
+  set(LIBSODIUM_LIB_PATH "${ANKI_EXTERNAL_DIR}/deps/libsodium/mac/lib")
 endif()
 
 set(SODIUM_LIBS sodium)
