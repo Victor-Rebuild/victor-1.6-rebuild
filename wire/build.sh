@@ -55,6 +55,9 @@ echo "Building victor..."
 echo "Copying vic-cloud and vic-gateway..."
 cp bin/* _build/vicos/Release/bin/
 
+echo "Copying alexa libs"
+cp -a EXTERNALS/deps/alexa-libs/* _build/vicos/Release/lib/
+
 echo "Copying libopus..."
 cp -a EXTERNALS/deps/opus/libopus.so.0.7.0 _build/vicos/Release/lib/libopus.so.0
 
