@@ -456,12 +456,15 @@ namespace Anki {
       Vision::ImageEncoding format = Vision::ImageEncoding::NoneImageEncoding;
       switch(capture_frame->format)
       {
+        case ANKI_CAM_FORMAT_BAYER_MIPI_BGGR10:
         case ANKI_CAM_FORMAT_BAYER_MIPI_BGGR10_2MP:
           format = Vision::ImageEncoding::BAYER;
           break;
+        case ANKI_CAM_FORMAT_RGB888:
         case ANKI_CAM_FORMAT_RGB888_2MP:
           format = Vision::ImageEncoding::RawRGB;
           break;
+        case ANKI_CAM_FORMAT_YUV:
         case ANKI_CAM_FORMAT_YUV_2MP:
           format = Vision::ImageEncoding::YUV420sp;
           break;
