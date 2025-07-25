@@ -35,6 +35,7 @@ enum class ScreenName : uint8_t {
   SensorInfo,
   IMUInfo,
   MotorInfo,
+  BuildInfo, // Build info
   Camera,
   CameraMotorTest,
   MicInfo,
