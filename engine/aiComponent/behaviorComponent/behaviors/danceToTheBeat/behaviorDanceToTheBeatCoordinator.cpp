@@ -89,6 +89,7 @@ void BehaviorDanceToTheBeatCoordinator::InitBehavior()
   
   _iConfig.driveOffChargerBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(DriveOffChargerStraight));
   _iConfig.goHomeBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(FindAndGoToHome));
+  _iConfig.doExploring = BC.FindBehaviorByID(BEHAVIOR_ID(Exploring));
 }
   
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -136,6 +137,7 @@ void BehaviorDanceToTheBeatCoordinator::GetAllDelegates(std::set<IBehavior*>& de
   delegates.insert(_iConfig.onChargerDancingBehavior.get());
   delegates.insert(_iConfig.driveOffChargerBehavior.get());
   delegates.insert(_iConfig.goHomeBehavior.get());
+  delegates.insert(_iConfig.doExploring.get());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -261,7 +263,9 @@ void BehaviorDanceToTheBeatCoordinator::TransitionToOffChargerListening()
                           // Dancing does not want to run - just go back home in this case
                           PRINT_CH_INFO("Behaviors", "BehaviorDanceToTheBeatCoordinator.TransitionToOffChargerListening.DoesNotWantToDance",
                                         "Returning to charger since the offChargerDancing behavior does not want to run");
-                          if (_iConfig.goHomeBehavior->WantsToBeActivated()) {
+                         if (_iConfig.doExploring->WantsToBeActivated()) {
+                            DelegateIfInControl(_iConfig.doExploring.get());
+                          } else if (_iConfig.goHomeBehavior->WantsToBeActivated()) {
                             DelegateIfInControl(_iConfig.goHomeBehavior.get());
                           }
                         }
