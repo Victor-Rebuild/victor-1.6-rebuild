@@ -77,7 +77,7 @@
 #define FORCE_TRANSITION_TO_PAIRING 0
 #endif
 
-#define ENABLE_SELF_TEST 0
+#define ENABLE_SELF_TEST 1
 
 #if !FACTORY_TEST
 
@@ -299,9 +299,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
   ADD_MENU_ITEM(Main, "EXIT", None);
 #if ENABLE_SELF_TEST
-  ADD_MENU_ITEM(Main, "RUN SELF TEST", SelfTest);
+  ADD_MENU_ITEM(Main, IsXray() ? "TEST" : "SELF TEST", SelfTest);
 #endif
-  ADD_MENU_ITEM(Main, "CLEAR USER DATA", ClearUserData);
+  ADD_MENU_ITEM(Main, IsXray() ? "CLEAR" : "CLEAR USER DATA", ClearUserData);
 
   // === Self test screen ===
   ADD_MENU_ITEM(SelfTest, "EXIT", Main);
