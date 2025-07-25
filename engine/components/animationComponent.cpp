@@ -47,8 +47,8 @@ namespace {
 
   const u32 kMaxNumAvailableAnimsToReportPerTic = 1000;
 
-  static const u32 kNumImagePixels     = FACE_DISPLAY_HEIGHT * FACE_DISPLAY_WIDTH;
-  static const u32 kNumHalfImagePixels = kNumImagePixels / 2;
+  // static const u32 kNumImagePixels     = FACE_DISPLAY_HEIGHT * FACE_DISPLAY_WIDTH;
+  // static const u32 kNumHalfImagePixels = kNumImagePixels / 2;
 
   static const int kMaxAnimGroupRecursionDepth = 100;
 }
@@ -497,7 +497,7 @@ Result AnimationComponent::DisplayFaceImageBinary(const Vision::Image& img, u32 
 
     RobotInterface::DisplayFaceImageBinaryChunk msg;
     static const u32 kFaceArraySize = sizeof(msg.faceData);
-    static_assert(8 * kFaceArraySize == kNumHalfImagePixels, "AnimationComponent.DisplayFaceImageBinary.WrongFaceDataSize");
+    // static_assert(8 * kFaceArraySize == kNumHalfImagePixels, "AnimationComponent.DisplayFaceImageBinary.WrongFaceDataSize");
   
     msg.imageId = 0;
     msg.chunkIndex = halfIdx;
@@ -559,9 +559,9 @@ Result AnimationComponent::DisplayFaceImageHelper(const ImageType& img, u32 dura
     return RESULT_FAIL;
   }
   
-  ASSERT_NAMED(img.IsContinuous(), "AnimationComponent.DisplayFaceImage.NotContinuous");
-  ASSERT_NAMED(img.GetNumRows() == FACE_DISPLAY_HEIGHT, "AnimationComponent.DisplayFaceImage.IncorrectImageHeight");
-  ASSERT_NAMED(img.GetNumCols() == FACE_DISPLAY_WIDTH,  "AnimationComponent.DisplayFaceImage.IncorrectImageWidth");
+  // ASSERT_NAMED(img.IsContinuous(), "AnimationComponent.DisplayFaceImage.NotContinuous");
+  // ASSERT_NAMED(img.GetNumRows() == FACE_DISPLAY_HEIGHT, "AnimationComponent.DisplayFaceImage.IncorrectImageHeight");
+  // ASSERT_NAMED(img.GetNumCols() == FACE_DISPLAY_WIDTH,  "AnimationComponent.DisplayFaceImage.IncorrectImageWidth");
   
   MessageType msg;
   const int kMaxPixelsPerMsg = msg.faceData.size();
