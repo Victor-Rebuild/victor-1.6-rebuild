@@ -25,7 +25,7 @@ from select import select
 from hashlib import sha256
 from collections import OrderedDict
 from fcntl import fcntl, F_GETFL, F_SETFL
-from distutils.version import LooseVersion
+#from distutils.version import LooseVersion
 
 sys.path.append("/usr/bin")
 import update_payload
@@ -35,6 +35,7 @@ STATUS_DIR = "/run/update-engine"
 EXPECTED_DOWNLOAD_SIZE_FILE = os.path.join(STATUS_DIR, "expected-download-size")
 EXPECTED_WRITE_SIZE_FILE = os.path.join(STATUS_DIR, "expected-size")
 PROGRESS_FILE = os.path.join(STATUS_DIR, "progress")
+PHASE_FILE = os.path.join(STATUS_DIR, "phase")
 ERROR_FILE = os.path.join(STATUS_DIR, "error")
 DONE_FILE = os.path.join(STATUS_DIR, "done")
 MANIFEST_FILE = os.path.join(STATUS_DIR, "manifest.ini")
@@ -61,6 +62,7 @@ def make_blocking(pipe, blocking):
         fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~os.O_NONBLOCK)  # clear it
 
 def das_event(name, parameters = []):
+    "Log a DAS event"
     args = ["/anki/bin/vic-log-event", "update-engine", name]
     for p in parameters:
         args.append(p.rstrip().replace('\r', '\\r').replace('\n', '\\n'))
@@ -131,6 +133,14 @@ def zero_slot(target_slot):
     open_slot("boot", target_slot, "w").write(zeroblock)
     open_slot("system", target_slot, "w").write(zeroblock)
 
+# RCM 2020-8-20 zeros just the system 
+def zero_system_slot(target_slot):
+    "Writes zeros to the first block of the destination slot system to ensure they aren't booted"
+    assert target_slot == 'a' or target_slot == 'b'  # Make sure we don't zero f
+    zeroblock = b"\x00"*DD_BLOCK_SIZE
+    open_slot("system", target_slot, "w").write(zeroblock)
+
+
 
 def call(*args):
     "Simple wrapper around subprocess.call to make ret=0 -> True"
@@ -165,9 +175,7 @@ def get_prop(property_name):
 
 def is_dev_robot(cmdline):
     "Returns true if this robot is a dev robot"
-    if "anki.dev" in cmdline:
-        return True
-    return False
+    return True
 
 
 def get_cmdline():
@@ -187,7 +195,7 @@ def get_cmdline():
 
 
 def get_slot(kernel_command_line):
-    "Get the current and target slots from the kernel commanlines"
+    "Get the current and target slots from the kernel command line"
     suffix = kernel_command_line.get("androidboot.slot_suffix", '_f')
     if suffix == '_a':
         return 'a', 'b'
@@ -290,15 +298,17 @@ def open_url_stream(url):
         assert url.startswith("http")  # Accepts http and https but not ftp or file
         os_version = get_prop("ro.anki.version")
         victor_version = get_prop("ro.anki.victor.version")
+        victor_target = get_prop("ro.build.target")
         if '?' in url:  # Already has a query string
             if not url.endswith('?'):
                 url += '&'
         else:
             url += '?'
-        url += "emresn={0:s}&ankiversion={1:s}&victorversion={2:s}".format(
+        url += "emresn={0:s}&ankiversion={1:s}&victorversion={2:s}&victortarget={3:s}".format(
                 get_prop("ro.serialno"),
                 os_version,
-                victor_version)
+                victor_version,
+                victor_target)
         request = urllib2.Request(url)
         opener = urllib2.build_opener()
         opener.addheaders = [('User-Agent', 'Victor-OTA/{0:s}'.format(os_version))]
@@ -351,10 +361,38 @@ def extract_ti(manifest, tar_stream, expected_name, section, dest_fh, progress_c
                                       manifest.getint(section, "bytes"),
                                       True)
     decompressor.read_to_file(dest_fh, DD_BLOCK_SIZE, progress_callback)
-    if decompressor.digest() != manifest.get(section, "sha256"):
-        return False
-    else:
-        return decompressor.tell()
+    # RCM 2020-4-15 skips digest checks
+    #if decompressor.digest() != manifest.get(section, "sha256"):
+    #    return False
+    #else:
+    #    return decompressor.tell()
+    return decompressor.tell()
+
+# RCM2020-8-20: support updating just the system
+def handle_system(target_slot, manifest, tar_stream):
+    "Process 0.9.2 format manifest files"
+    total_size = manifest.getint("SYSTEM", "bytes")
+    write_status(EXPECTED_WRITE_SIZE_FILE, total_size)
+    written_size = 0
+
+    def progress_update(progress):
+        "Update progress while writing to slots"
+        write_status(PROGRESS_FILE, written_size + progress)
+        if DEBUG:
+            sys.stdout.write("{0:0.3f}\r".format(float(written_size+progress)/float(total_size)))
+            sys.stdout.flush()
+
+    # Extract system images
+    if DEBUG:
+        print("System")
+    extract_result = extract_ti(manifest, tar_stream, "sysfs.img.gz", "SYSTEM",
+                                open_slot("system", target_slot, "w"),
+                                progress_update)
+    if extract_result is False:
+        zero_system_slot(target_slot)
+        die(209, "System image hash doesn't match signed manifest")
+    written_size += extract_result
+
 
 
 def handle_boot_system(target_slot, manifest, tar_stream):
@@ -410,15 +448,23 @@ def copy_slot(partition, src_slot, dst_slot):
                 buffer = src.read(DD_BLOCK_SIZE)
             dst.write(buffer)
 
+def get_file_size(filename):
+    "Get the size in bytes of a file"
+    fd = os.open(filename, os.O_RDONLY)
+    try:
+        return os.lseek(fd, 0, os.SEEK_END)
+    finally:
+        os.close(fd)
 
 def handle_delta(current_slot, target_slot, manifest, tar_stream):
     "Apply a delta update to the boot and system partitions"
     current_version = get_prop("ro.anki.version")
     delta_base_version = manifest.get("DELTA", "base_version")
-    if current_version != delta_base_version:
-        die(211, "My version is {} not {}".format(current_version, delta_base_version))
+    # <nerd_emoji>
+    #if current_version != delta_base_version:
+    #    die(211, "My version is {} not {}".format(current_version, delta_base_version))
     delta_bytes = manifest.getint("DELTA", "bytes")
-    download_progress_denominator = 4  # Download expected not to take more than 25% of the time
+    download_progress_denominator = 10  # Download expected not to take more than 10% of the time
     write_status(EXPECTED_WRITE_SIZE_FILE, delta_bytes*download_progress_denominator)
     write_status(PROGRESS_FILE, 0)
 
@@ -442,7 +488,19 @@ def handle_delta(current_slot, target_slot, manifest, tar_stream):
         payload.Init()
 
         # Update progress estimate
-        num_operations = len(payload.manifest.install_operations) + len(payload.manifest.kernel_install_operations)
+        # Assume each 1 megabyte of copied or hashed data from the eMMC is equivalent
+        # to 1 operation in addition to the operations necessary to transform the
+        # system and boot partitions
+        block_size = 1024 * 1024
+        num_operations = ( (payload.manifest.old_rootfs_info.size / block_size)
+                           + (payload.manifest.old_kernel_info.size / block_size)
+                           + (get_file_size(get_slot_name("system", current_slot)) / block_size)
+                           + (get_file_size(get_slot_name("boot", current_slot)) / block_size)
+                           + len(payload.manifest.install_operations)
+                           + len(payload.manifest.kernel_install_operations)
+                           + (payload.manifest.new_rootfs_info.size / block_size)
+                           + (payload.manifest.new_kernel_info.size / block_size))
+
         progress = (num_operations + 1) / (download_progress_denominator - 1)
         num_operations += progress
         write_status(PROGRESS_FILE, progress)
@@ -460,6 +518,7 @@ def handle_delta(current_slot, target_slot, manifest, tar_stream):
                 yield
 
         payload.progress_tick_callback = progress_ticker(progress, num_operations)
+        payload.phase_callback = lambda phase: write_status(PHASE_FILE, phase)
         payload.Apply(get_slot_name("boot", target_slot),
                       get_slot_name("system", target_slot),
                       get_slot_name("boot", current_slot),
@@ -471,6 +530,33 @@ def handle_delta(current_slot, target_slot, manifest, tar_stream):
     except update_payload.PayloadError as pay_err:
         zero_slot(target_slot)
         die(207, "Delta payload error: {!s}".format(pay_err))
+
+#RCM 2020-8-20 This is from Vector software 0.12
+#It allows modifying just the /anki folder
+#The original nuked it then replaced it
+def handle_ankiRCM(manifest, tar_stream):
+    "Update the Anki folder only"
+    write_status(EXPECTED_WRITE_SIZE_FILE, 4)  # We're faking progress here with just stages 0-N
+    write_status(PROGRESS_FILE, 0)
+    write_status(PROGRESS_FILE, 1)
+    if DEBUG:
+        print("Installing new Anki")
+    if not call(['/bin/mount', '-o', 'remount,rw', "/"]):
+        die(202, "Could not mount the main filesystem as writeable")
+
+    try:
+        anki_path = "/"
+        write_status(PROGRESS_FILE, 2)
+        anki_ti = tar_stream.next()
+        src_file = tar_stream.extractfile(anki_ti)
+        sha_fh = ShaFile(src_file)
+        anki_tar = make_tar_stream(sha_fh, "r|" + manifest.get("ANKI", "compression"))
+        anki_tar.extractall(anki_path)
+        #update_build_props(MOUNT_POINT)
+    finally:
+        pass
+    write_status(PROGRESS_FILE, 3)
+    write_status(PROGRESS_FILE, 4)
 
 def handle_factory(manifest, tar_stream):
     "Update factory partitions"
@@ -534,24 +620,29 @@ def handle_factory(manifest, tar_stream):
     safe_delete(ABOOT_STAGING)
 
 def validate_new_os_version(current_os_version, new_os_version, cmdline):
-    allow_downgrade = os.getenv("UPDATE_ENGINE_ALLOW_DOWNGRADE", "False") in TRUE_SYNONYMS
-    if allow_downgrade and is_dev_robot(cmdline):
-        return
-    os_version_regex = re.compile('^(?:\d+\.){2,3}\d+(d|ud)?$')
-    m = os_version_regex.match(new_os_version)
-    if not m:
-        die(216, "OS version " + new_os_version + " does not match regular expression")
-    new_os_version_suffix = m.groups()[0]
-    m = os_version_regex.match(current_os_version)
-    current_os_version_suffix = m.groups()[0]
-    if new_os_version_suffix != current_os_version_suffix:
-        die(216, "Update from " + current_os_version + " to " + new_os_version + " not allowed")
-    if LooseVersion(new_os_version) < LooseVersion(current_os_version):
-        die(216, "Downgrade from " + current_os_version + " to " + new_os_version + " not allowed")
+    # RCM 2020-12-21: disabling whole def
+    #"Make sure we are allowed to install the new os version"
+    #allow_downgrade = os.getenv("UPDATE_ENGINE_ALLOW_DOWNGRADE", "False") in TRUE_SYNONYMS
+    #if allow_downgrade and is_dev_robot(cmdline):
+    #    return
+    #os_version_regex = re.compile('^(?:\d+\.){2,3}\d+(d|ud)?$')
+    #m = os_version_regex.match(new_os_version)
+    #if not m:
+    #    die(216, "OS version " + new_os_version + " does not match regular expression")
+    #new_os_version_suffix = m.groups()[0]
+    #m = os_version_regex.match(current_os_version)
+    #current_os_version_suffix = m.groups()[0]
+    # RCM 2020-4-24: disabling the manifest suffix verification and
+    # and downgrading (the manifest could lie to get around these.. so just extra)
+    #if new_os_version_suffix != current_os_version_suffix:
+    #    die(216, "Update from " + current_os_version + " to " + new_os_version + " not allowed")
+    #if LooseVersion(new_os_version) < LooseVersion(current_os_version):
+    #    die(216, "Downgrade from " + current_os_version + " to " + new_os_version + " not allowed")
     return
 
 def update_from_url(url):
     "Updates the inactive slot from the given URL"
+    write_status(PHASE_FILE, "download")
     # Figure out slots
     cmdline = get_cmdline()
     current_slot, target_slot = get_slot(cmdline)
@@ -567,6 +658,8 @@ def update_from_url(url):
     current_os_version = get_prop("ro.anki.version")
     next_boot_os_version = current_os_version
     is_factory_update = False
+    # RCM 2020-8-20 this is set if we are only updating the filesystem
+    skip_bootctl = False
     reboot_after_install = 0
     with make_tar_stream(stream) as tar_stream:
         # Get the manifest
@@ -577,15 +670,16 @@ def update_from_url(url):
             die(200, "Expected manifest.ini at beginning of download, found \"{0.name}\"".format(manifest_ti))
         with open(MANIFEST_FILE, "wb") as manifest:
             manifest.write(tar_stream.extractfile(manifest_ti).read())
-        manifest_sig_ti = tar_stream.next()
-        if not manifest_sig_ti.name.endswith('manifest.sha256'):
-            die(200, "Expected manifest signature after manifest.ini. Found \"{0.name}\"".format(manifest_sig_ti))
-        with open(MANIFEST_SIG, "wb") as signature:
-            signature.write(tar_stream.extractfile(manifest_sig_ti).read())
-        verification_status = verify_signature(MANIFEST_FILE, MANIFEST_SIG, OTA_PUB_KEY)
-        if not verification_status[0]:
-            die(209,
-                "Manifest failed signature validation, openssl returned {1:d} {2:s} {3:s}".format(*verification_status))
+        # RCM 2020-4-15: disabling the manifest verification
+        #manifest_sig_ti = tar_stream.next()
+        #if not manifest_sig_ti.name.endswith('manifest.sha256'):
+        #    die(200, "Expected manifest signature after manifest.ini. Found \"{0.name}\"".format(manifest_sig_ti))
+        #with open(MANIFEST_SIG, "wb") as signature:
+        #    signature.write(tar_stream.extractfile(manifest_sig_ti).read())
+        #verification_status = verify_signature(MANIFEST_FILE, MANIFEST_SIG, OTA_PUB_KEY)
+        #if not verification_status[0]:
+        #    die(209,
+        #        "Manifest failed signature validation, openssl returned {1:d} {2:s} {3:s}".format(*verification_status))
         # Manifest was signed correctly
         manifest = get_manifest(open(MANIFEST_FILE, "r"))
         # Inspect the manifest
@@ -601,21 +695,43 @@ def update_from_url(url):
                 die(214, "Ankidev OS can't install non-ankidev OTA file")
         elif manifest.getint("META", "ankidev"):
             die(214, "Non-ankidev OS can't install ankidev OTA file")
-        # Mark target unbootable
-        if not call(['/bin/bootctl', current_slot, 'set_unbootable', target_slot]):
-            die(202, "Could not mark target slot unbootable")
-        zero_slot(target_slot)  # Make it doubly unbootable just in case
+
         num_images = manifest.getint("META", "num_images")
+
+        #RCM 2020-8-20 don't nuke the boot or system if its a small update
+        if num_images == 1:
+            if manifest.has_section("ANKI"):
+                pass
+            elif manifest.has_section("SYSTEM"):
+                zero_system_slot(target_slot)
+            elif manifest.has_section("DELTA"):
+                zero_slot(target_slot)  # Make it doubly unbootable just in case
+
+
+        else:
+            # Mark target unbootable
+            if not call(['/bin/bootctl', current_slot, 'set_unbootable', target_slot]):
+                die(202, "Could not mark target slot unbootable")
+            zero_slot(target_slot)  # Make it doubly unbootable just in case
+
         if num_images == 2:
             if manifest.has_section("BOOT") and manifest.has_section("SYSTEM"):
                 handle_boot_system(target_slot, manifest, tar_stream)
             else:
                 die(201, "Two images specified but couldn't find boot or system")
         elif num_images == 1:
-            if manifest.has_section("DELTA"):
+            #RCM 2020-8-20 Allow just the system to be updated
+            if manifest.has_section("SYSTEM"):
+                handle_boot_system(target_slot, manifest, tar_stream)
+            elif manifest.has_section("DELTA"):
                 handle_delta(current_slot, target_slot, manifest, tar_stream)
+            #RCM 2020-8-20 Allow the whole anki folder to be updated
+            elif manifest.has_section("ANKI"):
+                # RCM 2020-8-20 this is set since we are only updating the filesystem
+                skip_bootctl = True
+                handle_ankiRCM(manifest, tar_stream)
             else:
-                die(201, "One image specified but not DELTA")
+                die(201, "One image specified but not SYSTEM or DELTA or ANKI")
         elif num_images == 3:
             if manifest.has_section("ABOOT") and manifest.has_section("RECOVERY") and manifest.has_section("RECOVERYFS"):
                 if manifest.get("META", "qsn") == get_qsn():
@@ -633,8 +749,10 @@ def update_from_url(url):
         die(208, "Couldn't sync OS images to disk")
     # Mark the slot bootable now
     if not is_factory_update:
-        if not call(["/bin/bootctl", current_slot, "set_active", target_slot]):
-            die(202, "Could not set target slot as active")
+        # RCM 2020-8-20 skip if we only updated a bit of the filesystem
+        if not skip_bootctl:
+            if not call(["/bin/bootctl", current_slot, "set_active", target_slot]):
+                die(202, "Could not set target slot as active")
     else: # Is a factory update, mark both update slots unbootable and erase user data
         write_status(WIPE_DATA_COOKIE, 1)
         if not call(["/bin/bootctl", current_slot, "set_unbootable", 'a']):
@@ -643,20 +761,24 @@ def update_from_url(url):
             die(202, "Could not set b slot as unbootable")
     safe_delete(ERROR_FILE)
     write_status(DONE_FILE, 1)
+    write_status(PHASE_FILE, "done")
     das_event("robot.ota_download_end", ["success", next_boot_os_version])
     if reboot_after_install:
         os.system("/sbin/reboot")
 
 def logv(msg):
+    "If DEBUG (verbose logging) is enabled, print out msg"
     if DEBUG:
         print(msg)
         sys.stdout.flush()
 
 def loge(msg):
+    "Send error message to stderr"
     print(msg, file=sys.stderr)
     sys.stderr.flush()
 
 def generate_shard_id():
+    "Generate a shard id"
     override_shard = os.getenv("UPDATE_ENGINE_SHARD", None)
     if override_shard:
         return override_shard
@@ -665,6 +787,7 @@ def generate_shard_id():
     return "{:02d}".format(b)
 
 def construct_update_url(os_version, cmdline):
+    "Construct full URL for automatic updates"
     base_url = os.getenv("UPDATE_ENGINE_BASE_URL", None)
     if is_dev_robot(cmdline):
         base_url = os.getenv("UPDATE_ENGINE_ANKIDEV_BASE_URL", base_url)
@@ -683,6 +806,7 @@ if __name__ == '__main__':
     clear_status()
     DEBUG = os.getenv("UPDATE_ENGINE_DEBUG", "False") in TRUE_SYNONYMS
     url = os.getenv("UPDATE_ENGINE_URL", "auto")
+    # We don't expect command line args, but handle them to facilitate developer testing
     if len(sys.argv) > 1:
         url = sys.argv[1]
     if len(sys.argv) > 2 and sys.argv[2] == '-v':
