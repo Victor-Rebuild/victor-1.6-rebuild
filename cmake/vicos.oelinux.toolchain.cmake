@@ -108,7 +108,6 @@ list(APPEND VICOS_COMPILER_FLAGS
 	-no-canonical-prefixes)
 list(APPEND VICOS_COMPILER_FLAGS_CXX
 	-fno-exceptions
-	-Wgnu-include-next
 	-fno-rtti)
 list(APPEND VICOS_COMPILER_FLAGS_RELEASE
   -D_FORTIFY_SOURCE=2)
