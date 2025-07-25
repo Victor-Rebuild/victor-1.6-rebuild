@@ -51,7 +51,6 @@ namespace
   static const char* kCustomEyeColorEnabledKey = "enabled";
   static const char* kCustomEyeColorHueKey = "hue";
   static const char* kCustomEyeColorSaturationKey = "saturation";
-
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // ROBOT SETTINGS console vars and functions:
 
@@ -448,9 +447,6 @@ void SettingsCommManager::OnRequestUpdateSettings(const external_interface::Upda
       saveToCloudImmediately |= _settingsManager->DoesSettingUpdateCloudImmediately(external_interface::RobotSetting::eye_color);
     }
   }
-
-
-
 
   if (settings.oneof_custom_eye_color_case() == external_interface::RobotSettingsConfig::OneofCustomEyeColorCase::kCustomEyeColor)
   {
