@@ -108,6 +108,7 @@ list(APPEND VICOS_COMPILER_FLAGS
 	-no-canonical-prefixes)
 list(APPEND VICOS_COMPILER_FLAGS_CXX
 	-fno-exceptions
+	-Wgnu-include-next
 	-fno-rtti)
 list(APPEND VICOS_COMPILER_FLAGS_RELEASE
   -D_FORTIFY_SOURCE=2)
@@ -125,8 +126,8 @@ list(APPEND VICOS_COMPILER_FLAGS_DEBUG
 	-O0
         -fno-limit-debug-info)
 list(APPEND VICOS_COMPILER_FLAGS_RELEASE
-	-Os
-        -DNDEBUG)
+    -O2 -fmath-errno
+    -DNDEBUG)
 
 # Toolchain and ABI specific flags.
 list(APPEND VICOS_COMPILER_FLAGS
