@@ -51,7 +51,6 @@ namespace
   static const char* kCustomEyeColorEnabledKey = "enabled";
   static const char* kCustomEyeColorHueKey = "hue";
   static const char* kCustomEyeColorSaturationKey = "saturation";
-
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // ROBOT SETTINGS console vars and functions:
 
@@ -67,7 +66,7 @@ namespace
   CONSOLE_FUNC(DebugSetMasterVolume, kConsoleGroup);
 
   // NOTE: Need to keep kEyeColors in sync with enum EyeColor in settings.proto
-  constexpr const char* kEyeColors = "TIP_OVER_TEAL,OVERFIT_ORANGE,UNCANNY_YELLOW,NON_LINEAR_LIME,SINGULARITY_SAPPHIRE,FALSE_POSITIVE_PURPLE,CONFUSION_MATRIX_GREEN";
+  constexpr const char* kEyeColors = "TIP_OVER_TEAL,OVERFIT_ORANGE,UNCANNY_YELLOW,NON_LINEAR_LIME,SINGULARITY_SAPPHIRE,FALSE_POSITIVE_PURPLE,CONFUSION_MATRIX_GREEN,RAINBOW_EYES";
   CONSOLE_VAR_ENUM(u8, kEyeColor, kConsoleGroup, 0, kEyeColors);
   void DebugSetEyeColor(ConsoleFunctionContextRef context)
   {
@@ -448,9 +447,6 @@ void SettingsCommManager::OnRequestUpdateSettings(const external_interface::Upda
       saveToCloudImmediately |= _settingsManager->DoesSettingUpdateCloudImmediately(external_interface::RobotSetting::eye_color);
     }
   }
-
-
-
 
   if (settings.oneof_custom_eye_color_case() == external_interface::RobotSettingsConfig::OneofCustomEyeColorCase::kCustomEyeColor)
   {
