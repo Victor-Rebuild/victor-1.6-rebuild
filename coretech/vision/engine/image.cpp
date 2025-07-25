@@ -28,6 +28,7 @@
 #endif
 
 #include <fstream>
+#include "anki/cozmo/shared/factory/emrHelper.h"
 
 namespace {
 
@@ -1993,7 +1994,11 @@ namespace Vision {
   }
 
   void ImageRGB::ConvertToShowableFormat(cv::Mat& showImg) const {
-    cv::cvtColor(this->get_CvMat_(), showImg, cv::COLOR_RGB2BGR);
+    if (Vector::IsXray()) {
+      this->get_CvMat_().copyTo(showImg);
+    } else {
+      cv::cvtColor(this->get_CvMat_(), showImg, cv::COLOR_RGB2BGR);
+    }
   }
 
   void ImageRGB::SetFromShowableFormat(const cv::Mat& showImg) {
@@ -2061,6 +2066,21 @@ namespace Vision {
     std::function<PixelRGB565(const PixelRGB&)> convertFcn = [&gammaLUT](const PixelRGB& pixRGB)
     {
       PixelRGB565 pixRGB565(gammaLUT[pixRGB.r()], gammaLUT[pixRGB.g()], gammaLUT[pixRGB.b()]);
+      return pixRGB565;
+    };
+
+    imageRGB.ApplyScalarFunction(convertFcn, *this);
+
+    return *this;
+  }
+
+  ImageRGB565& ImageRGB565::SetFromImageRGB2BGR(const ImageRGB& imageRGB, const std::array<u8, 256>& gammaLUT)
+  {
+    Allocate(imageRGB.GetNumRows(), imageRGB.GetNumCols());
+
+    std::function<PixelRGB565(const PixelRGB&)> convertFcn = [&gammaLUT](const PixelRGB& pixRGB)
+    {
+      PixelRGB565 pixRGB565(gammaLUT[pixRGB.b()], gammaLUT[pixRGB.g()], gammaLUT[pixRGB.r()]);
       return pixRGB565;
     };
 
