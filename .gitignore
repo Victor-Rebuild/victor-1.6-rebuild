@@ -2,6 +2,7 @@
 *~
 *.d
 *.cache
+anki-deps
 *.swp
 matlab.mat
 
