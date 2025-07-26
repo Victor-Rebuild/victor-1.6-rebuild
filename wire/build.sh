@@ -20,6 +20,14 @@ if [[ ! -d .anki ]]; then
     mv anki-deps .anki
 fi
 
+cd ~/.anki
+git pull
+
+if [[ -d ~/.anki/cmake/3.9.6 ]]; then
+    echo "Removing old version of cmake"
+    rm -rf ~/.anki/cmake
+fi
+
 if [[ ${UNAME} == "Darwin" ]]; then
     echo "Checking out macOS branch..."
     cd ~/.anki
@@ -28,8 +36,6 @@ if [[ ${UNAME} == "Darwin" ]]; then
     else
         git checkout macos
     fi
-    git lfs install
-    git lfs pull
 else
     if [[ $(uname -a) == *"aarch64"* ]]; then
        cd ~/.anki
@@ -50,7 +56,7 @@ fi
 
 echo "Building victor..."
 
-./project/victor/scripts/victor_build_release.sh
+./project/victor/scripts/victor_build_release.sh -x /usr/bin/cmake
 
 echo "Copying vic-cloud and vic-gateway..."
 cp bin/* _build/vicos/Release/bin/
