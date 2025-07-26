@@ -1008,7 +1008,7 @@ f32 HAL::ChargerGetVoltage()
 u8 HAL::BatteryGetTemperature_C()
 {
   if (bodyData_->battery.temperature > 0xff) {
-    AnkiWarn("HAL.BatteryGetTemperature_C.InvalidTemp", "%u", bodyData_->battery.temperature);
+    // AnkiWarn("HAL.BatteryGetTemperature_C.InvalidTemp", "%u", bodyData_->battery.temperature);
     return 0;
   }
   return static_cast<u8>(bodyData_->battery.temperature);

@@ -321,9 +321,13 @@ def get_flatc_dir():
   """Determine flatc executable location for platform"""
   platform_map = {
     'Darwin': 'x86_64-apple-darwin',
+    'Darwin-arm64': 'aarch64-apple-darwin',
     'Linux': 'x86_64-linux-gnu',
+    'Linux-arm64': 'aarch64-linux-gnu'
   }
   platform_name = platform.system()
+  if platform.machine() in ['aarch64', 'arm64']:
+    platform_name = '{}-arm64'.format(platform_name)
   target_triple = platform_map.get(platform_name)
 
   if target_triple:
