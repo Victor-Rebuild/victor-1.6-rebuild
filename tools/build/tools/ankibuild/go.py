@@ -62,7 +62,7 @@ def install_go(version):
         '1.10.4-linux': 'fa04efdb17a275a0c6e137f969a1c4eb878939e91e1da16060ce42f02c2ec5ec',
         '1.11-darwin': '9749e6cb9c6d05cf10445a7c9899b58e72325c54fee9783ed1ac679be8e1e073',
         '1.11-linux': 'b3fcf280ff86558e0559e185b601c9eade0fd24c900b4c63cd14d1d38613e499',
-        '1.11-linux-arm64': 'e4853168f41d0bea65e4d38f992a2d44b58552605f623640c5ead89d515c56c9
+        '1.11-linux-arm64': 'e4853168f41d0bea65e4d38f992a2d44b58552605f623640c5ead89d515c56c9'
     }
 
     # platform_name = platform.system().lower()

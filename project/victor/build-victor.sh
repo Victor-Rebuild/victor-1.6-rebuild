@@ -34,7 +34,7 @@ function usage() {
 # defaults
 #
 VERBOSE=0
-CONFIGURE=0
+CONFIGURE=1
 GEN_SRC_ONLY=0
 RM_BUILD_ASSETS=0
 RUN_BUILD=1
@@ -45,7 +45,7 @@ IGNORE_EXTERNAL_DEPENDENCIES=0
 BUILD_SHARED_LIBS=1
 DONT_ANIM=1
 
-CONFIGURATION=Debug
+CONFIGURATION=Release
 PLATFORM=vicos
 GENERATOR=Ninja
 FEATURES=""
@@ -133,24 +133,6 @@ shift $(($OPTIND - 1))
 # Run everything from ${TOPLEVEL}, even if invoked from somewhere else
 cd ${TOPLEVEL}
 
-#
-# Verify tflite files were downloaded correctly via git lfs
-#
-
-function usage_fix_lfs() {
-    echo "$1 is not a valid .tflite file!!!"
-    echo "Probably a problem with your git lfs setup.  Try the following to fix it...."
-    echo ""
-    echo "git lfs uninstall  # Remove Git LFS hooks and filters"
-    echo "rm $f              # Delete borked file"
-    echo "git stash          # Save your work in progress"
-    echo "git reset --hard   # This will wipe out your work in progress, hope you stashed"
-    echo "git lfs install    # Install Git LFS configuration"
-    echo "git lfs pull       # Fetch Git LFS changes from remote & checkout required files"
-    echo "git stash apply    # This will grab changes from your stash"
-    exit 1
-}
-
 for f in `git ls-files *.tflite`; do
     egrep -q TFL3 $f || usage_fix_lfs $f
 done
@@ -162,6 +144,7 @@ done
 
 if [ -z "${CMAKE_EXE+x}" ]; then
     echo "Attempting to install cmake"
+    echo -n "CMake: "
     ${TOPLEVEL}/tools/build/tools/ankibuild/cmake.py --install-cmake 3.9.6
     CMAKE_EXE=`${TOPLEVEL}/tools/build/tools/ankibuild/cmake.py --find-cmake 3.9.6`
 fi
@@ -240,6 +223,11 @@ done
 # Get short commit sha
 #
 export ANKI_BUILD_SHA=`git rev-parse --short HEAD`
+
+#
+# Get branch 
+#
+export ANKI_BUILD_BRANCH=`git branch --show-current`
 
 #
 # Enable export flags
@@ -358,8 +346,12 @@ HOST=`uname -a | awk '{print tolower($1);}' | sed -e 's/darwin/mac/'`
 PROTOBUF_HOME=${TOPLEVEL}/EXTERNALS/deps/protobuf/${HOST}
 
 # Build protocCppPlugin if needed
-if [[ ! -x ${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin ]]; then
+
+if [[ ! -x "${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin" ]]; then
   BUILD_PROTOC_PLUGIN=1
+# "Unknown" means it's functional
+elif [[ "$(${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin --help 2>&1)" != *"Unknown"* ]]; then
+  echo "Rebuilding protocCppPlugin plugin as it fails to run"
 else 
   BUILD_PROTOC_PLUGIN=0
   for f in `find ${TOPLEVEL}/tools/protobuf/plugin -type f`; do
@@ -458,6 +450,7 @@ if [ $CONFIGURE -eq 1 ]; then
         -DGOROOT=${GOROOT} \
         -DPROTOBUF_HOME=${PROTOBUF_HOME} \
         -DANKI_BUILD_SHA=${ANKI_BUILD_SHA} \
+        -DANKI_BUILD_BRANCH=${ANKI_BUILD_BRANCH} \
         ${EXPORT_FLAGS} \
         ${FEATURE_FLAGS} \
         ${DEFINES} \
