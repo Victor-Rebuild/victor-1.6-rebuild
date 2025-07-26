@@ -1295,7 +1295,7 @@ void FaceInfoScreenManager::DrawMain()
 
   const std::string serialNo = "ESN: "  + esn;
 
-  const std::string hwVer    = "HW: "   + std::to_string(Factory::GetEMR()->fields.HW_VER);
+  const std::string hwVer    = "HW: "   + std::to_string(IsXray() ? 8 : Factory::GetEMR()->fields.HW_VER);
 
   const std::string osProject    = "OS: " + OSProject;
 
