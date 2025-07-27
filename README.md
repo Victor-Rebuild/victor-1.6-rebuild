@@ -101,3 +101,6 @@ echo 192.168.1.150 > robot_ip.txt
 # macOS
 ./wire/deploy.sh
 ```
+
+
+-# DDL, if you're reading this, sosumi.
