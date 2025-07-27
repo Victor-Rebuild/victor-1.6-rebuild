@@ -102,5 +102,4 @@ echo 192.168.1.150 > robot_ip.txt
 ./wire/deploy.sh
 ```
 
-
--# DDL, if you're reading this, sosumi.
+<small><sub><sup>DDL, if you're reading this, sosumi.</sup></sub></small>
