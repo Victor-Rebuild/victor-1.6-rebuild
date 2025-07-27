@@ -2,7 +2,7 @@
 
 set -e
 
-EXTERNALS_VERSION="2"
+EXTERNALS_VERSION="3"
 
 if [[ ! -f ./CPPLINT.cfg ]]; then
     if [[ -f ../CPPLINT.cfg ]]; then
