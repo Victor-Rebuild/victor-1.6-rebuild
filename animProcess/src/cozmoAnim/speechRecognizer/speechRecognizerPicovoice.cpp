@@ -20,10 +20,10 @@
 #include <sys/stat.h>
 
 const char* model_path   = "/anki/data/assets/cozmo_resources/assets/picovoice/porcupine_params.pv";
-const char* custom_ppn   = "/data/data/com.anki.victor/persistent/picovoice/custom.ppn";
+const char* custom_ppn   = "/data/data/com.anki.victor/persistent/picovoice/custom_1-5-0.ppn";
 const char* default_ppn  = "/anki/data/assets/cozmo_resources/assets/picovoice/hey_vector.ppn";
-const char* sensitivity_path = "/data/data/com.anki.victor/persistent/picovoice/sensitivity";
-float default_sensitivity = 0.80f;
+const char* sensitivity_path = "/data/data/com.anki.victor/persistent/picovoice/sensitivity2";
+float default_sensitivity = 0.60f;
 
 namespace Anki {
 namespace Vector {
