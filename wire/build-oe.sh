@@ -49,7 +49,7 @@ set -e
 
 echo "Building victor..."
 
-./project/victor/scripts/victor_build_release.sh -x /usr/bin/cmake
+./project/victor/scripts/victor_build_release.sh
 
 echo "Copying vic-cloud and vic-gateway..."
 cp bin/* _build/vicos/Release/bin/
