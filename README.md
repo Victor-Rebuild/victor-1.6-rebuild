@@ -2,10 +2,15 @@
 
 Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector lives
 
-## Changes
+## Changes from regular 1.6
 
 - Add Vector 2.0 support
-- Backport Custome Eye Colors from 1.8
+- Good looking Vector 2.0 eyes (Used from WireOS)
+- Backport Custom Eye Colors from 1.8
+- Picovoice 1.5 (Code used from WireOS)
+- Fixed path planning to stop head bobbing loop
+- BinaryEyes when leaving charger
+- Added the previously unused second timer end beep animation
 
 ## Building (Linux)
 
