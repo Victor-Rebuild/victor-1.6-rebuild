@@ -2,8 +2,6 @@
 
 set -e
 
-export EXTERNALS_VERSION="3"
-
 if [[ ! -f ./CPPLINT.cfg ]]; then
     if [[ -f ../CPPLINT.cfg ]]; then
         cd ..

@@ -4,6 +4,8 @@ set -u
 
 SCRIPT_PATH=$(dirname $([ -L $0 ] && echo "$(dirname $0)/$(readlink -n $0)" || echo $0))
 
+EXTERNALS_VERSION="3"
+
 GIT=`which git`
 if [ -z $GIT ]; then
   echo git not found
