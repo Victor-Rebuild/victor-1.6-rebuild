@@ -6,6 +6,9 @@ SCRIPT_PATH=$(dirname $([ -L $0 ] && echo "$(dirname $0)/$(readlink -n $0)" || e
 SCRIPT_NAME=`basename ${0}`
 TOPLEVEL=$(cd "${SCRIPT_PATH}/../.." && pwd)
 BUILD_TOOLS="${TOPLEVEL}/tools/build/tools"
+mkdir _build
+mkdir _build/vicos
+mkdir _build/vicos/Release
 mkdir _build/vicos/Release/install
 
 function usage() {
