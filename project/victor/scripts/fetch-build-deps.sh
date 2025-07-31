@@ -35,6 +35,7 @@ esac
 
 if [[ -d EXTERNALS/ ]]; then
     if [ "$CURRENT_EXTERNALS_VERSION" != "$EXTERNALS_VERSION_LATEST" ]; then
+        echo "Old EXTERNALS version found"
         echo "Removing old EXTERNALS"
         rm -rf EXTERNALS/
         echo "Downloading EXTERNALS folder contents... (EXTERNALS version $EXTERNALS_VERSION_LATEST)"
