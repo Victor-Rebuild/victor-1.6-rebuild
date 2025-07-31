@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-
+#!/usr/bin/env python
+from __future__ import print_function
 """
 Example implementation of Anki Victor Update engine.
 """
@@ -13,12 +13,12 @@ __author__ = "Daniel Casner <daniel@anki.com>"
 
 import sys
 import os
-import urllib.request, urllib.error, urllib.parse
+import urllib2
 import subprocess
 import tarfile
 import zlib
 import shutil
-import configparser
+import ConfigParser
 import socket
 import re
 from select import select
@@ -28,7 +28,7 @@ from fcntl import fcntl, F_GETFL, F_SETFL
 #from distutils.version import LooseVersion
 
 sys.path.append("/usr/bin")
-#import update_payload
+import update_payload
 
 BOOT_DEVICE = "/dev/block/bootdevice/by-name"
 STATUS_DIR = "/run/update-engine"
@@ -61,17 +61,12 @@ def make_blocking(pipe, blocking):
     else:
         fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~os.O_NONBLOCK)  # clear it
 
-def das_event(name, parameters=[]):
+def das_event(name, parameters = []):
     "Log a DAS event"
     args = ["/anki/bin/vic-log-event", "update-engine", name]
     for p in parameters:
-        if isinstance(p, bytes):
-            p = p.decode()
-        if p is None:
-            p = ""
-        args.append(str(p).rstrip().replace('\r', '\\r').replace('\n', '\\n'))
+        args.append(p.rstrip().replace('\r', '\\r').replace('\n', '\\n'))
     subprocess.call(args)
-
 
 def safe_delete(name):
     "Delete a filesystem path name without error"
@@ -138,7 +133,7 @@ def zero_slot(target_slot):
     open_slot("boot", target_slot, "w").write(zeroblock)
     open_slot("system", target_slot, "w").write(zeroblock)
 
-# RCM 2020-8-20 zeros just the system 
+# RCM 2020-8-20 zeros just the system
 def zero_system_slot(target_slot):
     "Writes zeros to the first block of the destination slot system to ensure they aren't booted"
     assert target_slot == 'a' or target_slot == 'b'  # Make sure we don't zero f
@@ -217,11 +212,11 @@ def get_qsn():
 
 def get_manifest(fileobj):
     "Returns config parsed from INI file in filelike object"
-    config = configparser.ConfigParser({'encryption': '0',
-                                        'qsn': '',
+    config = ConfigParser.ConfigParser({'encryption': '0',
+                                        'qsn': None,
                                         'ankidev': '0',
                                         'reboot_after_install': '0'})
-    config.read_file(fileobj)
+    config.readfp(fileobj)
     return config
 
 
@@ -236,7 +231,7 @@ class StreamDecompressor(object):
         self.sum = sha256() if do_sha else None
         cmds = []
         if encryption == 1:
-            cmds.append("openssl enc -d -aes-256-ctr -pass file:{0} -md md5".format(OTA_ENC_PASSWORD))
+            cmds.append("openssl enc -d -aes-256-ctr -pass file:{0}".format(OTA_ENC_PASSWORD))
         elif encryption != 0:
             die(210, "Unsupported encryption scheme {}".format(encryption))
         if compression == 'gz':
@@ -310,13 +305,13 @@ def open_url_stream(url):
         else:
             url += '?'
         url += "emresn={0:s}&ankiversion={1:s}&victorversion={2:s}&victortarget={3:s}".format(
-                get_prop("ro.serialno").decode(),
-                os_version.decode(),
-                victor_version.decode(),
-                victor_target.decode())
-        request = urllib.request.Request(url)
-        opener = urllib.request.build_opener()
-        opener.addheaders = [('User-Agent', 'Victor-OTA/{0:s}'.format(os_version.decode()))]
+                get_prop("ro.serialno"),
+                os_version,
+                victor_version,
+                victor_target)
+        request = urllib2.Request(url)
+        opener = urllib2.build_opener()
+        opener.addheaders = [('User-Agent', 'Victor-OTA/{0:s}'.format(os_version))]
         return opener.open(request, timeout=HTTP_TIMEOUT)
     except Exception as e:
         die(203, "Failed to open URL: " + str(e))
@@ -325,7 +320,7 @@ def open_url_stream(url):
 def make_tar_stream(fileobj, open_mode="r|"):
     "Converts a file like object into a streaming tar object"
     try:
-        return tarfile.open(mode="r|*", fileobj=fileobj)
+        return tarfile.open(mode=open_mode, fileobj=fileobj)
     except Exception as e:
         die(204, "Couldn't open contents as tar file " + str(e))
 
@@ -658,7 +653,7 @@ def update_from_url(url):
         os.mkdir(STATUS_DIR)
     # Open URL as a tar stream
     stream = open_url_stream(url)
-    content_length = stream.getheader("Content-Length")
+    content_length = stream.info().getheaders("Content-Length")[0]
     write_status(EXPECTED_DOWNLOAD_SIZE_FILE, content_length)
     current_os_version = get_prop("ro.anki.version")
     next_boot_os_version = current_os_version
@@ -715,7 +710,7 @@ def update_from_url(url):
 
         else:
             # Mark target unbootable
-            if not call(['/bin/bootctl-anki', current_slot, 'set_unbootable', target_slot]):
+            if not call(['/bin/bootctl', current_slot, 'set_unbootable', target_slot]):
                 die(202, "Could not mark target slot unbootable")
             zero_slot(target_slot)  # Make it doubly unbootable just in case
 
@@ -756,13 +751,13 @@ def update_from_url(url):
     if not is_factory_update:
         # RCM 2020-8-20 skip if we only updated a bit of the filesystem
         if not skip_bootctl:
-            if not call(["/bin/bootctl-anki", current_slot, "set_active", target_slot]):
+            if not call(["/bin/bootctl", current_slot, "set_active", target_slot]):
                 die(202, "Could not set target slot as active")
     else: # Is a factory update, mark both update slots unbootable and erase user data
         write_status(WIPE_DATA_COOKIE, 1)
-        if not call(["/bin/bootctl-anki", current_slot, "set_unbootable", 'a']):
+        if not call(["/bin/bootctl", current_slot, "set_unbootable", 'a']):
             die(202, "Could not set a slot as unbootable")
-        if not call(["/bin/bootctl-anki", current_slot, "set_unbootable", 'b']):
+        if not call(["/bin/bootctl", current_slot, "set_unbootable", 'b']):
             die(202, "Could not set b slot as unbootable")
     safe_delete(ERROR_FILE)
     write_status(DONE_FILE, 1)

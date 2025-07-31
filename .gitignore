@@ -413,4 +413,7 @@ robot_ip.txt
 victor-packages
 log.txt
 
+oe-logs
+oe-workdir
+
 robot_sshkey

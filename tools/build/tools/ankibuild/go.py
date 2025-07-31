@@ -44,7 +44,7 @@ def install_go(version):
     platform_map = {
         'darwin': 'darwin-amd64',
         'linux': 'linux-amd64',
-        'linux-arm64': 'linux-arm64'
+	'linux-arm64': 'linux-arm64'
     }
 
     platform_name = platform.system().lower()
@@ -62,10 +62,10 @@ def install_go(version):
         '1.10.4-linux': 'fa04efdb17a275a0c6e137f969a1c4eb878939e91e1da16060ce42f02c2ec5ec',
         '1.11-darwin': '9749e6cb9c6d05cf10445a7c9899b58e72325c54fee9783ed1ac679be8e1e073',
         '1.11-linux': 'b3fcf280ff86558e0559e185b601c9eade0fd24c900b4c63cd14d1d38613e499',
-        '1.11-linux-arm64': 'e4853168f41d0bea65e4d38f992a2d44b58552605f623640c5ead89d515c56c9'
+	'1.11-linux-arm64': 'e4853168f41d0bea65e4d38f992a2d44b58552605f623640c5ead89d515c56c9'
     }
 
-    # platform_name = platform.system().lower()
+   # platform_name = platform.system().lower()
 
     go_platform = platform_map[platform_name]
     go_archive_url = "https://dl.google.com/go/go{}.{}.tar.gz".format(version, go_platform)
@@ -74,9 +74,9 @@ def install_go(version):
     go_dist_path = toolget.get_anki_tool_dist_directory(GO)
     go_hash = sha_map['{}-{}'.format(version, platform_name)]
 
-    # if go_hash is None:
-    #     print("Error: Don't know hash for %s" % go_basename)
-    #     sys.exit(1)
+    #if go_hash is None:
+    #    print("Error: Don't know hash for %s" % go_basename)
+    #    sys.exit(1)
 
     toolget.download_and_install(go_archive_url,
                                  go_hash,
@@ -154,4 +154,3 @@ def main(argv):
 if __name__ == '__main__':
     ret = main(sys.argv)
     sys.exit(ret)
-
