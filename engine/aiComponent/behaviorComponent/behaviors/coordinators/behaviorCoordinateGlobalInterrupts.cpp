@@ -51,7 +51,8 @@ namespace{
                                                                            BEHAVIOR_CLASS(PickUpCube),
                                                                            BEHAVIOR_CLASS(PopAWheelie),
                                                                            BEHAVIOR_CLASS(PounceWithProx),
-                                                                           BEHAVIOR_CLASS(RollBlock) }};
+                                                                           BEHAVIOR_CLASS(RollBlock),
+                                                                           BEHAVIOR_CLASS(PossiblePerformance)}};
 
   static const std::set<BehaviorClass> kBehaviorClassesToSuppressReactToSound = {{ BEHAVIOR_CLASS(BlackJack),
                                                                                    BEHAVIOR_CLASS(DanceToTheBeat),
@@ -64,15 +65,17 @@ namespace{
                                                                                    BEHAVIOR_CLASS(PopAWheelie),
                                                                                    BEHAVIOR_CLASS(PounceWithProx),
                                                                                    BEHAVIOR_CLASS(RollBlock),
-                                                                                   BEHAVIOR_CLASS(FindCubeAndThen) }};
+                                                                                   BEHAVIOR_CLASS(FindCubeAndThen),
+                                                                                   BEHAVIOR_CLASS(PossiblePerformance)}};
 
-  static const std::set<BehaviorClass> kBehaviorClassesToSuppressTouch = { BEHAVIOR_CLASS(BlackJack) };
+  static const std::set<BehaviorClass> kBehaviorClassesToSuppressTouch = {{ BEHAVIOR_CLASS(BlackJack),
+                                                                           BEHAVIOR_CLASS(PossiblePerformance) }};
 
-  static const std::set<BehaviorClass> kBehaviorClassesToSuppressCliff = { BEHAVIOR_CLASS(BlackJack),
-                                                                           BEHAVIOR_CLASS(FetchCube) };
+  static const std::set<BehaviorClass> kBehaviorClassesToSuppressCliff = { BEHAVIOR_CLASS(BlackJack)};
 
   static const std::set<BehaviorClass> kBehaviorClassesToSuppressTimerAntics = {{ BEHAVIOR_CLASS(BlackJack),
-                                                                                  BEHAVIOR_CLASS(CoordinateWeather) }};
+                                                                                  BEHAVIOR_CLASS(CoordinateWeather),
+                                                                                  BEHAVIOR_CLASS(PossiblePerformance) }};
 
   static const std::set<BehaviorID> kBehaviorIDsToSuppressWhenMeetVictor = {{
     BEHAVIOR_ID(ReactToTouchPetting),       // the user will often turn the robot to face them and in the process touch it
@@ -100,6 +103,14 @@ namespace{
     USER_INTENT(movement_turnright),
     USER_INTENT(movement_turnaround),
   }};
+
+  static const std::set<BehaviorID> kBehaviorIDsToSuppressWhenInAnPerformance = {
+    BEHAVIOR_ID(DanceToTheBeatCoordinator),
+    BEHAVIOR_ID(ListenForBeats),
+    BEHAVIOR_ID(DanceToTheBeat),
+    BEHAVIOR_ID(ReactToObstacle),
+    BEHAVIOR_ID(ReactToSoundAwake),
+  };
 }
 
 
@@ -150,6 +161,10 @@ void BehaviorCoordinateGlobalInterrupts::InitPassThrough()
   for( const auto& id : kBehaviorIDsToSuppressWhenGoingHome ) {
     _iConfig.toSuppressWhenGoingHome.push_back( BC.FindBehaviorByID(id) );
   }
+  
+  for( const auto& id : kBehaviorIDsToSuppressWhenInAnPerformance ) {
+    _iConfig.toSuppressWhenInAnPerformance.push_back( BC.FindBehaviorByID(id) );
+  }
 
   BC.FindBehaviorByIDAndDowncast(BEHAVIOR_ID(TimerUtilityCoordinator),
                                  BEHAVIOR_CLASS(TimerUtilityCoordinator),
@@ -164,6 +179,8 @@ void BehaviorCoordinateGlobalInterrupts::InitPassThrough()
   _iConfig.reactToObstacleBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(ReactToObstacle));
   _iConfig.meetVictorBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(MeetVictor));
   _iConfig.danceToTheBeatBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(DanceToTheBeat));
+  _iConfig.intentionalPerformanceBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(PossibleIntentionalPerformance));
+  _iConfig.unintentionalPerformanceBehavior = BC.FindBehaviorByID(BEHAVIOR_ID(PossibleUnintentionalPerformance));
 
   _iConfig.behaviorsThatShouldntReactToUnexpectedMovement.AddBehavior(BC, BEHAVIOR_CLASS(BumpObject));
   _iConfig.behaviorsThatShouldntReactToUnexpectedMovement.AddBehavior(BC, BEHAVIOR_CLASS(ClearChargerArea));
@@ -232,6 +249,15 @@ void BehaviorCoordinateGlobalInterrupts::PassThroughUpdate()
   // Suppress behaviors if dancing to the beat
   if( _iConfig.danceToTheBeatBehavior->IsActivated() ) {
     for( const auto& beh : _iConfig.toSuppressWhenDancingToTheBeat ) {
+      beh->SetDontActivateThisTick(GetDebugLabel());
+    }
+  }
+
+
+  // Stop certain behaviors from interrupting performances
+  if( _iConfig.intentionalPerformanceBehavior->IsActivated() || 
+      _iConfig.unintentionalPerformanceBehavior->IsActivated() ) {
+    for( const auto& beh : _iConfig.toSuppressWhenInAnPerformance ) {
       beh->SetDontActivateThisTick(GetDebugLabel());
     }
   }

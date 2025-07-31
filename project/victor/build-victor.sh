@@ -227,7 +227,7 @@ export ANKI_BUILD_SHA=`git rev-parse --short HEAD`
 #
 # Get branch 
 #
-export ANKI_BUILD_BRANCH=`git branch --show-current`
+export ANKI_BUILD_BRANCH=`git rev-parse --abbrev-ref HEAD`
 
 #
 # Enable export flags

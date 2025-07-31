@@ -40,7 +40,7 @@ namespace Anki {
     namespace Anim {
       class RobotDataLoader;
     }
-    class SpeechRecognizerTHF;
+    class SpeechRecognizerPicovoice;
     class SpeechRecognizerPryonLite;
     namespace {
       struct TriggerModelTypeData;
@@ -141,12 +141,12 @@ private:
     { }
   };
   
-  using TriggerContextThf = TriggerContext<SpeechRecognizerTHF>;
+  using TriggerContextPicovoice = TriggerContext<SpeechRecognizerPicovoice>;
   using TriggerContextPryon = TriggerContext<SpeechRecognizerPryonLite>;
   
   const Anim::AnimContext*                    _context = nullptr;
   MicData::MicDataSystem*                     _micDataSystem = nullptr;
-  std::unique_ptr<TriggerContextThf>          _victorTrigger;
+  std::unique_ptr<TriggerContextPicovoice>          _victorTrigger;
   
   std::unique_ptr<TriggerContextPryon>        _alexaTrigger;
   Alexa*                                      _alexaComponent = nullptr;
@@ -195,9 +195,9 @@ private:
   void ApplyLocaleUpdate();
   
   template <class SpeechRecognizerType>
-  void ApplySpeechRecognizerLoacleUpdate(TriggerContext<SpeechRecognizerType>& aTrigger);
+  void ApplySpeechRecognizerLocaleUpdate(TriggerContext<SpeechRecognizerType>& aTrigger);
   
-  bool UpdateRecognizerModel(TriggerContext<SpeechRecognizerTHF>& aTrigger);
+  bool UpdateRecognizerModel(TriggerContext<SpeechRecognizerPicovoice>& aTrigger);
   bool UpdateRecognizerModel(TriggerContext<SpeechRecognizerPryonLite>& aTrigger);
   
   // Console Var methods

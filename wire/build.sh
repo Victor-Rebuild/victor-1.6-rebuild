@@ -2,8 +2,6 @@
 
 set -e
 
-EXTERNALS_VERSION="2"
-
 if [[ ! -f ./CPPLINT.cfg ]]; then
     if [[ -f ../CPPLINT.cfg ]]; then
         cd ..
@@ -48,13 +46,6 @@ fi
 cd "${VICDIR}"
 
 git lfs update --force
-
-if [[ ! -d EXTERNALS/ ]]; then
-    echo "Downloading EXTERNALS folder contents..."
-    wget https://github.com/Switch-modder/victor-1.6-rebuild/releases/download/externals-${EXTERNALS_VERSION}/1.6-externals.tar.gz
-    tar xzf 1.6-externals.tar.gz
-    rm 1.6-externals.tar.gz
-fi
 
 echo "Building victor..."
 

@@ -16,6 +16,8 @@ asset_project(
                 ('externals/animation-assets', 'anim_manifest.json'),
                 ('externals/animation-assets', 'compositeImageResources/imageLayouts/**/*.json'),
                 ('externals/animation-assets', 'compositeImageResources/imageMaps/**/*.json'),
+		('speech-recognition', 'picovoice/**/*.pv'),
+		('speech-recognition', 'picovoice/**/*.ppn')
                 ],
                 prefix = 'assets'
             ),
