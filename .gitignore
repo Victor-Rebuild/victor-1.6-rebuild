@@ -322,6 +322,7 @@ include/anki/cozmo/shared/msgIDs.txt
 *.htm
 block/build/
 block/lst/
+build/cache
 robot/**/build/
 rx-packet-log.txt
 coretech/project/gyp/common-robot.lst
