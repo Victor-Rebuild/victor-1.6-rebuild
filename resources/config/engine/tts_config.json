@@ -97,7 +97,7 @@
     "ja":
     {
       "voice": "co-Japanese-Sakura-22khz/ja_jp/ja_jp_sakura_22k_co.fl.ini",
-      "speed": 30,
+      "speed": 70,
       "pitch": 100,
       "shaping": 115
     }
