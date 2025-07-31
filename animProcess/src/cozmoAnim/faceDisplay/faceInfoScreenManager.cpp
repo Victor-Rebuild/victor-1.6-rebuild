@@ -70,7 +70,7 @@
 // CHANGE THIS TO BE YOUR PROJECT'S NAME AND BRANCH
 const std::string OSProject = "1.6-rebuilt";
 const std::string OSBranch = "snowboy";
-const std::string Creator = "Rebuilt by Raj";
+const std::string Creator = "Rebuilt by Raj-jyot/Ellie";
 const std::string CreatorWebsite = "modder.my.to";
 
 // Log options
@@ -1292,6 +1292,9 @@ void FaceInfoScreenManager::DrawMain()
     }
     esn =  serialNum;
   }
+
+  std::transform(esn.begin(), esn.end(), esn.begin(),
+    [](unsigned char c){ return std::tolower(c); });
 
   const std::string serialNo = "ESN: "  + esn;
 
