@@ -14,6 +14,7 @@ Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector 
 - Unintentional and Intentional performances
 - Improved Japanese TTS voice
 - Upped temprature limit for Vector 2.0
+- Rainbow Eyes!
 
 ## Building (Linux)
 
