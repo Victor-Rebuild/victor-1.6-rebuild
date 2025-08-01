@@ -12,6 +12,9 @@ Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector 
 - BinaryEyes when leaving charger
 - Added the previously unused second timer end beep animation
 - Unintentional and Intentional performances
+- Improved Japanese TTS voice
+- Fixed head nodding loop
+- Upped temprature limit for Vector 2.0
 
 ## Building (Linux)
 
