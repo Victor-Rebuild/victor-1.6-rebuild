@@ -11,6 +11,7 @@ Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector 
 - Fixed path planning to stop head bobbing loop
 - BinaryEyes when leaving charger
 - Added the previously unused second timer end beep animation
+- Unintentional and Intentional performances
 
 ## Building (Linux)
 
