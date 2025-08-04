@@ -15,6 +15,7 @@ Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector 
 - Improved Japanese TTS voice
 - Upped temprature limit for Vector 2.0
 - Rainbow Eyes!
+- Petting Lights (Code from WireOS but petting colors are mine)
 
 ## Building (Linux)
 
