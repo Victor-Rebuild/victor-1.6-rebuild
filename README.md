@@ -1,5 +1,5 @@
 # Project slowdown notice
-School is gonna be starting for me soon in the next few weeks so I won't have time to work on Viccyware or 1.6-rebuild much anymore. Updates will still come but be much smaller and less often. Sorry about that but some things have to happen.
+School is gonna be starting for me soon in the next few weeks so I won't have time to work on Viccyware or 1.6-rebuild much anymore. Updates will still come but be much smaller and less often. Sorry about that but some things have to happen. If you want to make a Pull Request please dont hesitate to, I will try and get to it as soon as possible.
 
 -- Raj-jyot / Ellie
 
