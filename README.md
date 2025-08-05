@@ -1,3 +1,8 @@
+# Project slowdown notice
+School is gonna be starting for me soon in the next few weeks so I won't have time to work on Viccyware or 1.6-rebuild much anymore. Updates will still come but be much smaller and less often. Sorry about that but some things have to happen.
+
+-- Raj-jyot / Ellie
+
 # victor-1.6-rebuild
 
 Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector lives
