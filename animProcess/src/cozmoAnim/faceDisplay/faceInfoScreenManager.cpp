@@ -68,9 +68,8 @@
 
 // ------ I TAKE NO CREDIT, THIS BRANCH SCREEN IS FROM WIREOS ------
 // CHANGE THIS TO BE YOUR PROJECT'S NAME AND BRANCH
-const std::string OSProject = "1.6-rebuilt";
-const std::string OSBranch = "snowboy";
-const std::string Creator = "Rebuilt by Raj-jyot/Ellie";
+const std::string OSProject = "1.6-rebuild";
+const std::string Creator = "Rebuilt by Ellie";
 const std::string CreatorWebsite = "modder.my.to";
 
 // Log options
@@ -1636,12 +1635,12 @@ void FaceInfoScreenManager::DrawAlexaFace()
     case ScreenName::AlexaPairingSuccess:
     {
       textVec.push_back( { "You're ready to use Alexa." } );
-      if (IsXray()) {
-        textVec.push_back( { "Check out the Alexa App." } );
-      } else {
-        textVec.push_back( { "Check out the Alexa App" } );
-        textVec.push_back( { "for things to try." } );
-      }
+      // if (IsXray()) {
+      //   textVec.push_back( { "Check out the Alexa App." } );
+      // } else {
+      	textVec.push_back( { "Check out the Alexa App" } );
+      	textVec.push_back( { "for things to try." } );
+      // }
 
       break;
     }
