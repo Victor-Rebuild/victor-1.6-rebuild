@@ -130,7 +130,7 @@ list(APPEND VICOS_COMPILER_FLAGS_DEBUG
 	-O0
         -fno-limit-debug-info)
 list(APPEND VICOS_COMPILER_FLAGS_RELEASE
-	-Os
+	-O2
         -DNDEBUG)
 
 # Toolchain and ABI specific flags.
