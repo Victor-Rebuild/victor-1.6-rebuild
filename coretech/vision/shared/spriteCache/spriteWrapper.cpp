@@ -240,8 +240,9 @@ void SpriteWrapper::LoadSprite(Image* outImage) const
               "CompositeImage.SpriteBoxImpl.Constructor.GrayLoadFailed",
               "Failed to load sprite %s",
               _fullSpritePath.c_str());
+
   if(Vector::IsXray()) {
-    outImage->Resize(Vector::FACE_DISPLAY_HEIGHT, Vector::FACE_DISPLAY_WIDTH);
+    outImage->Resize(outImage->GetNumRows() * 80 / 96, outImage->GetNumCols() * 160 / 184);
   }
 }
 

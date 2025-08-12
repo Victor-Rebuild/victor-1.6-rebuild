@@ -165,8 +165,14 @@ void BehaviorDisplayWeather::InitBehavior()
   {
     auto* spriteCache = dataAccessorComp.GetSpriteCache();
     Vision::HSImageHandle faceHueAndSaturation = ProceduralFace::GetHueSatWrapper();
-    _iConfig->compImg = std::make_unique<Vision::CompositeImage>(spriteCache, faceHueAndSaturation,
-                                                                 FACE_DISPLAY_WIDTH, FACE_DISPLAY_HEIGHT);
+
+    if (IsXray()) {
+      _iConfig->compImg = std::make_unique<Vision::CompositeImage>(spriteCache, faceHueAndSaturation,
+                                                                   160, 80);
+    } else {
+      _iConfig->compImg = std::make_unique<Vision::CompositeImage>(spriteCache, faceHueAndSaturation,
+                                                                   184, 96);
+    }
   }
 
   auto& compImgMap = *dataAccessorComp.GetCompImgMap();
