@@ -1,7 +1,7 @@
 # Project slowdown notice
 School is gonna be starting for me soon in the next few weeks so I won't have time to work on Viccyware or 1.6-rebuild much anymore. Updates will still come but be much smaller and less often. Sorry about that but some things have to happen. If you want to make a Pull Request please dont hesitate to, I will try and get to it as soon as possible.
 
--- Raj-jyot / Ellie
+-- Ellie
 
 # victor-1.6-rebuild
 
@@ -19,8 +19,12 @@ Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector 
 - Unintentional and Intentional performances
 - Improved Japanese TTS voice
 - Upped temprature limit for Vector 2.0
+- Smoother pre-1.6 eye darts (Used code from Viccyware)
 - Rainbow Eyes!
 - Petting Lights (Code from WireOS but petting colors are mine)
+- Smoother pre-1.6 eye darts (Used code from Viccyware)
+- Intent graph backported from firmware 1.8 (Could someone with a ddl server sub test this pls?)
+- Fixed going back to charger loop
 
 ## Building (Linux)
 
