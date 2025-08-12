@@ -906,24 +906,40 @@ namespace Vector {
         const bool localizeToCharger = existingCharger->GetPose().IsSameAs(observedCharger->GetPose(),
                                                                            existingCharger->GetSameDistanceTolerance(),
                                                                            existingCharger->GetSameAngleTolerance());
-
-        bool localizeSuccess = false;
         if (localizeToCharger) {
+          // Keep track of poses of the observed objects wrt to robot so 
+          // that they can be corrected after the robot has relocalized
+          std::vector<Pose3d> objectsSeenPosesWrtRobot;
+          for (const auto& obj : objectsSeen) {
+            Pose3d poseWrtRobot;
+            obj->GetPose().GetWithRespectTo(_robot->GetPose(), poseWrtRobot);
+            objectsSeenPosesWrtRobot.push_back(poseWrtRobot);
+          }
           // Localize to the charger instance in this origin
-          result = _robot->LocalizeToObject(observedCharger.get(), existingCharger);
-          localizeSuccess = (result == Result::RESULT_OK);
+          _robot->LocalizeToObject(observedCharger.get(), existingCharger);
+
+          // Update pose of objects seen after robot relocalization
+          auto newObjSeenIt = objectsSeenPosesWrtRobot.begin();
+          for (auto& obj : objectsSeen) {
+            obj->SetPose(newObjSeenIt->GetWithRespectToRoot(),
+                         obj->GetLastPoseUpdateDistance(), 
+                         obj->GetPoseState());
+            ++newObjSeenIt;
+          }
         }
         // Update object poses, but ignore the charger if we've just localized to it
-        const bool ignoreCharger = localizeSuccess;
-        UpdateKnownObjects(objectsSeen, atTimestamp, ignoreCharger);
+        UpdateKnownObjects(objectsSeen, atTimestamp);
       } else {
         // We have a match for the charger in a previous origin. First update all objects _except_ the charger, then
         // localize to charger from the previous origin.
-        const bool ignoreCharger = true;
-        UpdateKnownObjects(objectsSeen, atTimestamp, ignoreCharger);
+        UpdateKnownObjects(objectsSeen, atTimestamp, true);
         
         // Localize to the charger instance in the old origin
         result = _robot->LocalizeToObject(observedCharger.get(), existingCharger);
+
+        if (result == Result::RESULT_OK) {
+          existingCharger->SetObservationTimes(observedCharger.get());
+        }
       }
     } else {
       UpdateKnownObjects(objectsSeen, atTimestamp);
@@ -998,12 +1014,6 @@ namespace Vector {
         matchingObject = FindLocatedMatchingObject(filter);
       }
 
-      // Regardless of whether we skip updating the existing object's pose
-      //  we should update the timestamps for the observations.
-      if(matchingObject != nullptr) {
-        matchingObject->SetObservationTimes(objSeen.get());
-      }
-
       // Was the camera moving? If so, we must skip this observation _unless_ this is the dock object or carry object.
       // Might be sufficient to check for movement at historical time, but to be conservative (and account for
       // timestamping inaccuracies?) we will also check _current_ moving status.
@@ -1021,6 +1031,7 @@ namespace Vector {
         objSeen->CopyID(matchingObject);
         
         // Update the matching object's pose
+        matchingObject->SetObservationTimes(objSeen.get());
         const float distToObjSeen = objSeen->GetLastPoseUpdateDistance();
         matchingObject->SetPose(objSeen->GetPose(), distToObjSeen, PoseState::Known);
         
