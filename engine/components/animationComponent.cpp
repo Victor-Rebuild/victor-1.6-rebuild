@@ -97,6 +97,7 @@ void AnimationComponent::InitDependent(Vector::Robot* robot, const RobotCompMap&
     helper.SubscribeGameToEngine<MessageGameToEngineTag::SetFaceHue>();
     helper.SubscribeGameToEngine<MessageGameToEngineTag::DisplayFaceImageBinaryChunk>();
     helper.SubscribeGameToEngine<MessageGameToEngineTag::DisplayFaceImageRGBChunk>();
+    helper.SubscribeGameToEngine<MessageGameToEngineTag::SetKeepFaceAliveParameters>();
     helper.SubscribeGameToEngine<MessageGameToEngineTag::ReadAnimationFile>();
   }
   
@@ -719,6 +720,21 @@ Result AnimationComponent::SendEnableKeepFaceAlive(bool enable, u32 disableTimeo
   return res;
 }
 
+Result AnimationComponent::SetDefaultKeepFaceAliveParameters() const
+{
+  return _robot->SendRobotMessage<RobotInterface::SetDefaultKeepFaceAliveParameters>();
+}
+
+Result AnimationComponent::SetKeepFaceAliveParameter(KeepFaceAliveParameter param, f32 value) const
+{
+  return _robot->SendRobotMessage<RobotInterface::SetKeepFaceAliveParameter>(value, param, false);
+}
+
+Result AnimationComponent::SetKeepFaceAliveParameterToDefault(KeepFaceAliveParameter param) const
+{
+  return _robot->SendRobotMessage<RobotInterface::SetKeepFaceAliveParameter>(0.f, param, true);
+}
+
 Result AnimationComponent::AddOrUpdateEyeShift(const std::string& name, 
                                                f32 xPix,
                                                f32 yPix,
@@ -890,6 +906,22 @@ void AnimationComponent::HandleMessage(const ExternalInterface::DisplayFaceImage
 }
 
 template<>
+void AnimationComponent::HandleMessage(const ExternalInterface::SetKeepFaceAliveParameters& msg)
+{
+  if (msg.setUnspecifiedToDefault) {
+    SetDefaultKeepFaceAliveParameters();
+  }
+
+
+  if(ANKI_VERIFY(msg.paramNames.size() == msg.paramValues.size(), "AnimationComponent.HandleSetKeepFaceAliveParameters.NameValuePairMismatch", ""))
+  {
+    for (int i=0; i<msg.paramNames.size(); ++i) {
+      SetKeepFaceAliveParameter( msg.paramNames.at(i), msg.paramValues.at(i) );
+    }
+  }
+}
+
+template<>
 void AnimationComponent::HandleMessage(const ExternalInterface::ReadAnimationFile& msg)
 {
   _robot->SendRobotMessage<RobotInterface::AddAnim>(msg.full_path);
@@ -1009,7 +1041,8 @@ void AnimationComponent::AddKeepFaceAliveFocus(const std::string& name)
 {
   if (_focusRequests.empty())
   {
-    _robot->SendRobotMessage<RobotInterface::SetKeepFaceAliveFocus>(true);
+    SetKeepFaceAliveParameter(KeepFaceAliveParameter::EyeDartMaxDistance_pix,
+                              kEyeDartFocusValue_pix);
   }
   _focusRequests.insert(name);
 }
@@ -1019,7 +1052,7 @@ void AnimationComponent::RemoveKeepFaceAliveFocus(const std::string& name)
   _focusRequests.erase(name);
   if (_focusRequests.empty())
   {
-    _robot->SendRobotMessage<RobotInterface::SetKeepFaceAliveFocus>(false);
+    SetKeepFaceAliveParameterToDefault(KeepFaceAliveParameter::EyeDartMaxDistance_pix);
   }
 }
 
