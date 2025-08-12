@@ -16,9 +16,11 @@ Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector 
 - Fixed path planning to stop head bobbing loop
 - BinaryEyes when leaving charger
 - Added the previously unused second timer end beep animation
+- New public server environment (Setup at https://modder.my.to/1.6)
 - Unintentional and Intentional performances
 - Improved Japanese TTS voice
 - Upped temprature limit for Vector 2.0
+- Compiling with -O2 and fast math
 - Smoother pre-1.6 eye darts (Used code from Viccyware)
 - Rainbow Eyes!
 - Petting Lights (Code from WireOS but petting colors are mine)
