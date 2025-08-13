@@ -13,6 +13,7 @@
 
 #include "engine/aiComponent/behaviorComponent/behaviors/blackjack/blackJackVisualizer.h"
 
+#include "anki/cozmo/shared/cozmoConfig.h"
 #include "cannedAnimLib/cannedAnims/cannedAnimationContainer.h"
 #include "cannedAnimLib/proceduralFace/proceduralFace.h"
 #include "clad/types/compositeImageTypes.h"
@@ -243,10 +244,18 @@ void BlackJackVisualizer::Init(BehaviorExternalInterface& bei)
 
   // Init an ongoing image showing all cards dealt thus far
   Vision::HSImageHandle faceHueAndSaturation = ProceduralFace::GetHueSatWrapper();
-  _compImg = std::make_unique<Vision::CompositeImage>(dataAccessorComp.GetSpriteCache(),
-                                                      faceHueAndSaturation,
-                                                      FACE_DISPLAY_WIDTH,
-                                                      FACE_DISPLAY_HEIGHT);
+
+  if (IsXray()) {
+    _compImg = std::make_unique<Vision::CompositeImage>(dataAccessorComp.GetSpriteCache(),
+                                                    faceHueAndSaturation,
+                                                    160,
+                                                    80);
+  } else {
+    _compImg = std::make_unique<Vision::CompositeImage>(dataAccessorComp.GetSpriteCache(),
+                                                    faceHueAndSaturation,
+                                                    184,
+                                                    96);
+  }
 
   auto& compLayoutMap = *dataAccessorComp.GetCompLayoutMap(); 
   // Add the player card layout to the composite image
