@@ -269,6 +269,11 @@ void BehaviorDisplayWeather::OnBehaviorActivated()
   // reset dynamic variables
   _dVars = DynamicVariables();
 
+  if (IsXray()) {
+    // Up the cpu frequency to the max
+    (void)system("curl 'http://localhost:8080/api/mods/modify/FreqChange' -X POST -H 'Referer: http://localhost:8080/' -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' --data-raw '{\"freq\":2}'");
+  }
+
   auto& uic = GetBehaviorComp<UserIntentComponent>();
 
   _dVars.currentIntent = uic.GetUserIntentIfActive(USER_INTENT(weather_response));
@@ -303,6 +308,11 @@ void BehaviorDisplayWeather::OnBehaviorDeactivated()
 {
   if( _dVars.utteranceID != kInvalidUtteranceID ) {
     GetBEI().GetTextToSpeechCoordinator().CancelUtterance(_dVars.utteranceID);
+  }
+
+  if (IsXray()) {
+    // Now that the behavior has finished set the cpu speed back to something reasonable
+    (void)system("curl 'http://localhost:8080/api/mods/modify/FreqChange' -X POST -H 'Referer: http://localhost:8080/' -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' --data-raw '{\"freq\":1}'");
   }
 }
 

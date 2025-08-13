@@ -179,6 +179,11 @@ void BehaviorBlackJack::OnBehaviorActivated()
          "A Game of BlackJack has just started");
   DASMSG_SEND();
 
+  if (IsXray()) {
+    // Up the cpu frequency to the max
+    (void)system("curl 'http://localhost:8080/api/mods/modify/FreqChange' -X POST -H 'Referer: http://localhost:8080/' -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' --data-raw '{\"freq\":2}'");
+  }
+
   // --- On With the Game ---
   TransitionToTurnToFace();
 }
@@ -187,6 +192,11 @@ void BehaviorBlackJack::OnBehaviorActivated()
 void BehaviorBlackJack::OnBehaviorDeactivated()
 {
   _visualizer.ReleaseControlAndClearState(GetBEI());
+
+  if (IsXray()) {
+    // Now that the behavior has finished set the cpu speed back to something reasonable
+    (void)system("curl 'http://localhost:8080/api/mods/modify/FreqChange' -X POST -H 'Referer: http://localhost:8080/' -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' --data-raw '{\"freq\":1}'");
+  }
 
   // Log session end DAS events and track DAS related state
   std::string sessionWinLoseString(std::to_string(_humanWinsInSession) + "," + std::to_string(_robotWinsInSession));
