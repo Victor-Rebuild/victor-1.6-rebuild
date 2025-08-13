@@ -24,7 +24,6 @@ Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector 
 - Smoother pre-1.6 eye darts (Used code from Viccyware)
 - Rainbow Eyes!
 - Petting Lights (Code from WireOS but petting colors are mine)
-- Smoother pre-1.6 eye darts (Used code from Viccyware)
 - Intent graph backported from firmware 1.8 (Could someone with a ddl server sub test this pls?)
 - Fixed going back to charger loop
 
