@@ -413,3 +413,5 @@ victor-packages
 log.txt
 
 robot_sshkey
+singletask.lock
+
