@@ -5,12 +5,6 @@ Example implementation of Anki Victor Update engine.
 """
 __author__ = "Daniel Casner <daniel@anki.com>"
 
-#
-# DAS EVENTS Documentation Notice!!!!!
-# If you add / modify / remove DAS events from this file, you MUST
-# update the DAS macros in update-engine-das-event-documentation.cpp
-#
-
 import sys
 import os
 import urllib2
@@ -19,39 +13,36 @@ import tarfile
 import zlib
 import shutil
 import ConfigParser
-import socket
-import re
 from select import select
 from hashlib import sha256
 from collections import OrderedDict
 from fcntl import fcntl, F_GETFL, F_SETFL
-#from distutils.version import LooseVersion
 
 sys.path.append("/usr/bin")
 import update_payload
 
 BOOT_DEVICE = "/dev/block/bootdevice/by-name"
 STATUS_DIR = "/run/update-engine"
+MOUNT_POINT = "/mnt/sdcard"
+ANKI_REV_FILE = "/anki/etc/revision"
+ANKI_VER_FILE = "/anki/etc/version"
 EXPECTED_DOWNLOAD_SIZE_FILE = os.path.join(STATUS_DIR, "expected-download-size")
 EXPECTED_WRITE_SIZE_FILE = os.path.join(STATUS_DIR, "expected-size")
 PROGRESS_FILE = os.path.join(STATUS_DIR, "progress")
-PHASE_FILE = os.path.join(STATUS_DIR, "phase")
 ERROR_FILE = os.path.join(STATUS_DIR, "error")
 DONE_FILE = os.path.join(STATUS_DIR, "done")
 MANIFEST_FILE = os.path.join(STATUS_DIR, "manifest.ini")
 MANIFEST_SIG = os.path.join(STATUS_DIR, "manifest.sha256")
 BOOT_STAGING = os.path.join(STATUS_DIR, "boot.img")
 DELTA_STAGING = os.path.join(STATUS_DIR, "delta.bin")
-ABOOT_STAGING = os.path.join(STATUS_DIR, "aboot.img")
 OTA_PUB_KEY = "/anki/etc/ota.pub"
 OTA_ENC_PASSWORD = "/anki/etc/ota.pas"
 HTTP_BLOCK_SIZE = 1024*2  # Tuned to what seems to work best with DD_BLOCK_SIZE
-HTTP_TIMEOUT = 90 # Give up after 90 seconds on blocking operations
 DD_BLOCK_SIZE = HTTP_BLOCK_SIZE*1024
 SUPPORTED_MANIFEST_VERSIONS = ["0.9.2", "0.9.3", "0.9.4", "0.9.5", "1.0.0"]
-TRUE_SYNONYMS = ["True", "true", "on", "1"]
 WIPE_DATA_COOKIE = "/run/wipe-data"
 DEBUG = False
+
 
 def make_blocking(pipe, blocking):
     "Set a filehandle to blocking or not"
@@ -61,12 +52,6 @@ def make_blocking(pipe, blocking):
     else:
         fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~os.O_NONBLOCK)  # clear it
 
-def das_event(name, parameters = []):
-    "Log a DAS event"
-    args = ["/anki/bin/vic-log-event", "update-engine", name]
-    for p in parameters:
-        args.append(p.rstrip().replace('\r', '\\r').replace('\n', '\\n'))
-    subprocess.call(args)
 
 def safe_delete(name):
     "Delete a filesystem path name without error"
@@ -75,12 +60,6 @@ def safe_delete(name):
     elif os.path.isdir(name):
         shutil.rmtree(name)
 
-
-def safe_delete_staging_files():
-    "Delete staging files"
-    safe_delete(BOOT_STAGING)
-    safe_delete(DELTA_STAGING)
-    safe_delete(ABOOT_STAGING)
 
 def clear_status():
     "Clear everything out of the status directory"
@@ -99,11 +78,9 @@ def write_status(file_name, status):
 def die(code, text):
     "Write out an error string and exit with given status code"
     write_status(ERROR_FILE, text)
-    das_event("robot.ota_download_end", ["fail", get_prop("ro.anki.version"), str(text), "", str(code)])
     if DEBUG:
         sys.stderr.write(str(text))
         sys.stderr.write(os.linesep)
-    safe_delete_staging_files()
     exit(code)
 
 
@@ -123,6 +100,8 @@ def get_slot_name(partition, slot):
 
 def open_slot(partition, slot, mode):
     "Opens a partition slot"
+    if slot == "f":
+        assert mode == "r"  # No writing to F slot
     return open(os.path.join(BOOT_DEVICE, get_slot_name(partition, slot)), mode + "b")
 
 
@@ -133,17 +112,9 @@ def zero_slot(target_slot):
     open_slot("boot", target_slot, "w").write(zeroblock)
     open_slot("system", target_slot, "w").write(zeroblock)
 
-# RCM 2020-8-20 zeros just the system 
-def zero_system_slot(target_slot):
-    "Writes zeros to the first block of the destination slot system to ensure they aren't booted"
-    assert target_slot == 'a' or target_slot == 'b'  # Make sure we don't zero f
-    zeroblock = b"\x00"*DD_BLOCK_SIZE
-    open_slot("system", target_slot, "w").write(zeroblock)
-
-
 
 def call(*args):
-    "Simple wrapper around subprocess.call to make ret=0 -> True"
+    "Simple wrapper arround subprocess.call to make ret=0 -> True"
     return subprocess.call(*args) == 0
 
 
@@ -173,11 +144,6 @@ def get_prop(property_name):
     return None
 
 
-def is_dev_robot(cmdline):
-    "Returns true if this robot is a dev robot"
-    return True
-
-
 def get_cmdline():
     "Returns /proc/cmdline arguments as a dict"
     cmdline = open("/proc/cmdline", "r").read()
@@ -195,7 +161,7 @@ def get_cmdline():
 
 
 def get_slot(kernel_command_line):
-    "Get the current and target slots from the kernel command line"
+    "Get the current and target slots from the kernel commanlines"
     suffix = kernel_command_line.get("androidboot.slot_suffix", '_f')
     if suffix == '_a':
         return 'a', 'b'
@@ -212,10 +178,7 @@ def get_qsn():
 
 def get_manifest(fileobj):
     "Returns config parsed from INI file in filelike object"
-    config = ConfigParser.ConfigParser({'encryption': '0',
-                                        'qsn': None,
-                                        'ankidev': '0',
-                                        'reboot_after_install': '0'})
+    config = ConfigParser.ConfigParser({'encryption': '0', 'qsn': None, 'ankidev': '0'})
     config.readfp(fileobj)
     return config
 
@@ -298,21 +261,19 @@ def open_url_stream(url):
         assert url.startswith("http")  # Accepts http and https but not ftp or file
         os_version = get_prop("ro.anki.version")
         victor_version = get_prop("ro.anki.victor.version")
-        victor_target = get_prop("ro.build.target")
-        if '?' in url:  # Already has a query string
+        if '?' in url:  # Already has a querry string
             if not url.endswith('?'):
                 url += '&'
         else:
             url += '?'
-        url += "emresn={0:s}&ankiversion={1:s}&victorversion={2:s}&victortarget={3:s}".format(
+        url += "emresn={0:s}&ankiversion={1:s}&victorversion={2:s}".format(
                 get_prop("ro.serialno"),
                 os_version,
-                victor_version,
-                victor_target)
+                victor_version)
         request = urllib2.Request(url)
         opener = urllib2.build_opener()
-        opener.addheaders = [('User-Agent', 'Victor-OTA/{0:s}'.format(os_version))]
-        return opener.open(request, timeout=HTTP_TIMEOUT)
+        opener.addheaders = opener.addheaders = [('User-Agent', 'Victor/{0:s}'.format(os_version))]
+        return opener.open(request)
     except Exception as e:
         die(203, "Failed to open URL: " + str(e))
 
@@ -350,51 +311,6 @@ class ShaFile(object):
         return self.len
 
 
-def extract_ti(manifest, tar_stream, expected_name, section, dest_fh, progress_callback):
-    "Extract an image from a tar_info object"
-    tar_info = tar_stream.next()
-    if not tar_info.name.endswith(expected_name):
-        die(200, "Expected \"{0}\" to be next in tar but found \"{1}\"".format(expected_name, tar_info.name))
-    decompressor = StreamDecompressor(tar_stream.extractfile(tar_info),
-                                      manifest.getint(section, "encryption"),
-                                      manifest.get(section, "compression"),
-                                      manifest.getint(section, "bytes"),
-                                      True)
-    decompressor.read_to_file(dest_fh, DD_BLOCK_SIZE, progress_callback)
-    # RCM 2020-4-15 skips digest checks
-    #if decompressor.digest() != manifest.get(section, "sha256"):
-    #    return False
-    #else:
-    #    return decompressor.tell()
-    return decompressor.tell()
-
-# RCM2020-8-20: support updating just the system
-def handle_system(target_slot, manifest, tar_stream):
-    "Process 0.9.2 format manifest files"
-    total_size = manifest.getint("SYSTEM", "bytes")
-    write_status(EXPECTED_WRITE_SIZE_FILE, total_size)
-    written_size = 0
-
-    def progress_update(progress):
-        "Update progress while writing to slots"
-        write_status(PROGRESS_FILE, written_size + progress)
-        if DEBUG:
-            sys.stdout.write("{0:0.3f}\r".format(float(written_size+progress)/float(total_size)))
-            sys.stdout.flush()
-
-    # Extract system images
-    if DEBUG:
-        print("System")
-    extract_result = extract_ti(manifest, tar_stream, "sysfs.img.gz", "SYSTEM",
-                                open_slot("system", target_slot, "w"),
-                                progress_update)
-    if extract_result is False:
-        zero_system_slot(target_slot)
-        die(209, "System image hash doesn't match signed manifest")
-    written_size += extract_result
-
-
-
 def handle_boot_system(target_slot, manifest, tar_stream):
     "Process 0.9.2 format manifest files"
     total_size = manifest.getint("BOOT", "bytes") + manifest.getint("SYSTEM", "bytes")
@@ -412,30 +328,56 @@ def handle_boot_system(target_slot, manifest, tar_stream):
     # Extract boot image
     if DEBUG:
         print("Boot")
-    extract_result = extract_ti(manifest, tar_stream, "boot.img.gz", "BOOT", open(BOOT_STAGING, "wb"), progress_update)
-    if extract_result is False:
-        zero_slot(target_slot)
-        die(209, "Boot image hash doesn't match signed manifest")
-    written_size += extract_result
+    boot_ti = tar_stream.next()
+    # Skip manifest.sha256 if it appears here
+    if boot_ti.name.endswith("manifest.sha256"):
+        if DEBUG:
+            print("Ignoring manifest.sha256")
+        boot_ti = tar_stream.next()
+    
+    if not boot_ti.name.endswith("boot.img.gz"):
+        die(200, "Expected boot.img.gz to be next in tar but found \"{}\"".format(boot_ti.name))
+    with open(BOOT_STAGING, "wb") as boot_fh:
+        decompressor = StreamDecompressor(tar_stream.extractfile(boot_ti),
+                                          manifest.getint("BOOT", "encryption"),
+                                          manifest.get("BOOT", "compression"),
+                                          manifest.getint("BOOT", "bytes"),
+                                          True)
+        decompressor.read_to_file(boot_fh, DD_BLOCK_SIZE, progress_update)
+        # Verify boot hash
+        if decompressor.digest() != manifest.get("BOOT", "sha256"):
+            zero_slot(target_slot)
+            die(209, "Boot image hash doesn't match signed manifest")
+        written_size += decompressor.tell()
 
     # Extract system images
     if DEBUG:
         print("System")
-    extract_result = extract_ti(manifest, tar_stream, "sysfs.img.gz", "SYSTEM",
-                                open_slot("system", target_slot, "w"),
-                                progress_update)
-    if extract_result is False:
-        zero_slot(target_slot)
-        die(209, "System image hash doesn't match signed manifest")
-    written_size += extract_result
-
+    system_ti = tar_stream.next()
+    # Skip manifest.sha256 if it appears here too
+    if system_ti.name.endswith("manifest.sha256"):
+        if DEBUG:
+            print("Ignoring manifest.sha256")
+        system_ti = tar_stream.next()
+    
+    if not system_ti.name.endswith("sysfs.img.gz"):
+        die(200, "Expected sysfs.img.gz to be next in tar but found \"{}\"".format(system_ti.name))
+    with open_slot("system", target_slot, "w") as system_slot:
+        decompressor = StreamDecompressor(tar_stream.extractfile(system_ti),
+                                          manifest.getint("SYSTEM", "encryption"),
+                                          manifest.get("SYSTEM", "compression"),
+                                          manifest.getint("SYSTEM", "bytes"),
+                                          True)
+        decompressor.read_to_file(system_slot, DD_BLOCK_SIZE, progress_update)
+        if decompressor.digest() != manifest.get("SYSTEM", "sha256"):
+            zero_slot(target_slot)
+            die(209, "System image hash doesn't match signed manifest")
+        written_size += decompressor.tell()
+    
     # Actually write the boot image now
     with open(BOOT_STAGING, "rb") as src:
         with open_slot("boot", target_slot, "w") as dst:
             dst.write(src.read())
-
-    # Delete the staged boot.img file
-    safe_delete(BOOT_STAGING)
 
 
 def copy_slot(partition, src_slot, dst_slot):
@@ -448,23 +390,50 @@ def copy_slot(partition, src_slot, dst_slot):
                 buffer = src.read(DD_BLOCK_SIZE)
             dst.write(buffer)
 
-def get_file_size(filename):
-    "Get the size in bytes of a file"
-    fd = os.open(filename, os.O_RDONLY)
-    try:
-        return os.lseek(fd, 0, os.SEEK_END)
-    finally:
-        os.close(fd)
+
+def update_build_props(mount_point):
+    "Updates (or creates) a property in the build.prop file specified"
+    # Get the Anki Victor info
+    victor_build_ver = open(os.path.join(mount_point, ANKI_VER_FILE), "r").read().strip()
+    victor_build_rev = open(os.path.join(mount_point, ANKI_REV_FILE), "r").read().strip()
+    build_prop_path_name = os.path.join(mount_point, "build.prop")
+    # Get all the old OS properties
+    props = OrderedDict()
+    for key, value in [p.strip().split('=') for p in open(build_prop_path_name, "r").readlines()]:
+        props[key] = value
+    os_version = props['ro.anki.version']
+    os_build_timestamp = props['ro.build.version.release']
+    os_rev = ""  # TODO find this somewhere
+    props["ro.revision"] = "anki-{VICTOR_BUILD_REV}_os-{REV}".format(VICTOR_BUILD_REV=victor_build_rev, REV=os_rev)
+    props["ro.anki.victor.version"] = victor_build_ver
+    version_id = "v{VICTOR_BUILD_VERSION}_os{OS_VERSION}".format(
+        VICTOR_BUILD_VERSION=victor_build_ver,
+        OS_VERSION=os_version
+    )
+    build_id = "v{VICTOR_BUILD_VERSION}{VICTOR_REV_TAG}_os{OS_VERSION}{REV_TAG}-{BUILD_TIMESTAMP}".format(
+        VICTOR_BUILD_VERSION=victor_build_ver,
+        VICTOR_REV_TAG="-" + victor_build_rev if victor_build_rev else "",
+        OS_VERSION=os_version,
+        REV_TAG="-" + os_rev if os_rev else "",
+        BUILD_TIMESTAMP=os_build_timestamp
+    )
+    props["ro.build.fingerprint"] = build_id
+    props["ro.build.id"] = build_id
+    props["ro.build.display.id"] = version_id
+
+    with open(build_prop_path_name, "w") as propfile:
+        propfile.write("\n".join(["=".join(prop) for prop in props.items()]))
+        propfile.write("\n")
+
 
 def handle_delta(current_slot, target_slot, manifest, tar_stream):
     "Apply a delta update to the boot and system partitions"
     current_version = get_prop("ro.anki.version")
     delta_base_version = manifest.get("DELTA", "base_version")
-    # <nerd_emoji>
-    #if current_version != delta_base_version:
-    #    die(211, "My version is {} not {}".format(current_version, delta_base_version))
+    if current_version != delta_base_version:
+        die(211, "My version is {} not {}".format(current_version, delta_base_version))
     delta_bytes = manifest.getint("DELTA", "bytes")
-    download_progress_denominator = 10  # Download expected not to take more than 10% of the time
+    download_progress_denominator = 4  # Download expected not to take more than 25% of the time
     write_status(EXPECTED_WRITE_SIZE_FILE, delta_bytes*download_progress_denominator)
     write_status(PROGRESS_FILE, 0)
 
@@ -478,30 +447,34 @@ def handle_delta(current_slot, target_slot, manifest, tar_stream):
     # Extract delta file
     if DEBUG:
         print("Delta")
-    extract_result = extract_ti(manifest, tar_stream, "delta.bin.gz", "DELTA",
-                                open(DELTA_STAGING, "wb"),
-                                progress_update)
-    if extract_result is False:
+    delta_ti = tar_stream.next()
+    # Skip manifest.sha256 if it appears here
+    if delta_ti.name.endswith("manifest.sha256"):
+        if DEBUG:
+            print("Ignoring manifest.sha256")
+        delta_ti = tar_stream.next()
+    
+    if not delta_ti.name.endswith("delta.bin.gz"):
+        die(200,
+            "Expected delta.bin.gz to be next in tar but found \"{}\""
+            .format(delta_ti.name))
+    decompressor = StreamDecompressor(tar_stream.extractfile(delta_ti),
+                                      manifest.getint("DELTA", "encryption"),
+                                      manifest.get("DELTA", "compression"),
+                                      manifest.getint("DELTA", "bytes"),
+                                      True)
+    decompressor.read_to_file(open(DELTA_STAGING, "wb"), DD_BLOCK_SIZE, progress_update)
+    # Verify delta hash
+    if decompressor.digest() != manifest.get("DELTA", "sha256"):
+        safe_delete(DELTA_STAGING)
         die(209, "delta.bin hash doesn't match manifest value")
     try:
         payload = update_payload.Payload(open(DELTA_STAGING, "rb"))
         payload.Init()
 
         # Update progress estimate
-        # Assume each 1 megabyte of copied or hashed data from the eMMC is equivalent
-        # to 1 operation in addition to the operations necessary to transform the
-        # system and boot partitions
-        block_size = 1024 * 1024
-        num_operations = ( (payload.manifest.old_rootfs_info.size / block_size)
-                           + (payload.manifest.old_kernel_info.size / block_size)
-                           + (get_file_size(get_slot_name("system", current_slot)) / block_size)
-                           + (get_file_size(get_slot_name("boot", current_slot)) / block_size)
-                           + len(payload.manifest.install_operations)
-                           + len(payload.manifest.kernel_install_operations)
-                           + (payload.manifest.new_rootfs_info.size / block_size)
-                           + (payload.manifest.new_kernel_info.size / block_size))
-
-        progress = (num_operations + 1) / (download_progress_denominator - 1)
+        num_operations = len(payload.manifest.install_operations) + len(payload.manifest.kernel_install_operations)
+        progress = num_operations / download_progress_denominator
         num_operations += progress
         write_status(PROGRESS_FILE, progress)
         write_status(EXPECTED_WRITE_SIZE_FILE, num_operations)
@@ -518,131 +491,67 @@ def handle_delta(current_slot, target_slot, manifest, tar_stream):
                 yield
 
         payload.progress_tick_callback = progress_ticker(progress, num_operations)
-        payload.phase_callback = lambda phase: write_status(PHASE_FILE, phase)
         payload.Apply(get_slot_name("boot", target_slot),
                       get_slot_name("system", target_slot),
                       get_slot_name("boot", current_slot),
                       get_slot_name("system", current_slot),
                       truncate_to_expected_size=False)
 
-        safe_delete(DELTA_STAGING)
-
     except update_payload.PayloadError as pay_err:
         zero_slot(target_slot)
         die(207, "Delta payload error: {!s}".format(pay_err))
 
-#RCM 2020-8-20 This is from Vector software 0.12
-#It allows modifying just the /anki folder
-#The original nuked it then replaced it
-def handle_ankiRCM(manifest, tar_stream):
+
+def handle_anki(current_slot, target_slot, manifest, tar_stream):
     "Update the Anki folder only"
     write_status(EXPECTED_WRITE_SIZE_FILE, 4)  # We're faking progress here with just stages 0-N
     write_status(PROGRESS_FILE, 0)
+    if DEBUG:
+        print("Copying system from {} to {}".format(current_slot, target_slot))
+    copy_slot("system", current_slot, target_slot)
     write_status(PROGRESS_FILE, 1)
     if DEBUG:
         print("Installing new Anki")
-    if not call(['/bin/mount', '-o', 'remount,rw', "/"]):
-        die(202, "Could not mount the main filesystem as writeable")
-
+    if not call(["mount", os.path.join(BOOT_DEVICE, "system" + "_" + target_slot), MOUNT_POINT]):
+        die(208, "Couldn't mount target system partition")
     try:
-        anki_path = "/"
+        anki_path = os.path.join(MOUNT_POINT, "anki")
+        shutil.rmtree(anki_path)
         write_status(PROGRESS_FILE, 2)
         anki_ti = tar_stream.next()
+        # Skip manifest.sha256 if it appears here
+        if anki_ti.name.endswith("manifest.sha256"):
+            if DEBUG:
+                print("Ignoring manifest.sha256")
+            anki_ti = tar_stream.next()
+        
         src_file = tar_stream.extractfile(anki_ti)
-        sha_fh = ShaFile(src_file)
+        if manifest.getint("ANKI", "encryption") != 0:
+            die(210, "Encrypted Anki updates are not supported")
+        else:
+            sha_fh = ShaFile(src_file)
         anki_tar = make_tar_stream(sha_fh, "r|" + manifest.get("ANKI", "compression"))
-        anki_tar.extractall(anki_path)
-        #update_build_props(MOUNT_POINT)
+        anki_tar.extractall(MOUNT_POINT)
+        update_build_props(MOUNT_POINT)
     finally:
-        pass
+        call(["umount", MOUNT_POINT])
     write_status(PROGRESS_FILE, 3)
+    # Verify anki tar hash
+    if sha_fh.bytes() != manifest.getint("ANKI", "bytes"):
+        zero_slot(target_slot)
+        die(209, "Anki archive wrong size")
+    if sha_fh.digest() != manifest.get("ANKI", "sha256"):
+        zero_slot(target_slot)
+        die(209, "Anki archive didn't match signed manifest")
+    # Copy over the boot partition since we passed
+    if DEBUG:
+        print("Sig passed, installing kernel")
+    copy_slot("boot", current_slot, target_slot)
     write_status(PROGRESS_FILE, 4)
 
-def handle_factory(manifest, tar_stream):
-    "Update factory partitions"
-    total_size = manifest.getint("ABOOT", "bytes") + \
-                 manifest.getint("RECOVERY", "bytes") + \
-                 manifest.getint("RECOVERYFS", "bytes")
-    write_status(EXPECTED_WRITE_SIZE_FILE, total_size)
-    written_size = 0
-    write_status(PROGRESS_FILE, written_size)
-    target_slot = 'f'
-
-    def progress_update(progress):
-        "Update progress while writing to slots"
-        write_status(PROGRESS_FILE, written_size + progress)
-        if DEBUG:
-            sys.stdout.write("{0:0.3f}\r".format(float(written_size+progress)/float(total_size)))
-            sys.stdout.flush()
-
-    # Install new aboot, recovery, recoverfs
-    if DEBUG:
-        print("ABoot")
-    extract_result = extract_ti(manifest, tar_stream, "emmc_appsboot.img.gz", "ABOOT",
-                                open(ABOOT_STAGING, "wb"),
-                                progress_update)
-    if extract_result is False:
-        die(209, "aboot hash doesn't match signed manifest")
-    else:
-        written_size += extract_result
-    if DEBUG:
-        print("recovery")
-    extract_result = extract_ti(manifest, tar_stream, "boot.img.gz", "RECOVERY",
-                                open(BOOT_STAGING, "wb"),
-                                progress_update)
-    if extract_result is False:
-        die(209, "Boot image hash doesn't match signed manifest")
-    written_size += extract_result
-    # Extract system images
-    if DEBUG:
-        print("recoveryfs")
-    extract_result = extract_ti(manifest, tar_stream, "sysfs.img.gz", "RECOVERYFS",
-                                open_slot("system", target_slot, "w"),
-                                progress_update)
-    if extract_result is False:
-        zero_slot(target_slot)
-        die(209, "System image hash doesn't match signed manifest")
-    written_size += extract_result
-    # Actually write the boot image now
-    with open(BOOT_STAGING, "rb") as src:
-        with open_slot("boot", target_slot, "w") as dst:
-            dst.write(src.read())
-
-    # Delete the staged boot.img file
-    safe_delete(BOOT_STAGING)
-
-    # And actually write the aboot image
-    with open(ABOOT_STAGING, "rb") as src:
-        with open(os.path.join(BOOT_DEVICE, "aboot"), "wb") as dst:
-            dst.write(src.read())
-
-    # Delete the staged aboot.img file
-    safe_delete(ABOOT_STAGING)
-
-def validate_new_os_version(current_os_version, new_os_version, cmdline):
-    # RCM 2020-12-21: disabling whole def
-    #"Make sure we are allowed to install the new os version"
-    #allow_downgrade = os.getenv("UPDATE_ENGINE_ALLOW_DOWNGRADE", "False") in TRUE_SYNONYMS
-    #if allow_downgrade and is_dev_robot(cmdline):
-    #    return
-    #os_version_regex = re.compile('^(?:\d+\.){2,3}\d+(d|ud)?$')
-    #m = os_version_regex.match(new_os_version)
-    #if not m:
-    #    die(216, "OS version " + new_os_version + " does not match regular expression")
-    #new_os_version_suffix = m.groups()[0]
-    #m = os_version_regex.match(current_os_version)
-    #current_os_version_suffix = m.groups()[0]
-    # RCM 2020-4-24: disabling the manifest suffix verification and
-    # and downgrading (the manifest could lie to get around these.. so just extra)
-    #if new_os_version_suffix != current_os_version_suffix:
-    #    die(216, "Update from " + current_os_version + " to " + new_os_version + " not allowed")
-    #if LooseVersion(new_os_version) < LooseVersion(current_os_version):
-    #    die(216, "Downgrade from " + current_os_version + " to " + new_os_version + " not allowed")
-    return
 
 def update_from_url(url):
     "Updates the inactive slot from the given URL"
-    write_status(PHASE_FILE, "download")
     # Figure out slots
     cmdline = get_cmdline()
     current_slot, target_slot = get_slot(cmdline)
@@ -655,12 +564,6 @@ def update_from_url(url):
     stream = open_url_stream(url)
     content_length = stream.info().getheaders("Content-Length")[0]
     write_status(EXPECTED_DOWNLOAD_SIZE_FILE, content_length)
-    current_os_version = get_prop("ro.anki.version")
-    next_boot_os_version = current_os_version
-    is_factory_update = False
-    # RCM 2020-8-20 this is set if we are only updating the filesystem
-    skip_bootctl = False
-    reboot_after_install = 0
     with make_tar_stream(stream) as tar_stream:
         # Get the manifest
         if DEBUG:
@@ -670,77 +573,36 @@ def update_from_url(url):
             die(200, "Expected manifest.ini at beginning of download, found \"{0.name}\"".format(manifest_ti))
         with open(MANIFEST_FILE, "wb") as manifest:
             manifest.write(tar_stream.extractfile(manifest_ti).read())
-        # RCM 2020-4-15: disabling the manifest verification
-        #manifest_sig_ti = tar_stream.next()
-        #if not manifest_sig_ti.name.endswith('manifest.sha256'):
-        #    die(200, "Expected manifest signature after manifest.ini. Found \"{0.name}\"".format(manifest_sig_ti))
-        #with open(MANIFEST_SIG, "wb") as signature:
-        #    signature.write(tar_stream.extractfile(manifest_sig_ti).read())
-        #verification_status = verify_signature(MANIFEST_FILE, MANIFEST_SIG, OTA_PUB_KEY)
-        #if not verification_status[0]:
-        #    die(209,
-        #        "Manifest failed signature validation, openssl returned {1:d} {2:s} {3:s}".format(*verification_status))
+#        manifest_sig_ti = tar_stream.next()
+#        if not manifest_sig_ti.name.endswith('manifest.sha256'):
+#        with open(MANIFEST_SIG, "wb") as signature:
+#            signature.write(tar_stream.extractfile(manifest_sig_ti).read())
+#        verification_status = verify_signature(MANIFEST_FILE, MANIFEST_SIG, OTA_PUB_KEY)
+#        if not verification_status[0]:
+#            die(209,
+#                "Manifest failed signature validation, openssl returned {1:d} {2:s} {3:s}".format(*verification_status))
         # Manifest was signed correctly
         manifest = get_manifest(open(MANIFEST_FILE, "r"))
         # Inspect the manifest
-        if manifest.get("META", "manifest_version") not in SUPPORTED_MANIFEST_VERSIONS:
-            die(201, "Unexpected manifest version")
-        reboot_after_install = manifest.getint("META", "reboot_after_install")
-        next_boot_os_version = manifest.get("META", "update_version")
-        validate_new_os_version(current_os_version, next_boot_os_version, cmdline)
+#        if manifest.get("META", "manifest_version") not in SUPPORTED_MANIFEST_VERSIONS:
+#            die(201, "Unexpected manifest version")
         if DEBUG:
-            print("Updating to version {}".format(next_boot_os_version))
-        if is_dev_robot(cmdline):
-            if not manifest.getint("META", "ankidev"):
-                die(214, "Ankidev OS can't install non-ankidev OTA file")
-        elif manifest.getint("META", "ankidev"):
-            die(214, "Non-ankidev OS can't install ankidev OTA file")
-
+            print("Updating to version {}".format(manifest.get("META", "update_version")))
+#        if "anki.dev" in cmdline:
+#            if not manifest.getint("META", "ankidev"):
+#                die(214, "Ankidev OS can't install non-ankidev OTA file")
+#        elif manifest.getint("META", "ankidev"):
+#            die(214, "Non-ankidev OS can't install ankidev OTA file")
+        # Mark target unbootable
+        if not call(['/bin/bootctl', current_slot, 'set_unbootable', target_slot]):
+            die(202, "Could not mark target slot unbootable")
+        zero_slot(target_slot)  # Make it doubly unbootable just in case
         num_images = manifest.getint("META", "num_images")
-
-        #RCM 2020-8-20 don't nuke the boot or system if its a small update
-        if num_images == 1:
-            if manifest.has_section("ANKI"):
-                pass
-            elif manifest.has_section("SYSTEM"):
-                zero_system_slot(target_slot)
-            elif manifest.has_section("DELTA"):
-                zero_slot(target_slot)  # Make it doubly unbootable just in case
-
-
-        else:
-            # Mark target unbootable
-            if not call(['/bin/bootctl', current_slot, 'set_unbootable', target_slot]):
-                die(202, "Could not mark target slot unbootable")
-            zero_slot(target_slot)  # Make it doubly unbootable just in case
-
         if num_images == 2:
             if manifest.has_section("BOOT") and manifest.has_section("SYSTEM"):
                 handle_boot_system(target_slot, manifest, tar_stream)
             else:
                 die(201, "Two images specified but couldn't find boot or system")
-        elif num_images == 1:
-            #RCM 2020-8-20 Allow just the system to be updated
-            if manifest.has_section("SYSTEM"):
-                handle_boot_system(target_slot, manifest, tar_stream)
-            elif manifest.has_section("DELTA"):
-                handle_delta(current_slot, target_slot, manifest, tar_stream)
-            #RCM 2020-8-20 Allow the whole anki folder to be updated
-            elif manifest.has_section("ANKI"):
-                # RCM 2020-8-20 this is set since we are only updating the filesystem
-                skip_bootctl = True
-                handle_ankiRCM(manifest, tar_stream)
-            else:
-                die(201, "One image specified but not SYSTEM or DELTA or ANKI")
-        elif num_images == 3:
-            if manifest.has_section("ABOOT") and manifest.has_section("RECOVERY") and manifest.has_section("RECOVERYFS"):
-                if manifest.get("META", "qsn") == get_qsn():
-                    handle_factory(manifest, tar_stream)
-                    is_factory_update = True
-                else:
-                    die(213, "QSN doesn't match manifest")
-            else:
-                die(201, "3 images specified but not factory update")
         else:
             die(201, "Unexpected manifest configuration")
     stream.close()
@@ -748,90 +610,27 @@ def update_from_url(url):
     if not call(["/bin/sync"]):
         die(208, "Couldn't sync OS images to disk")
     # Mark the slot bootable now
-    if not is_factory_update:
-        # RCM 2020-8-20 skip if we only updated a bit of the filesystem
-        if not skip_bootctl:
-            if not call(["/bin/bootctl", current_slot, "set_active", target_slot]):
-                die(202, "Could not set target slot as active")
-    else: # Is a factory update, mark both update slots unbootable and erase user data
-        write_status(WIPE_DATA_COOKIE, 1)
-        if not call(["/bin/bootctl", current_slot, "set_unbootable", 'a']):
-            die(202, "Could not set a slot as unbootable")
-        if not call(["/bin/bootctl", current_slot, "set_unbootable", 'b']):
-            die(202, "Could not set b slot as unbootable")
-    safe_delete(ERROR_FILE)
+    if not call(["/bin/bootctl", current_slot, "set_active", target_slot]):
+        die(202, "Could not set target slot as active")
     write_status(DONE_FILE, 1)
-    write_status(PHASE_FILE, "done")
-    das_event("robot.ota_download_end", ["success", next_boot_os_version])
-    if reboot_after_install:
-        os.system("/sbin/reboot")
 
-def logv(msg):
-    "If DEBUG (verbose logging) is enabled, print out msg"
-    if DEBUG:
-        print(msg)
-        sys.stdout.flush()
-
-def loge(msg):
-    "Send error message to stderr"
-    print(msg, file=sys.stderr)
-    sys.stderr.flush()
-
-def generate_shard_id():
-    "Generate a shard id"
-    override_shard = os.getenv("UPDATE_ENGINE_SHARD", None)
-    if override_shard:
-        return override_shard
-    esn = get_prop("ro.serialno")
-    b = int(sha256(esn).hexdigest(), 16) % 100
-    return "{:02d}".format(b)
-
-def construct_update_url(os_version, cmdline):
-    "Construct full URL for automatic updates"
-    base_url = os.getenv("UPDATE_ENGINE_BASE_URL", None)
-    if is_dev_robot(cmdline):
-        base_url = os.getenv("UPDATE_ENGINE_ANKIDEV_BASE_URL", base_url)
-    if not base_url:
-        return None
-    ota_type = os.getenv("UPDATE_ENGINE_OTA_TYPE", "diff")
-    shard_part = ""
-    use_sharding = os.getenv("UPDATE_ENGINE_USE_SHARDING", "False") in TRUE_SYNONYMS
-    if use_sharding:
-        shard_part = generate_shard_id() + "/"
-    url = "{0}{1}{2}/{3}.ota".format(base_url, shard_part, ota_type, os_version.rstrip("ud"))
-    return url
 
 if __name__ == '__main__':
-    das_event("robot.ota_download_start")
-    clear_status()
-    DEBUG = os.getenv("UPDATE_ENGINE_DEBUG", "False") in TRUE_SYNONYMS
-    url = os.getenv("UPDATE_ENGINE_URL", "auto")
-    # We don't expect command line args, but handle them to facilitate developer testing
-    if len(sys.argv) > 1:
-        url = sys.argv[1]
-    if len(sys.argv) > 2 and sys.argv[2] == '-v':
+    if len(sys.argv) == 1:  # Clear the output directory
+        clear_status()
+        exit(0)
+    elif len(sys.argv) == 3 and sys.argv[2] == '-v':
         DEBUG = True
-    if url == "auto":
-        logv("Automatic update running.....")
-        url = construct_update_url(get_prop("ro.anki.version"), get_cmdline())
-        if not url:
-            loge("Unable to construct automatic update url")
-            die(203, "Unable to construct automatic update url")
-        logv("Automatic URL = {}".format(url))
 
     if DEBUG:
-        update_from_url(url)
+        update_from_url(sys.argv[1])
     else:
         try:
-            update_from_url(url)
+            update_from_url(sys.argv[1])
         except zlib.error as decompressor_error:
             die(205, "Decompression error: " + str(decompressor_error))
-        except socket.timeout as timeout_error:
-            das_event("robot.ota_download_stalled")
-            die(215, "Socket Timeout: " + str(timeout_error))
         except IOError as io_error:
             die(208, "IO Error: " + str(io_error))
         except Exception as e:
             die(219, e)
-    safe_delete_staging_files()
-    exit(0)
+        exit(0)
