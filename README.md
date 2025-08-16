@@ -23,6 +23,7 @@ Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector 
 - Compiling with -O2 and fast math
 - Smoother pre-1.6 eye darts (Used code from Viccyware)
 - Rainbow Eyes!
+- Fixed occasional bouncy lift ([Anki commit](https://github.com/kercre123/victor/commit/54cfb370c14421d03811bc54d9a64b0b31e3b4fb))
 - Petting Lights (Code from WireOS but petting colors are mine)
 - Intent graph backported from firmware 1.8 (Could someone with a ddl server sub test this pls?)
 - Fixed going back to charger loop
