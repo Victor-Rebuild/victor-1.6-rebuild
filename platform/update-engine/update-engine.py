@@ -353,6 +353,9 @@ class ShaFile(object):
 def extract_ti(manifest, tar_stream, expected_name, section, dest_fh, progress_callback):
     "Extract an image from a tar_info object"
     tar_info = tar_stream.next()
+    if tar_info.name.endswith("manifest.sha256"):
+        print("Ignoring manifest.sha256")
+        tar_info = tar_stream.next()
     if not tar_info.name.endswith(expected_name):
         die(200, "Expected \"{0}\" to be next in tar but found \"{1}\"".format(expected_name, tar_info.name))
     decompressor = StreamDecompressor(tar_stream.extractfile(tar_info),
