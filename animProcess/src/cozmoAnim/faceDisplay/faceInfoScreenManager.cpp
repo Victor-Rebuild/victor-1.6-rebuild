@@ -1312,7 +1312,7 @@ void FaceInfoScreenManager::DrawMain()
 
   std::string ip             = osstate->GetIPAddress();
   if (ip.empty()) {
-    ip = "XXX.XXX.XXX.XXX";
+    ip = "NOT CONNECTED";
   }
 
   // ESN/serialNo and the HW version are drawn on the same line with serialNo default left aligned and
@@ -1340,7 +1340,7 @@ void FaceInfoScreenManager::DrawNetwork()
 
   std::string ip             = osstate->GetIPAddress();
   if (ip.empty()) {
-    ip = "XXX.XXX.XXX.XXX";
+    ip = "NOT CONNECTED";
   }
 
   std::tm timeObj;
@@ -1356,7 +1356,7 @@ void FaceInfoScreenManager::DrawNetwork()
 
   auto getStatusString = [](const auto& status) {
     switch (status) {
-      case CloudMic::ConnectionCode::Available:   { return ColoredText("AVAILABLE",    NamedColors::GREEN); }
+      case CloudMic::ConnectionCode::Available:   { return ColoredText("CONNECTED",    NamedColors::GREEN); }
       case CloudMic::ConnectionCode::Connectivity:{ return ColoredText("CONNECTIVITY", NamedColors::RED); }
       case CloudMic::ConnectionCode::Tls:         { return ColoredText("TLS",          NamedColors::RED); }
       case CloudMic::ConnectionCode::Auth:        { return ColoredText("AUTH",         NamedColors::RED); }
