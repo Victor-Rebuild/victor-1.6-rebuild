@@ -9,24 +9,11 @@ Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector 
 
 ## Changes from regular 1.6
 
-- Add Vector 2.0 support
-- Good looking Vector 2.0 eyes (Used from WireOS)
-- Backport Custom Eye Colors from 1.8
-- Picovoice 1.5 (Code used from WireOS)
-- Fixed path planning to stop head bobbing loop
-- BinaryEyes when leaving charger
-- Added the previously unused second timer end beep animation
-- New public server environment (Setup at https://modder.my.to/1.6)
-- Unintentional and Intentional performances
-- Improved Japanese TTS voice
-- Upped temprature limit for Vector 2.0
-- Compiling with -O2 and fast math
-- Smoother pre-1.6 eye darts (Used code from Viccyware)
-- Rainbow Eyes!
-- Fixed occasional bouncy lift ([Anki commit](https://github.com/kercre123/victor/commit/54cfb370c14421d03811bc54d9a64b0b31e3b4fb))
-- Petting Lights (Code from WireOS but petting colors are mine)
-- Intent graph backported from firmware 1.8 (Could someone with a ddl server sub test this pls?)
-- Fixed going back to charger loop
+You can see all the changes made compared to normal 1.6 in [CHANGES.md](/CHANGES.md)
+
+## Prebuilt otas
+There aren't any prebuilt otas for 1.6-rebuild just yet, but they will be coming soon.
+Use [this](http://modder.my.to:81/otas/ota-internal/vicos-2.1.0.0d.ota) OTA as a base to deploy 1.6-rebuild on until otas are available.
 
 ## Building (Linux)
 
