@@ -20,7 +20,7 @@
 ## Behavior related changes
 - Unintentional and Intentional performances ([Anki Commit 1](https://github.com/kercre123/victor/commit/d3fa225) [Anki Commit 2](https://github.com/kercre123/victor/commit/2184b33))
 - Can now play Blackjack on charger
-- Now plays the wakeup after onboarding is finished (Code from Viccyware)
+- Now plays the wakeup after onboarding is finished from web setup (Code from Viccyware)
 
 ## Cloud changes
 - vic-cloud and gateway that works with wirepod and regular servers
