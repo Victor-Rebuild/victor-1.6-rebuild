@@ -14,10 +14,11 @@ You can see all the changes made compared to normal 1.6 in [CHANGES.md](/CHANGES
 ## Prebuilt otas
 There aren't any prebuilt otas for 1.6-rebuild just yet, but they will be coming soon.
 Use [this](http://modder.my.to:81/otas/ota-internal/vicos-2.1.0.0d.ota) OTA as a base to deploy 1.6-rebuild on until otas are available.
+Don't use 1.6-rebuild otas given out by others.
 
 ## Building (Linux)
 
- - Prereqs: Make sure you have `docker` and `git-lfs` installed.
+ - Prereqs: Make sure you have `docker` installed.
 
 1. Clone the repo and cd into it:
 
@@ -48,7 +49,7 @@ cd ~/victor-1.6-rebuild
 ## Building (Intel macOS)
 
  - Prereqs: Make sure you have [brew](https://brew.sh/) installed.
-   -  Then: `brew install pyenv git-lfs ccache wget`
+   -  Then: `brew install pyenv ccache wget`
 
 1. Clone the repo and cd into it:
 
