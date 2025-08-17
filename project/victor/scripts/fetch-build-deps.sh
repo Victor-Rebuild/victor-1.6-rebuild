@@ -7,7 +7,7 @@ SCRIPT_PATH=$(dirname $([ -L $0 ] && echo "$(dirname $0)/$(readlink -n $0)" || e
 set +e
 CURRENT_EXTERNALS_VERSION=$(cat "EXTERNALS/VERSION")
 set -e
-EXTERNALS_VERSION_LATEST=5
+EXTERNALS_VERSION_LATEST=6
 
 GIT=`which git`
 if [ -z $GIT ]; then
@@ -34,16 +34,20 @@ case $OS_NAME in
 esac
 
 if [[ -d EXTERNALS/ ]]; then
-    if [ "$CURRENT_EXTERNALS_VERSION" != "$EXTERNALS_VERSION_LATEST" ]; then
-        echo "Old EXTERNALS version found"
-        echo "Removing old EXTERNALS"
-        rm -rf EXTERNALS/
-        echo "Downloading EXTERNALS folder contents... (EXTERNALS version $EXTERNALS_VERSION_LATEST)"
-        wget https://github.com/Switch-modder/victor-1.6-rebuild/releases/download/externals-${EXTERNALS_VERSION_LATEST}/1.6-externals.tar.gz
-        tar xzf 1.6-externals.tar.gz
-        rm 1.6-externals.tar.gz
+    if [ $EXTERNALS_UPDATE_SKIP != 1 ]; then
+        if [ "$CURRENT_EXTERNALS_VERSION" != "$EXTERNALS_VERSION_LATEST" ]; then
+            echo "Old EXTERNALS version found"
+            echo "Removing old EXTERNALS"
+            rm -rf EXTERNALS/
+            echo "Downloading EXTERNALS folder contents... (EXTERNALS version $EXTERNALS_VERSION_LATEST)"
+            wget https://github.com/Switch-modder/victor-1.6-rebuild/releases/download/externals-${EXTERNALS_VERSION_LATEST}/1.6-externals.tar.gz
+            tar xzf 1.6-externals.tar.gz
+            rm 1.6-externals.tar.gz
+        else
+            echo "EXTERNALS up to date (Latest version = $EXTERNALS_VERSION_LATEST)"
+        fi
     else
-        echo "EXTERNALS up to date (Latest version = $EXTERNALS_VERSION_LATEST)"
+        echo "EXTERNALS update skip detected, not updating EXTERNALS"
     fi
 else
     echo "Downloading EXTERNALS folder contents... (EXTERNALS version $EXTERNALS_VERSION_LATEST)"
