@@ -230,7 +230,7 @@ namespace Anki {
       
       typedef std::map<RobotTimeStamp_t, HistRobotState> StateMap_t;
       
-      const StateMap_t& GetRawPoses() const { return _states; }
+      const StateMap_t& GetRawStates() const { return _states; }
       
     private:
       

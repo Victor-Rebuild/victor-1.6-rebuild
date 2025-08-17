@@ -636,6 +636,11 @@ namespace Anki {
 
       auto& pathComponent = GetRobot().GetPathComponent();
       
+      // Just in case, ask the ProxSensor to check if the lift might need calibration
+      // TODO: if we later follow up and decide we should calibrate the motors, we should delegate
+      //       to CalibrateMotorAction here.
+      GetRobot().GetProxSensorComponent().VerifyLiftCalibration();
+
       _timeToAbortPlanning = -1.0f;
       
       // todo: we might consider dynamically turning off _precompute if GetCollisionArea() of the map is negligible
