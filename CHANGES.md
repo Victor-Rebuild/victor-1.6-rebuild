@@ -29,6 +29,7 @@
 ## Miscellaneous changes
 - Improved Japanese TTS voice
 - Upped temprature limit for Vector 2.0
+- Support for DVT bodyboards
 - Compiling with -O2 and fast math
 - Picovoice 1.5 for customizable wakeword (Code used from WireOS)
 

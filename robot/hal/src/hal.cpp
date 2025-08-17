@@ -9,6 +9,8 @@
 // System Includes
 #include <chrono>
 #include <assert.h>
+#include <cstdio>
+#include <cstring>
 
 // Our Includes
 #include "anki/cozmo/robot/DAS.h"
@@ -46,6 +48,9 @@ namespace { // "Private members"
   // Whether or not there is a valid syscon application
   // Assume we do until we get a PAYLOAD_BOOT_FRAME
   bool haveValidSyscon_ = true;
+
+  // whether we should parse data values with dvt2-best.dfu in mind
+  bool isDVT2Robot_ = false;
 
 #ifdef HAL_DUMMY_BODY
   BodyToHead dummyBodyData_ = {
@@ -260,6 +265,13 @@ void handle_syscon_version(const VersionInfo* versionInfo)
     _sysconVersionInfo = *versionInfo;
     record_body_version(versionInfo);
     das_log_version_info(versionInfo);
+    char versionTxt[sizeof(versionInfo->app_version) + 1] = {};
+    memcpy(versionTxt, versionInfo->app_version, sizeof(versionInfo->app_version));
+
+    if (strstr(versionTxt, "DevBuild") != nullptr) {
+      AnkiInfo("HAL.Init.DetectGeneration", "DVT2/3 robot detected (via DevBuild in version)")
+      isDVT2Robot_ = true;
+    }
   }
 }
 
@@ -697,8 +709,16 @@ void HAL::Stop()
 
 void ProcessTouchLevel(void)
 {
-  if(bodyData_->touchHires[HAL::BUTTON_CAPACITIVE] != 0xFFFF) {
-    lastValidTouchIntensity_ = bodyData_->touchHires[HAL::BUTTON_CAPACITIVE];
+  if (isDVT2Robot_) {
+    // touchLevel is 600-650 or so, touchhires is a much higher range.
+    // account for this by raising to a power rather than multiplying
+    if(bodyData_->touchLevel[0] != 0xFFFF) {
+      lastValidTouchIntensity_ = (uint16_t)pow((double)bodyData_->touchLevel[HAL::BUTTON_CAPACITIVE], 1.2);
+    }
+  } else {
+    if(bodyData_->touchHires[HAL::BUTTON_CAPACITIVE] != 0xFFFF) {
+      lastValidTouchIntensity_ = bodyData_->touchHires[HAL::BUTTON_CAPACITIVE];
+    }
   }
 }
 
@@ -896,7 +916,7 @@ void ProcessProxData()
     proxData_.spadCount        = 200.f;
     proxData_.timestamp_ms     = HAL::GetTimeStamp();
     proxData_.rangeStatus      = RangeStatus::RANGE_VALID;
-  } else if (bodyData_->proximity.sampleCount != lastProxDataSampleCount_) {
+  } else if (isDVT2Robot_ || bodyData_->proximity.sampleCount != lastProxDataSampleCount_) {
     proxData_.rangeStatus = ConvertToApiRangeStatus(bodyData_->proximity.rangeStatus);
     // Track the occurrences of invalid prox sensor readings, reported on a periodic basis
     switch(proxData_.rangeStatus) {
