@@ -182,6 +182,9 @@ void BehaviorBlackJack::OnBehaviorActivated()
   if (IsXray()) {
     // Up the cpu frequency to the max
     (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2' -H 'Accept-Encoding: gzip, deflate' -H 'Referer: http://localhost:8080/' -H 'Connection: keep-alive' -H 'Priority: u=0'");
+
+    // This is the older method, I'm keeping it to maintain backcompat with otas that have the older wired
+    (void)system("curl 'http://localhost:8080/api/mods/modify/FreqChange' -X POST -H 'Referer: http://localhost:8080/' -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' --data-raw '{\"freq\":2}'");
   }
 
   // --- On With the Game ---
@@ -196,6 +199,9 @@ void BehaviorBlackJack::OnBehaviorDeactivated()
   if (IsXray()) {
     // Now that the behavior has finished set the cpu speed back to something reasonable
     (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1' -H 'Accept-Encoding: gzip, deflate' -H 'Referer: http://localhost:8080/' -H 'Connection: keep-alive' -H 'Priority: u=0'");
+
+    // This is the older method, I'm keeping it to maintain backcompat with otas that have the older wired
+    (void)system("curl 'http://localhost:8080/api/mods/modify/FreqChange' -X POST -H 'Referer: http://localhost:8080/' -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' --data-raw '{\"freq\":1}'");
   }
 
   // Log session end DAS events and track DAS related state
