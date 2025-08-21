@@ -19,11 +19,11 @@
       "streamType"                       : "Blackjack",
       "earConAudioEventSuccess"          : "Play__Robot_Vic_Sfx__Wake_Word_Success",
       "earConAudioEventNeutral"          : "Play__Robot_Vic_Sfx__Wake_Word_Off",
-      "vocalPromptString"                : "Play Blackjack?",
+      "vocalPromptString"                : "Play a round of Blackjack!",
       "maxNumberOfReprompts"             : 0,
       "stopListeningOnIntents"           : true,
-      "playListeningGetIn"               : false,
-      "playListeningGetOut"              : false
+      "playListeningGetIn"               : true,
+      "playListeningGetOut"              : true
     }
   ]
 }
