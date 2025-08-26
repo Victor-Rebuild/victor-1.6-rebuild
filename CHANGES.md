@@ -3,7 +3,7 @@
 ## Backported features from >1.6
 - Add Vector 2.0 support (Firmware 2.0)
 - Custom Eye Colors (Firmware 1.8)
-- Intent graph backported from firmware 1.8 (Could someone with a ddl server sub test this pls?)
+- Intent graph backported from firmware 1.8 (The code does exist but doesn't seem to be functional)
 - Fixed occasional bouncy lift ([Anki commit](https://github.com/kercre123/victor/commit/54cfb37))
 - Fixed self confirming fist bump ([Anki Commit](https://github.com/kercre123/victor/commit/2d5213e))
 - Fixed path planning to stop head bobbing loop ([Anki Commit](https://github.com/kercre123/victor/commit/4110afc))
