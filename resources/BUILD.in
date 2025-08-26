@@ -6,6 +6,7 @@ asset_project(
                 ('assets', 'RewardedActions/RewardedActions.json'),
                 ('assets', 'cubeFirmware/cube.dfu'),
                 ('assets', 'LocalizedStrings/**/*.json'),
+                ('assets', 'faceOverlays/*.jpg'),
                 ('externals/deps/sensory', 'sensorySpeechRecModels/hey_vector/**/*.raw'),
                 ('externals/deps/sensory', 'sensorySpeechRecModels/alexa/**/*.raw'),
                 ('externals/deps/pryon_lite', 'pryonSpeechRecModels/**/*.bin'),
@@ -16,8 +17,8 @@ asset_project(
                 ('externals/animation-assets', 'anim_manifest.json'),
                 ('externals/animation-assets', 'compositeImageResources/imageLayouts/**/*.json'),
                 ('externals/animation-assets', 'compositeImageResources/imageMaps/**/*.json'),
-		('speech-recognition', 'picovoice/**/*.pv'),
-		('speech-recognition', 'picovoice/**/*.ppn')
+		        ('speech-recognition', 'picovoice/**/*.pv'),
+		        ('speech-recognition', 'picovoice/**/*.ppn')
                 ],
                 prefix = 'assets'
             ),

@@ -18,6 +18,7 @@
 - Petting Lights (Code from WireOS but petting colors are mine)
 - Alt power on eye animations
 - More expressive power on anims
+- Face image overlays (Code used from WireOS)
 
 ## Behavior related changes
 - Unintentional and Intentional performances ([Anki Commit 1](https://github.com/kercre123/victor/commit/d3fa225) [Anki Commit 2](https://github.com/kercre123/victor/commit/2184b33))
