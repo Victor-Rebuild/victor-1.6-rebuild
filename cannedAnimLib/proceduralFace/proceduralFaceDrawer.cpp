@@ -29,6 +29,11 @@ namespace Vector {
 
   static std::mutex gCustomEyeMtx;
 
+  static void LoadFaceOverlay(ConsoleFunctionContextRef context)
+  {
+    ProceduralFaceDrawer::LoadCustomEyePNG();
+  }
+
   #define CONSOLE_GROUP "Face.ParameterizedFace"
 
   enum class Filter {
@@ -52,12 +57,7 @@ namespace Vector {
   CONSOLE_VAR(bool, kProcFace_CustomEyes, CONSOLE_GROUP, false);
   CONSOLE_VAR_RANGED(f32, kProcFace_CustomEyeOpacity, CONSOLE_GROUP, 0.8f, 0.f, 1.f);
   CONSOLE_VAR_ENUM(u8, kProcFace_CustomEyeOverlay, CONSOLE_GROUP, 0, "Galaxy,Lesbian,Gay,Bi,Trans,Pan,Frog,All,Custom");
-  static void LOOK_LoadFaceOverlay(ConsoleFunctionContextRef context)
-  {
-    ProceduralFaceDrawer::LoadCustomEyePNG();
-  }
-  CONSOLE_FUNC(LOOK_LoadFaceOverlay, CONSOLE_GROUP);
-
+  CONSOLE_FUNC(LoadFaceOverlay, CONSOLE_GROUP);
 
 #if PROCEDURALFACE_GLOW_FEATURE
   CONSOLE_VAR_RANGED(f32, kProcFace_GlowSizeMultiplier,           CONSOLE_GROUP, 1.f, 0.f, 1.f);
