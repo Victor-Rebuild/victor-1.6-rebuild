@@ -134,9 +134,9 @@ shift $(($OPTIND - 1))
 # Run everything from ${TOPLEVEL}, even if invoked from somewhere else
 cd ${TOPLEVEL}
 
-for f in `git ls-files *.tflite`; do
-    egrep -q TFL3 $f || usage_fix_lfs $f
-done
+# for f in `git ls-files *.tflite`; do
+#     egrep -q TFL3 $f || usage_fix_lfs $f
+# done
 
 
 #

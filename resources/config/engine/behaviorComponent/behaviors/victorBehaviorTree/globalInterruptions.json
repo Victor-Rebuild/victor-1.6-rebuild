@@ -22,6 +22,7 @@
     "ReactToUnclaimedIntent",
     "HeldInPalmDispatcher",
     "WhileInAirDispatcher",
+    "PetDetection",
     "ReactToPutDown",
     "ReactToDarkness",
     "GreetAfterLongTime", // autonomous - I think this should be higher priority than StayOnCharger--the magic moment is worth it (?)

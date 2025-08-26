@@ -177,6 +177,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/userDefinedBehaviorTree/behaviorUserDefinedBehaviorSelector.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/userDefinedBehaviorTree/behaviorUserDefinedBehaviorTreeRouter.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorConfirmObject.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorPetDetection.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorPoweringRobotOff.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorReactToTouchPetting.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorReactToUnclaimedIntent.h"
@@ -1214,6 +1215,12 @@ ICozmoBehaviorPtr BehaviorFactory::CreateBehavior(const Json::Value& config)
       break;
     }
     
+    case BehaviorClass::PetDetection:
+    {
+      newBehavior = ICozmoBehaviorPtr(new BehaviorPetDetection(config));
+      break;
+    }
+
     case BehaviorClass::PoweringRobotOff:
     {
       newBehavior = ICozmoBehaviorPtr(new BehaviorPoweringRobotOff(config));

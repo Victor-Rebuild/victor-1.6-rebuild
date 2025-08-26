@@ -500,6 +500,10 @@ enum uint_16 BehaviorID {
   // victorBehaviorTree/weather
   WeatherResponses,
   WeatherTextToSpeech,
+
+  // victorBehaviorTree
+  PetDetection,
+
 }
 
 }
