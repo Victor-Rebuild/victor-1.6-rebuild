@@ -56,7 +56,7 @@ namespace Vector {
   CONSOLE_VAR_RANGED(f32,   kProcFace_AntiAliasingSigmaFraction,  CONSOLE_GROUP, IsXray() ? 0.3f : 0.5f, 0.0f, 1.0f);
   CONSOLE_VAR(bool, kProcFace_CustomEyes, CONSOLE_GROUP, false);
   CONSOLE_VAR_RANGED(f32, kProcFace_CustomEyeOpacity, CONSOLE_GROUP, 0.8f, 0.f, 1.f);
-  CONSOLE_VAR_ENUM(u8, kProcFace_CustomEyeOverlay, CONSOLE_GROUP, 0, "Galaxy,Lesbian,Gay,Bi,Trans,Pan,Frog,All,Custom");
+  CONSOLE_VAR_ENUM(u8, kProcFace_CustomEyeOverlay, CONSOLE_GROUP, 0, "Trans,Lesbian,Gay,Bi,Pan,Frog,All,Galaxy,Custom");
   CONSOLE_FUNC(LoadFaceOverlay, CONSOLE_GROUP);
 
 #if PROCEDURALFACE_GLOW_FEATURE
@@ -258,14 +258,14 @@ namespace Vector {
     std::lock_guard<std::mutex> lk(gCustomEyeMtx);
     _hasCustomEyes = false;
     static const cv::String kFaceOverlays[9] = { 
-      "/anki/data/assets/cozmo_resources/assets/faceOverlays/galaxy.jpg",
+      "/anki/data/assets/cozmo_resources/assets/faceOverlays/trans.jpg",
       "/anki/data/assets/cozmo_resources/assets/faceOverlays/lesbian.jpg", 
       "/anki/data/assets/cozmo_resources/assets/faceOverlays/gay.jpg",
-      "/anki/data/assets/cozmo_resources/assets/faceOverlays/bi.jpg",
       "/anki/data/assets/cozmo_resources/assets/faceOverlays/trans.jpg",
       "/anki/data/assets/cozmo_resources/assets/faceOverlays/pan.jpg",
       "/anki/data/assets/cozmo_resources/assets/faceOverlays/frog.jpg",
       "/anki/data/assets/cozmo_resources/assets/faceOverlays/all.jpg",
+      "/anki/data/assets/cozmo_resources/assets/faceOverlays/Galaxy.jpg"
       "/data/data/customFaceOverlay.jpg"
     };
     const cv::String kFaceOverlay = kFaceOverlays[kProcFace_CustomEyeOverlay];
