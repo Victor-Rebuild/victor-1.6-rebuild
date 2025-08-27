@@ -13,7 +13,7 @@ import sys
 # ankibuild
 import toolget
 
-PROTOBUF = 'protobuf'
+PROTOBUF = 'deps/protobuf'
 
 def get_protoc_version_from_command(exe):
     version = None
