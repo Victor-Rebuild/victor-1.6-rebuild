@@ -47,6 +47,8 @@ if [[ -d EXTERNALS/ ]]; then
                 echo "Updating EXTERNALS"
                 cd EXTERNALS/
                 git pull
+                git checkout externals-$EXTERNALS_VERSION_LATEST
+                cd ..
             else
                 echo "EXTERNALS up to date (EXTERNALS version = $CURRENT_EXTERNALS_VERSION, Latest version = $EXTERNALS_VERSION_LATEST)"
             fi
