@@ -30,7 +30,6 @@ vlog "Check homebrew dependencies"
     -d python2 \
     ninja \
     python3 \
-    git-lfs \
     libsndfile \
     node \
     rsync \
@@ -46,8 +45,8 @@ vlog "CMake"
 #vlog "Go"
 #./tools/build/tools/ankibuild/go.py
 
-vlog "git-lfs"
-$GIT lfs install
+# vlog "git-lfs"
+# $GIT lfs install
 
 if [ -d "/Applications/Webots.app" ]; then
   vlog "check webots version"

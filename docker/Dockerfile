@@ -40,7 +40,6 @@ RUN apt-get update && apt-get install -y \
     autoconf \
     ninja-build \
     libtool \
-    git-lfs \
     rsync \
     zlib1g-dev
 

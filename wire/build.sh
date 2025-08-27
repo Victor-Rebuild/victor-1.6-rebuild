@@ -45,8 +45,6 @@ fi
 
 cd "${VICDIR}"
 
-git lfs update --force
-
 echo "Building victor..."
 
 ./project/victor/scripts/victor_build_release.sh -x /usr/bin/cmake
