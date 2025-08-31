@@ -97,7 +97,6 @@ set(VICOS_LINKER_FLAGS_EXE)
 
 # Generic flags.
 list(APPEND VICOS_COMPILER_FLAGS
-    -Werror
     -DVICOS
 	-ffunction-sections
 	-fdata-sections
@@ -113,6 +112,7 @@ list(APPEND VICOS_COMPILER_FLAGS_CXX
 	-fno-exceptions
     -Wno-nonportable-include-path
     -Wno-delete-non-virtual-dtor
+    -Wgnu-include-next
 	-fno-rtti)
 list(APPEND VICOS_COMPILER_FLAGS_RELEASE
   -D_FORTIFY_SOURCE=2)
