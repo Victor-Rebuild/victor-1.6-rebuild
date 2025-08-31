@@ -378,10 +378,6 @@ void RtsHandlerV5::HandleRtsWifiScanRequest(const Vector::ExternalComms::RtsConn
 }
 
 void RtsHandlerV5::HandleRtsWifiForgetRequest(const Vector::ExternalComms::RtsConnection_5& msg) {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   if(_state == RtsPairingPhase::ConfirmedSharedSecret) {
     // Get message
     Anki::Vector::ExternalComms::RtsWifiForgetRequest forgetMsg = msg.Get_RtsWifiForgetRequest();
@@ -432,10 +428,6 @@ void RtsHandlerV5::HandleRtsOtaCancelRequest(const Vector::ExternalComms::RtsCon
 }
 
 void RtsHandlerV5::HandleRtsWifiAccessPointRequest(const Vector::ExternalComms::RtsConnection_5& msg) {
-  if(!IsAuthenticated()) {
-    return;
-  }
-
   if(_state == RtsPairingPhase::ConfirmedSharedSecret) {
     Anki::Vector::ExternalComms::RtsWifiAccessPointRequest accessPointMessage = msg.Get_RtsWifiAccessPointRequest();
     if(accessPointMessage.enable) {
@@ -623,9 +615,7 @@ void RtsHandlerV5::HandleRtsAppConnectionIdRequest(const Vector::ExternalComms::
 }
 
 void RtsHandlerV5::HandleRtsSdkProxyRequest(const Vector::ExternalComms::RtsConnection_5& msg) {
-  if(!IsAuthenticated()) {
-    return;
-  }
+
 
   if(_gatewayServer != nullptr) {
     Anki::Vector::ExternalComms::RtsSdkProxyRequest sdkMsg = 
@@ -909,9 +899,6 @@ void RtsHandlerV5::SendStatusResponse() {
 }
 
 void RtsHandlerV5::SendWifiAccessPointResponse(bool success, std::string ssid, std::string pw) {
-  if(!IsAuthenticated()) {
-    return;
-  }
 
   // Send challenge and update state
   SendRtsMessage<RtsWifiAccessPointResponse>(success, ssid, pw);
