@@ -24,7 +24,7 @@ Don't use 1.6-rebuild otas given out by others.
 
 ```
 cd ~
-git clone --recursive https://github.com/Switch-modder/victor-1.6-rebuild -b Main
+git clone --recursive https://github.com/Victor-Rebuild/victor-1.6-rebuild -b Main
 cd victor-1.6-rebuild
 ```
 
@@ -55,7 +55,7 @@ cd ~/victor-1.6-rebuild
 
 ```
 cd ~
-git clone --recursive https://github.com/Switch-modder/victor-1.6-rebuild -b Main
+git clone --recursive https://github.com/Victor-Rebuild/victor-1.6-rebuild -b Main
 cd victor-1.6-rebuild
 ```
 
