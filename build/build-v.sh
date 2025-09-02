@@ -1,5 +1,7 @@
 #!/bin/bash
 
+TOOLCHAIN_VERSION="5.2.1-r06"
+
 set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
@@ -12,6 +14,9 @@ if [[ "$(uname -a)" == *"x86_64"* && "$(uname -a)" == *"Linux"* ]]; then
 elif [[ "$(uname -a)" == *"arm64"* && "$(uname -a)" == *"Darwin"* ]]; then
 	HOST="arm64-macos"
 	ADEPS="$HOME/.anki"
+elif [[ "$(uname -a)" == *"aarch64"* && "$(uname -a)" == *"Linux"* ]]; then
+	HOST="arm64-linux"
+    ADEPS="anki-deps"
 else
     echo "This can only be run on x86_64 Linux or amd64 macOS systems at the moment."
     echo "This will be fixed once I compile the new toolchain for more platforms."
@@ -20,12 +25,16 @@ fi
 
 echo $HOST
 
-if [[ ! -d "$ADEPS/vicos-sdk/dist/4.0.0-r05/prebuilt" ]]; then
-	mkdir -p "$ADEPS/vicos-sdk/dist/4.0.0-r05"
-	cd "$ADEPS/vicos-sdk/dist/4.0.0-r05"
-	wget -q --show-progress https://github.com/os-vector/wire-os-externals/releases/download/4.0.0-r05/vicos-sdk_4.0.0-r05_$HOST.tar.gz
-	tar -zxf vicos-sdk_4.0.0-r05_$HOST.tar.gz
-	rm -f vicos-sdk_4.0.0-r05_$HOST.tar.gz
+# remove old toolchain
+echo "Deleting old 4.0.0-r05 toolchain if it exists..."
+rm -rf $ADEPS/vicos-sdk/dist/4.0.0-r05
+
+if [[ ! -d "$ADEPS/vicos-sdk/dist/5.2.1-r06/prebuilt" ]]; then
+	mkdir -p "$ADEPS/vicos-sdk/dist/5.2.1-r06"
+	cd "$ADEPS/vicos-sdk/dist/5.2.1-r06"
+	wget -q --show-progress https://github.com/os-vector/wire-os-externals/releases/download/5.2.1-r06/vicos-sdk_5.2.1-r06_$HOST.tar.gz
+	tar -zxf vicos-sdk_5.2.1-r06_$HOST.tar.gz
+	rm -f vicos-sdk_5.2.1-r06_$HOST.tar.gz
 fi
 
 cd "$DIR"
@@ -55,22 +64,22 @@ else
 		echo -e "\033[32mContinuing in 5 seconds... (you will only see this message once)\033[0m"
 		sleep 5
 	fi
-	if [[ -z $(docker images -q vic-standalone-builder-4) ]]; then
+	if [[ -z $(docker images -q vic-standalone-builder-5) ]]; then
 		docker build \
 		--build-arg DIR_PATH="$(pwd)" \
 		--build-arg USER_NAME=$USER \
 		--build-arg UID=$(id -u $USER) \
 		--build-arg GID=$(id -u $USER) \
-		-t vic-standalone-builder-4 \
+		-t vic-standalone-builder-5 \
 		build/
 	else
-		echo "Reusing vic-standalone-builder-4"
+		echo "Reusing vic-standalone-builder-5"
 	fi
-	docker run -it \
+	docker run --rm -it \
 		-v $(pwd)/anki-deps:/home/$USER/.anki \
 		-v $(pwd):$(pwd) \
 		-v $(pwd)/build/cache:/home/$USER/.ccache \
-		vic-standalone-builder-4 bash -c \
+		vic-standalone-builder-5 bash -c \
 		"cd $(pwd) && \
 		./project/victor/scripts/victor_build_release.sh"
 fi

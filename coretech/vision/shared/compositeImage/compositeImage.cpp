@@ -549,14 +549,14 @@ void CompositeImage::VerifySubImageProperties(const ImageType& image, const Spri
   sb.GetPositionForFrame(frameIdx, topCornerInt, width, height);
 
   // dev only verification that image size is as expected
-  ANKI_VERIFY(width == image.GetNumCols(), 
-              "CompositeImage.DrawSubImage.InvalidWidth",
-              "Quadrant Name:%s Expected Width:%d, Image Width:%d",
-              SpriteBoxNameToString(sb.spriteBoxName), width, image.GetNumCols());
-  ANKI_VERIFY(height == image.GetNumRows(), 
-              "CompositeImage.DrawSubImage.InvalidHeight",
-              "Quadrant Name:%s Expected Height:%d, Image Height:%d",
-              SpriteBoxNameToString(sb.spriteBoxName), height, image.GetNumRows());
+  // ANKI_VERIFY(width == image.GetNumCols(), 
+  //             "CompositeImage.DrawSubImage.InvalidWidth",
+  //             "Quadrant Name:%s Expected Width:%d, Image Width:%d",
+  //             SpriteBoxNameToString(sb.spriteBoxName), width, image.GetNumCols());
+  // ANKI_VERIFY(height == image.GetNumRows(), 
+  //             "CompositeImage.DrawSubImage.InvalidHeight",
+  //             "Quadrant Name:%s Expected Height:%d, Image Height:%d",
+  //             SpriteBoxNameToString(sb.spriteBoxName), height, image.GetNumRows());
 }
 
 

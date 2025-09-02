@@ -82,7 +82,7 @@ int main(int argc, char** argv)
   // Open animation file for reading
   const char *anim_path = use_santek_sizes() ? _animPathSantek : _animPathMidas;
 
-  int fd = open(anim_path, O_RDONLY);
+  int fd = open(anim_path, O_RDONLY, 644);
   if(fd < 0)
   {
     printf("Failed to open %s\n", anim_path);
