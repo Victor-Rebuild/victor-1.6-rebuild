@@ -121,6 +121,7 @@ list(APPEND VICOS_LINKER_FLAGS
 	-Wl,--gdb-index
 	-Wl,--warn-shared-textrel
 	-Wl,--gc-sections
+    -Wl,--allow-multiple-definition
 	-Wl,--fatal-warnings)
 list(APPEND VICOS_LINKER_FLAGS_EXE
 	-Wl,-z,nocopyreloc)
