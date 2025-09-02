@@ -33,7 +33,7 @@ namespace {
   const std::string kAppURL = "anki.com/v";
   const ColorRGBA kWhiteColor(0.9f, 0.9f, 0.9f, 1.f);
   const int kTextThickness = 1;
-  const int kNormalFont = CV_FONT_NORMAL;
+  const int kNormalFont = cv::QT_FONT_NORMAL;
   const bool kDrawTwice = false;
   const int kRobotNameVerticalPosition = 15;
 }

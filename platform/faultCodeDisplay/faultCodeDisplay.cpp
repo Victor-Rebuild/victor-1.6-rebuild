@@ -45,7 +45,7 @@ void DrawFaultCode(uint16_t fault, bool willRestart)
   const std::string faultString = std::to_string(fault);
   Vec2f size = Vision::Image::GetTextSize(faultString, 1.5,  1);
   img.DrawTextCenteredHorizontally(faultString,
-				   CV_FONT_NORMAL,
+				   cv::QT_FONT_NORMAL,
 				   1.5,
 				   2,
 				   NamedColors::WHITE,
@@ -55,7 +55,7 @@ void DrawFaultCode(uint16_t fault, bool willRestart)
   // Draw text centered horizontally and slightly above
   // the bottom of the screen
   const std::string & text = (willRestart ? kVectorWillRestart : kSupportURL);
-  const int font = CV_FONT_NORMAL;
+  const int font = cv::QT_FONT_NORMAL;
   const f32 scale = 0.5f;
   const int thickness = 1;
   const auto color = NamedColors::WHITE;

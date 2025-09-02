@@ -17,6 +17,7 @@ endif()
 
 set(OPENCV_LIBS
     calib3d
+    dnn
     features2d
     imgproc 
     core
@@ -35,7 +36,7 @@ set(LIB_POSTFIX "")
 if(VICOS)
   set(LIB_EXT so)
   set(LIB_TYPE SHARED)
-  set(LIB_POSTFIX .3.4)
+  set(LIB_POSTFIX .412)
 endif()
 
 # Add the include directory for each OpenCV module:
