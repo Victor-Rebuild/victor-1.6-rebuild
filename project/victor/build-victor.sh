@@ -53,7 +53,7 @@ FEATURES=""
 DEFINES=""
 ADDITIONAL_PLATFORM_ARGS=()
 
-while getopts ":x:c:p:a:t:g:F:D:hvfdCTeISX" opt; do
+while getopts ":x:c:p:a:t:g:F:D:hvfdCTeISXm" opt; do
     case $opt in
         h)
             usage

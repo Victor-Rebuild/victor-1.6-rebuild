@@ -137,7 +137,7 @@ list(APPEND VICOS_COMPILER_FLAGS_RELEASE
 list(APPEND VICOS_COMPILER_FLAGS
 	-march=armv7-a
 	-mfloat-abi=softfp
-	-mfpu=vfpv3-d16)
+	-mfpu=vfpv4-neon)
 list(APPEND VICOS_LINKER_FLAGS
 	-Wl,--fix-cortex-a8)
 
