@@ -9,8 +9,8 @@ alias victor_restart="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scr
 alias victor_start="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_start.sh"
 alias victor_stop="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_stop.sh"
 
-alias victor_build_release="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/wire/build-d.sh"
-alias victor_deploy_run="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/wire/deploy-d.sh"
+alias victor_build_release="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/build/build-v.sh"
+alias victor_deploy_run="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/build/deploy-v.sh"
 
 function IS_ROBOT_IP_THERE() {
     if [[ ! -f "$GIT_PROJ_ROOT/robot_ip.txt" ]]; then
