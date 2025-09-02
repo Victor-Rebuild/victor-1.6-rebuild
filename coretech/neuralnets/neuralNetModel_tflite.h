@@ -19,12 +19,12 @@
 
 #include <list>
 
-#include <memory>
-#include <string>
-#include <json/json.h>
-
-#include "tensorflow/lite/model.h"
-#include "tensorflow/lite/interpreter.h"
+// Forward declaration
+namespace tflite
+{
+  class FlatBufferModel;
+  class Interpreter;
+}
 
 namespace Anki {
 namespace NeuralNets {
@@ -36,13 +36,11 @@ public:
   TFLiteModel();
   virtual ~TFLiteModel();
   
-  virtual Result Detect(Vision::ImageRGB& img,
-                        std::list<Vision::SalientPoint>& salientPoints) override;
+  virtual Result Detect(Vision::ImageRGB& img, std::list<Vision::SalientPoint>& salientPoints) override;
   
 protected:
   
-  virtual Result LoadModelInternal(const std::string& modelPath,
-                                   const Json::Value& config) override;
+  virtual Result LoadModelInternal(const std::string& modelPath, const Json::Value& config) override;
   
 private:
   
@@ -56,5 +54,5 @@ private:
 } // namespace NeuralNets
 } // namespace Anki
 
-#endif /* __Anki_NeuralNets_NeuralNetModel_TFLite_H__ */
+#endif /* __Anki_Vision_NeuralNetModel_TFLite_H__ */
 
