@@ -53,9 +53,10 @@ if [[ "$(uname -a)" == *"Darwin"* ]]; then
 	./project/victor/scripts/victor_build_release.sh
 else
 	mkdir -p build/cache
-	if [[ ! -z $(docker images -q vic-standalone-builder-2) ]]; then
-		echo "Purging old vic-standalone-builder-2 container..."
-		docker ps -a --filter "ancestor=vic-standalone-builder-2" -q | xargs -r docker rm -f
+	if [[ ! -z $(docker images -q victor-${USER}) ]]; then
+		echo "Purging old legacy victor container..."
+		docker ps -a --filter "ancestor=victor-${USER}" -q | xargs -r docker rm -f
+		docker ps -a --filter "ancestor=victor" -q | xargs -r docker rm -f
 		echo
 		echo -e "\033[5m\033[1m\033[31mOld Docker builder detected on system. If you have built victor or wire-os many times, it is recommended you run:\033[0m"
 		echo
