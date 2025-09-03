@@ -98,10 +98,9 @@ set(VICOS_LINKER_FLAGS_EXE)
 # Generic flags.
 list(APPEND VICOS_COMPILER_FLAGS
     # Remove -Werror if you want to be LAZY
-    #-Werror
+    -Werror
     -DVICOS
     -Qunused-arguments
-    -w
 	-ffunction-sections
 	-fdata-sections
 	-funwind-tables
@@ -114,7 +113,6 @@ list(APPEND VICOS_COMPILER_FLAGS
 	-no-canonical-prefixes)
 list(APPEND VICOS_COMPILER_FLAGS_CXX
     -Qunused-arguments
-    -w
 	-fno-exceptions
 	-fno-rtti)
 list(APPEND VICOS_COMPILER_FLAGS_RELEASE
