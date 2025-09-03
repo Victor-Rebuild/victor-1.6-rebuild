@@ -101,6 +101,7 @@ list(APPEND VICOS_COMPILER_FLAGS
     #-Werror
     -DVICOS
     -Qunused-arguments
+    -w
 	-ffunction-sections
 	-fdata-sections
 	-funwind-tables
@@ -113,6 +114,7 @@ list(APPEND VICOS_COMPILER_FLAGS
 	-no-canonical-prefixes)
 list(APPEND VICOS_COMPILER_FLAGS_CXX
     -Qunused-arguments
+    -w
 	-fno-exceptions
 	-fno-rtti)
 list(APPEND VICOS_COMPILER_FLAGS_RELEASE
