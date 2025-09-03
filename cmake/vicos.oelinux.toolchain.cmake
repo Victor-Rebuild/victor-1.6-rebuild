@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6.0)
+cmake_minimum_required(VERSION 3.10)
 
 # CMake invokes the toolchain file twice during the first build, but only once
 # during subsequent rebuilds. This was causing the various flags to be added
@@ -97,32 +97,38 @@ set(VICOS_LINKER_FLAGS_EXE)
 
 # Generic flags.
 list(APPEND VICOS_COMPILER_FLAGS
+    # Remove -Werror if you want to be LAZY
+    #-Werror
     -DVICOS
+    -Qunused-arguments
 	-ffunction-sections
 	-fdata-sections
 	-funwind-tables
 	-fstack-protector-strong
-    -Wno-nonportable-include-path
-    -Wno-delete-non-virtual-dtor
+	# TFLite 2.19 has c++17-written headers - let's just ignore the use of these extensions now
+	-Wno-c++17-extensions
 #  -flto
 #  -fvisibility=hidden
 #  -fsanitize=cfi
 	-no-canonical-prefixes)
 list(APPEND VICOS_COMPILER_FLAGS_CXX
+    -Qunused-arguments
 	-fno-exceptions
-    -Wno-nonportable-include-path
-    -Wno-delete-non-virtual-dtor
-    -Wgnu-include-next
 	-fno-rtti)
 list(APPEND VICOS_COMPILER_FLAGS_RELEASE
   -D_FORTIFY_SOURCE=2)
 list(APPEND VICOS_LINKER_FLAGS
 	-Wl,--build-id
-	-Wl,--gdb-index
+	#-Wl,--gdb-index
 	-Wl,--warn-shared-textrel
 	-Wl,--gc-sections
-	-Wl,--fatal-warnings)
+	-Wl,--allow-multiple-definition
+        -Wl,-rpath-link,${VICOS_SDK}/sysroot/lib
+        -Wl,-rpath-link,${VICOS_SDK}/sysroot/usr/lib)
+#	-Wl,--fatal-warnings)
 list(APPEND VICOS_LINKER_FLAGS_EXE
+        -Wl,-rpath-link,${VICOS_SDK}/sysroot/lib
+        -Wl,-rpath-link,${VICOS_SDK}/sysroot/usr/lib
 	-Wl,-z,nocopyreloc)
 
 # Debug and release flags.
@@ -133,11 +139,19 @@ list(APPEND VICOS_COMPILER_FLAGS_RELEASE
 	-O2 -fno-math-errno -fno-trapping-math
         -DNDEBUG)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    list(APPEND VICOS_LINKER_FLAGS_EXE
+        -Wl,-rpath-link,${CMAKE_SOURCE_DIR}/_build/vicos/Debug/lib)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    list(APPEND VICOS_LINKER_FLAGS_EXE
+        -Wl,-rpath-link,${CMAKE_SOURCE_DIR}/_build/vicos/Release/lib)
+endif()
+
 # Toolchain and ABI specific flags.
 list(APPEND VICOS_COMPILER_FLAGS
 	-march=armv7-a
 	-mfloat-abi=softfp
-	-mfpu=vfpv4-neon)
+	-mfpu=neon-vfpv4)
 list(APPEND VICOS_LINKER_FLAGS
 	-Wl,--fix-cortex-a8)
 
@@ -194,8 +208,8 @@ endif()
 # set thumb mode (use -marm for arm mode)
 list(APPEND VICOS_COMPILER_FLAGS -mthumb)
 
-list(APPEND VICOS_COMPILER_FLAGS
-    -mfpu=neon)
+#list(APPEND VICOS_COMPILER_FLAGS
+#    -mfpu=neon)
 #list(APPEND VICOS_COMPILER_FLAGS
 #    -Wa,--noexecstack)
 list(APPEND VICOS_LINKER_FLAGS
@@ -304,13 +318,13 @@ if (USE_ANKIASAN)
                                # requires SDK support -shared-libasan
                                -ldl
                                -lrt
-                               -l${VICOS_SDK}/prebuilt/lib/clang/5.0.1/lib/linux/libclang_rt.asan-arm.a
+                               -l${VICOS_SDK}/prebuilt/lib/clang/5.0.0/lib/linux/libclang_rt.asan-arm.a
   )
 
   set(ASAN_EXE_LINKER_FLAGS    PUBLIC
                                -fsanitize=address
                                -ldl
                                -lrt
-                               -l${VICOS_SDK}/prebuilt/lib/clang/5.0.1/lib/linux/libclang_rt.asan-arm.a
+                               -l${VICOS_SDK}/prebuilt/lib/clang/5.0.0/lib/linux/libclang_rt.asan-arm.a
   )
 endif()

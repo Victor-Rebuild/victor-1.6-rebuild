@@ -197,7 +197,7 @@ void ExecCommand(const std::vector<std::string>& args)
   pid_t pID = fork();
   if (pID == 0) // child
   {
-    char* argv_child[args.size() + 1];
+    auto argv_child = std::vector<char*>(args.size() + 1);
 
     for (size_t i = 0; i < args.size(); i++) {
       argv_child[i] = (char *) malloc(args[i].size() + 1);
@@ -205,7 +205,7 @@ void ExecCommand(const std::vector<std::string>& args)
     }
     argv_child[args.size()] = nullptr;
 
-    execv(argv_child[0], argv_child);
+    execv(argv_child[0], argv_child.data());
 
     // We'll only get here if execv fails
     for (size_t i = 0 ; i < args.size() + 1 ; ++i) {
@@ -289,10 +289,10 @@ ConsoleVarSet(struct mg_connection *conn, void *cbdata)
   std::string query;
 
   if (info->content_length > 0) {
-    char buf[info->content_length+1];
-    mg_read(conn, buf, sizeof(buf));
-    buf[info->content_length] = 0;
-    query = buf;
+    std::vector<char> buf(static_cast<size_t>(info->content_length) + 1);
+    mg_read(conn, buf.data(), buf.size());
+    buf[static_cast<size_t>(info->content_length)] = 0;
+    query = buf.data();
   }
   else if (info->query_string) {
     query = info->query_string;
@@ -365,10 +365,10 @@ ConsoleFuncCall(struct mg_connection *conn, void *cbdata)
   std::string func;
   std::string args;
   if (info->content_length > 0) {
-    char buf[info->content_length+1];
-    mg_read(conn, buf, sizeof(buf));
-    buf[info->content_length] = 0;
-    func = buf;
+    std::vector<char> buf(static_cast<size_t>(info->content_length) + 1);
+    mg_read(conn, buf.data(), buf.size());
+    buf[static_cast<size_t>(info->content_length)] = 0;
+    func = buf.data();
   }
   else if (info->query_string) {
     func = info->query_string;
@@ -419,10 +419,10 @@ ProcessRequestFromQueryString(struct mg_connection *conn, void *cbdata, WebServi
   const mg_request_info* info = mg_get_request_info(conn);
   std::string request;
   if (info->content_length > 0) {
-    char buf[info->content_length+1];
-    mg_read(conn, buf, sizeof(buf));
-    buf[info->content_length] = 0;
-    request = buf;
+    std::vector<char> buf(static_cast<size_t>(info->content_length) + 1);
+    mg_read(conn, buf.data(), buf.size());
+    buf[static_cast<size_t>(info->content_length)] = 0;
+    request = buf.data();
   }
   else if (info->query_string) {
     request = info->query_string;

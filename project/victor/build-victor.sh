@@ -450,6 +450,7 @@ if [ $CONFIGURE -eq 1 ]; then
         -DPROTOBUF_HOME=${PROTOBUF_HOME} \
         -DANKI_BUILD_SHA=${ANKI_BUILD_SHA} \
         -DANKI_BUILD_BRANCH=${ANKI_BUILD_BRANCH} \
+        -DCMAKE_COLOR_DIAGNOSTICS=ON \
         ${EXPORT_FLAGS} \
         ${FEATURE_FLAGS} \
         ${DEFINES} \
