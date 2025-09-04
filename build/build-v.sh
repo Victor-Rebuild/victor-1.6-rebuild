@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TOOLCHAIN_VERSION="5.2.1-r06"
+TOOLCHAIN_VERSION="5.3.0-r07"
 
 set -e
 
@@ -27,14 +27,14 @@ echo $HOST
 
 # remove old toolchain
 echo "Deleting old 4.0.0-r05 toolchain if it exists..."
-rm -rf $ADEPS/vicos-sdk/dist/4.0.0-r05
+rm -rf $ADEPS/vicos-sdk/dist/5.2.1-r06
 
-if [[ ! -d "$ADEPS/vicos-sdk/dist/5.2.1-r06/prebuilt" ]]; then
-	mkdir -p "$ADEPS/vicos-sdk/dist/5.2.1-r06"
-	cd "$ADEPS/vicos-sdk/dist/5.2.1-r06"
-	wget -q --show-progress https://github.com/os-vector/wire-os-externals/releases/download/5.2.1-r06/vicos-sdk_5.2.1-r06_$HOST.tar.gz
-	tar -zxf vicos-sdk_5.2.1-r06_$HOST.tar.gz
-	rm -f vicos-sdk_5.2.1-r06_$HOST.tar.gz
+if [[ ! -d "$ADEPS/vicos-sdk/dist/5.3.0-r07/prebuilt" ]]; then
+	mkdir -p "$ADEPS/vicos-sdk/dist/5.3.0-r07"
+	cd "$ADEPS/vicos-sdk/dist/5.3.0-r07"
+	wget -q --show-progress https://github.com/os-vector/wire-os-externals/releases/download/5.3.0-r07/vicos-sdk_5.3.0-r07_$HOST.tar.gz
+	tar -zxf vicos-sdk_5.3.0-r07_$HOST.tar.gz
+	rm -f vicos-sdk_5.3.0-r07_$HOST.tar.gz
 fi
 
 cd "$DIR"

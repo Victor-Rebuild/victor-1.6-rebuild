@@ -158,7 +158,7 @@ void AsyncMessageGateComponent::PrepareCache()
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void AsyncMessageGateComponent::GetEventsForBehavior(IBehavior* subscriber,
-                                                     std::vector<const GameToEngineEvent>& events)
+                                                     std::vector<GameToEngineEvent>& events)
 {
   if(!ANKI_VERIFY(events.empty(), 
       "AsyncMessageGateComponent.GetEventsForBehavior.GameToEngineEvents",
@@ -179,7 +179,7 @@ void AsyncMessageGateComponent::GetEventsForBehavior(IBehavior* subscriber,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void AsyncMessageGateComponent::GetEventsForBehavior(IBehavior* subscriber,
-                                                     std::vector<const EngineToGameEvent>& events)
+                                                     std::vector<EngineToGameEvent>& events)
 {
   if(!ANKI_VERIFY(events.empty(), 
       "AsyncMessageGateComponent.GetEventsForBehavior.EngineToGameEvents",
@@ -200,7 +200,7 @@ void AsyncMessageGateComponent::GetEventsForBehavior(IBehavior* subscriber,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void AsyncMessageGateComponent::GetEventsForBehavior(IBehavior* subscriber,
-                                                     std::vector<const RobotToEngineEvent>& events)
+                                                     std::vector<RobotToEngineEvent>& events)
 {
   if(!ANKI_VERIFY(events.empty(), 
       "AsyncMessageGateComponent.GetEventsForBehavior.RobotToEngineEvent",
@@ -219,7 +219,7 @@ void AsyncMessageGateComponent::GetEventsForBehavior(IBehavior* subscriber,
   
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void AsyncMessageGateComponent::GetEventsForBehavior(IBehavior* subscriber,
-                                                     std::vector<const AppToEngineEvent>& events)
+                                                     std::vector<AppToEngineEvent>& events)
 {
   if(!ANKI_VERIFY(events.empty(),
       "AsyncMessageGateComponent.GetEventsForBehavior.AppToEngineEvents",

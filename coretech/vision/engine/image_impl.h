@@ -57,7 +57,7 @@ void ImageBase<T>::DrawSubImage(const DerivedType& subImage, const Point2f& topL
     for(s32 relRowIdx = 0; relRowIdx < numRowsToCopy; ++relRowIdx) {
       const T* source_row = subImage.GetRow(relRowIdx + subImageRowOffset) + subImageColOffset;
       T* dest_row = Array2d<T>::GetRow(relRowIdx + destRowOffset) + destColOffset;
-      std::memcpy(dest_row, source_row, numBytesToCopy);
+      std::memcpy((void*)dest_row, (const void*)source_row, numBytesToCopy);
     }
   } else {
     // Slower render that copies only non-blank pixels

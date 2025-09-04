@@ -14,6 +14,7 @@
 #define __Engine_AiComponent_StateConceptStrategies_IBEICondition_Fwd_H__
 
 #include <memory>
+#include <vector>
 
 namespace Anki {
 namespace Vector {

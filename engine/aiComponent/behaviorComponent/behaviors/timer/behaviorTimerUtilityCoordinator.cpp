@@ -126,7 +126,7 @@ private:
   std::vector<RecurranceEntry> _recurranceRules;
   int _lastAnticPlayed_s = 0;
 
-  std::vector<const RecurranceEntry>::const_iterator GetApplicableRule(const TimerUtility::SharedHandle timer) const;
+  std::vector<RecurranceEntry>::const_iterator GetApplicableRule(const TimerUtility::SharedHandle timer) const;
 };
 
 
@@ -219,7 +219,7 @@ bool AnticTracker::GetMaxTimeTillNextAntic(BehaviorExternalInterface& bei,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-auto AnticTracker::GetApplicableRule(const TimerUtility::SharedHandle timer) const -> std::vector<const RecurranceEntry>::const_iterator
+auto AnticTracker::GetApplicableRule(const TimerUtility::SharedHandle timer) const -> std::vector<RecurranceEntry>::const_iterator
 {
   auto secsRemaining = timer->GetTimeRemaining_s();
   for(auto iter = _recurranceRules.begin(); iter != _recurranceRules.end(); ++iter){

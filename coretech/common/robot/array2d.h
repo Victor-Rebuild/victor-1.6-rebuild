@@ -632,7 +632,7 @@ namespace Anki
 
       const s32 numBytes = this->get_size(0)*this->get_stride();
 
-      memset(this->Pointer(0,0), 0, numBytes);
+      memset((void*)this->Pointer(0,0), 0, numBytes);
 
       return numBytes;
     }

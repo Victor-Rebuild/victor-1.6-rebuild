@@ -46,7 +46,7 @@ check_dep which ninja
 echo `pwd`
 
 vlog "vicos-sdk"
-./tools/build/tools/ankibuild/vicos.py --install 5.2.1-r06
+./tools/build/tools/ankibuild/vicos.py --install 5.3.0-r07
 
 vlog "CMake"
 ./tools/build/tools/ankibuild/cmake.py

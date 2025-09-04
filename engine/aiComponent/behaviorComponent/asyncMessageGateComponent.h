@@ -70,10 +70,10 @@ public:
   // the last time the cache was prepared
   void PrepareCache();
   
-  void GetEventsForBehavior(IBehavior* subscriber, std::vector<const GameToEngineEvent>& events);
-  void GetEventsForBehavior(IBehavior* subscriber, std::vector<const EngineToGameEvent>& events);
-  void GetEventsForBehavior(IBehavior* subscriber, std::vector<const RobotToEngineEvent>& events);
-  void GetEventsForBehavior(IBehavior* subscriber, std::vector<const AppToEngineEvent>& events);
+  void GetEventsForBehavior(IBehavior* subscriber, std::vector<GameToEngineEvent>& events);
+  void GetEventsForBehavior(IBehavior* subscriber, std::vector<EngineToGameEvent>& events);
+  void GetEventsForBehavior(IBehavior* subscriber, std::vector<RobotToEngineEvent>& events);
+  void GetEventsForBehavior(IBehavior* subscriber, std::vector<AppToEngineEvent>& events);
   
   // Clear the messages out of the cache so that a new updates can be loaded in
   void ClearCache();
@@ -96,13 +96,13 @@ private:
   
   struct EventTracker{
     // Track events that come in within the tick
-    std::vector<const GameToEngineEvent>  _gameToEngineEvents;
+    std::vector<GameToEngineEvent>  _gameToEngineEvents;
     std::mutex _gameToEngineMutex;
-    std::vector<const EngineToGameEvent>  _engineToGameEvents;
+    std::vector<EngineToGameEvent>  _engineToGameEvents;
     std::mutex _engineToGameMutex;
-    std::vector<const RobotToEngineEvent> _robotToEngineEvents;
+    std::vector<RobotToEngineEvent> _robotToEngineEvents;
     std::mutex _robotToEngineMutex;
-    std::vector<const AppToEngineEvent> _appToEngineEvents;
+    std::vector<AppToEngineEvent> _appToEngineEvents;
     std::mutex _appToEngineMutex;
     
     // Only used by the cache instance of the tracker - allows faster access to events
