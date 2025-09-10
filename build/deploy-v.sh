@@ -39,7 +39,7 @@ docker run --rm -it \
     -v $(pwd):$(pwd) \
     -v $(pwd)/build/cache:/home/$USER/.ccache \
     -v /home/$USER/.ssh:/home/$USER/.ssh \
-    vic-standalone-builder-8 bash -c \
+    rebuild-standalone-builder-8 bash -c \
     "cd $(pwd) && \
     eval \$(ssh-agent) && \
     ssh-add robot_sshkey && \
