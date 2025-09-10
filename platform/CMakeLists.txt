@@ -59,6 +59,7 @@ endmacro()
 if (VICOS)
   # For each imported library, create a target to generate the symbol file
   set(STRIP_TARGETS
+    libatomic.so.1
     libc++.so.1
     libopencv_calib3d.so.412
     libopencv_core.so.412

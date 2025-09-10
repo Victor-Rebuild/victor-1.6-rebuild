@@ -7,8 +7,6 @@ matlab.mat
 anki-deps
 _build*/
 build/cache
-build/gocache
-build/usercache
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # build folders
