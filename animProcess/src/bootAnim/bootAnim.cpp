@@ -67,9 +67,9 @@ int main(int argc, char** argv)
   signal(SIGTERM, handler);
   signal(SIGINT,  handler);
 
-  lcd_init();
-  lcd_clear_screen();
-  lcd_shutdown();
+  // lcd_init();
+  // lcd_clear_screen();
+  // lcd_shutdown();
 
   // Init lcd
   int rc = lcd_init();
