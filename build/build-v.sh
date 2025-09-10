@@ -1,58 +1,37 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-TOOLCHAIN_VERSION="5.3.0-r07"
+CURRENT_BUILDER="vic-standalone-builder-8"
 
 set -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
-cd $DIR
-echo $DIR
-
-if [[ "$(uname -a)" == *"x86_64"* && "$(uname -a)" == *"Linux"* ]]; then
-	HOST="amd64-linux"
-	ADEPS="anki-deps"
-elif [[ "$(uname -a)" == *"arm64"* && "$(uname -a)" == *"Darwin"* ]]; then
-	HOST="arm64-macos"
-	ADEPS="$HOME/.anki"
-elif [[ "$(uname -a)" == *"aarch64"* && "$(uname -a)" == *"Linux"* ]]; then
-	HOST="arm64-linux"
-    ADEPS="anki-deps"
-else
-    echo "This can only be run on x86_64 Linux or amd64 macOS systems at the moment."
-    echo "This will be fixed once I compile the new toolchain for more platforms."
+if [[ $(id -u) == 0 ]]; then
+	echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo -e "\033[1;31mDo not run this script as root.\033[0m"
+    echo "If Docker is giving you a permission denied error, look over the README one more time. It includes instructions to allow Docker to be run as a normal user."
+	echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     exit 1
 fi
 
-echo $HOST
-
-# remove old toolchain
-echo "Deleting old 4.0.0-r05 toolchain if it exists..."
-rm -rf $ADEPS/vicos-sdk/dist/5.2.1-r06
-
-if [[ ! -d "$ADEPS/vicos-sdk/dist/5.3.0-r07/prebuilt" ]]; then
-	mkdir -p "$ADEPS/vicos-sdk/dist/5.3.0-r07"
-	cd "$ADEPS/vicos-sdk/dist/5.3.0-r07"
-	wget -q --show-progress https://github.com/os-vector/wire-os-externals/releases/download/5.3.0-r07/vicos-sdk_5.3.0-r07_$HOST.tar.gz
-	tar -zxf vicos-sdk_5.3.0-r07_$HOST.tar.gz
-	rm -f vicos-sdk_5.3.0-r07_$HOST.tar.gz
-fi
-
-cd "$DIR"
-
-if [[ ! -d "$ADEPS/wwise" ]]; then
-	mkdir -p "$ADEPS/wwise/versions/2017.2.7_a"
-	cd "$ADEPS/wwise/versions/2017.2.7_a"
-	wget -q --show-progress https://github.com/os-vector/wire-os-externals/releases/download/4.0.0-r05/wwise-2017.2.7_a.tar.gz
-	tar -zxf wwise-2017.2.7_a.tar.gz
-	rm -f wwise-2017.2.7_a.tar.gz
-fi
-
-cd "$DIR"
-
 if [[ "$(uname -a)" == *"Darwin"* ]]; then
-	./project/victor/scripts/victor_build_release.sh
+    echo "macOS building does not work right now. This will be fixed soon."
+    exit 0
+    ./project/victor/scripts/victor_build_release.sh "$@"
+    echo
+    echo -e "\033[1;32mComplete.\033[0m"
+    echo
 else
-	mkdir -p build/cache
+    if [[ -d build/cache/0 ]]; then
+        echo "Rebuilding cache..."
+        rm -rf build/cache
+        # permissions prevent us from deleting as sudo. this
+        # is fixed in build/cache/go thanks to -modcacherw
+        #rm -rf build/gocache
+        rm -rf build/usercache
+    fi
+    mkdir -p anki-deps
+    mkdir -p build/cache/ccache
+    mkdir -p build/cache/go
+    mkdir -p build/cache/user
 	if [[ ! -z $(docker images -q victor-${USER}) ]]; then
 		echo "Purging old legacy victor container..."
 		docker ps -a --filter "ancestor=victor-${USER}" -q | xargs -r docker rm -f
@@ -65,32 +44,27 @@ else
 		echo -e "\033[32mContinuing in 5 seconds... (you will only see this message once)\033[0m"
 		sleep 5
 	fi
-	if [[ -z $(docker images -q vic-standalone-builder-7) ]]; then
-		docker build \
-		--build-arg DIR_PATH="$(pwd)" \
-		--build-arg USER_NAME=$USER \
-		--build-arg UID=$(id -u $USER) \
-		--build-arg GID=$(id -u $USER) \
-		-t vic-standalone-builder-7 \
-		build/
-	else
-		echo "Reusing vic-standalone-builder-7"
-	fi
-	docker run --rm -it \
-		-v $(pwd)/anki-deps:/home/$USER/.anki \
-		-v $(pwd):$(pwd) \
-		-v $(pwd)/build/cache:/home/$USER/.ccache \
-		vic-standalone-builder-7 bash -c \
-		"cd $(pwd) && \
-		./project/victor/scripts/victor_build_release.sh"
+    if [[ -z $(docker images -q $CURRENT_BUILDER) ]]; then
+        docker build \
+        --build-arg DIR_PATH="$(pwd)" \
+        --build-arg USER_NAME=$USER \
+        --build-arg UID=$(id -u $USER) \
+        --build-arg GID=$(id -u $USER) \
+        -t $CURRENT_BUILDER \
+        build/
+    else
+        echo "Reusing $CURRENT_BUILDER"
+    fi
+    docker run --rm -it \
+    -v $(pwd)/anki-deps:/home/$USER/.anki \
+    -v $(pwd):$(pwd) \
+    -v $(pwd)/build/cache/ccache:/home/$USER/.ccache \
+    -v $(pwd)/build/cache/go:/home/$USER/go \
+    -v $(pwd)/build/cache/user:/home/$USER/.cache \
+    $CURRENT_BUILDER bash -c \
+    "cd $(pwd) && \
+		./project/victor/scripts/victor_build_release.sh $@ && \
+		echo && \
+		echo -e \"\e[1;32mComplete.\e[0m\" && \
+    echo"
 fi
-
-echo "Copying vic-cloud and vic-gateway..."
-cp -a bin/* _build/vicos/Release/bin/
-echo "Copying libopus..."
-cp -a EXTERNALS/deps/opus/libopus.so.0.7.0 _build/vicos/Release/lib/libopus.so.0
-#cp -a patch-libs/* _build/vicos/Release/lib/
-
-echo
-echo "Complete."
-echo
