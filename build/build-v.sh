@@ -85,12 +85,6 @@ else
 		./project/victor/scripts/victor_build_release.sh"
 fi
 
-echo "Copying vic-cloud and vic-gateway..."
-cp -a bin/* _build/vicos/Release/bin/
-echo "Copying libopus..."
-cp -a EXTERNALS/deps/opus/libopus.so.0.7.0 _build/vicos/Release/lib/libopus.so.0
-#cp -a patch-libs/* _build/vicos/Release/lib/
-
 echo
 echo "Complete."
 echo
