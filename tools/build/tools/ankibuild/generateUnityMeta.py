@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 import sys
 import argparse
 import os
@@ -10,7 +10,7 @@ import logging
 import textwrap
 
 # ankibuild
-from . import util
+import util
 
 #set up default logger
 UtilLog = logging.getLogger('generate.meta.files')

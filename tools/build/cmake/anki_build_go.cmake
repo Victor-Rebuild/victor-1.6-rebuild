@@ -9,8 +9,7 @@ function(anki_build_go)
     set(output_name ${ANKI_NAME})
   endif()
 
-  #        -DANKI_GO_COMPILER=${GO_EXE} \
-  find_program(GO_EXECUTABLE NAMES ${ANKI_GO_COMPILER} REQUIRED)
+  find_program(GO_EXECUTABLE NAMES go REQUIRED)
   find_program(UPX_EXECUTABLE NAMES upx)
   if(UPX_EXECUTABLE)
   else()

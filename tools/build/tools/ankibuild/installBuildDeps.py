@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python
 
 import sys
 import subprocess
@@ -54,15 +54,15 @@ class DependencyInstaller(object):
     try:
       stdout_result = subprocess.check_output([tool, '--version'])
       if stdout_result == "":
-        print(("info: {0} not installed at this time.".format(tool)))
+        print("info: {0} not installed at this time.".format(tool))
         return False
     except:
-      print(("info: {0} not installed at this time.".format(tool)))
+      print("info: {0} not installed at this time.".format(tool))
       return False
 
     current_version = home_regex.match(stdout_result)
 
-    print(("info: {0} {1}".format(tool, current_version.group(1))))
+    print("info: {0} {1}".format(tool, current_version.group(1)))
 
     return LooseVersion(min_version) > LooseVersion(current_version.group(1))
 
@@ -70,59 +70,59 @@ class DependencyInstaller(object):
     """if tool is using a version that is too old it needs to be updated."""
 
     if self.mustUpgrade(tool, version):
-      print(("info: {0} is too old. Updating...".format(tool)))
+      print("info: {0} is too old. Updating...".format(tool))
       if tool == 'brew':
          cmd = 'update'
       else:
          cmd = 'upgrade'
       result = subprocess.call(['brew', cmd])
       if result:
-        print(("error: failed to {0} {1}.".format(cmd, tool)))
+        print("error: failed to {0} {1}.".format(cmd, tool))
         return False
       return True
     return True
 
   def forceInstall(self, tool):
     """force installation of package.  this will be for packages that brew in its ignorance has deprecated."""
-    print(("force installing {0}".format(tool)))
+    print("force installing {0}".format(tool))
     result = subprocess.call(['brew', 'install', '--force', '--verbose', tool])
     if result:
-      print(("error: failed to install {0}!".format(tool)))
+      print("error: failed to install {0}!".format(tool))
       return False
-    print(("keg-only packages are not linked.".format(tool)))
-    print(("warning: force linking {0}".format(tool)))
+    print("keg-only packages are not linked.".format(tool))
+    print("warning: force linking {0}".format(tool))
     result = subprocess.call(['brew', 'link', '--force', '--verbose', tool])
     if result:
-      print(("error: failed to link {0}!".format(tool)))
+      print("error: failed to link {0}!".format(tool))
       return False
     if not self.isInstalled(tool):
-      print(("warning: {0} still not found at {1}".format(tool, self.L_BIN)))
+      print("warning: {0} still not found at {1}".format(tool,self.L_BIN))
     return True
 
 
   def installTool(self, tool):
     if not self.isInstalled(tool):
       # todo: add support for installing specific versions.
-      print("installing %s" % tool)
+      print "installing %s" % tool
       result = subprocess.call(['brew', 'install', tool])
       if result:
-        print("error: failed to install %s!" % tool)
+        print "error: failed to install %s!" % tool
         return False
       if not self.isInstalled(tool):
-        print(("warning: {0} still not found in {1}.  possibly keg-only".format(tool, self.L_BIN)))
+        print("warning: {0} still not found in {1}.  possibly keg-only".format(tool, self.L_BIN))
         return self.forceInstall(tool)
     return True
 
   def installPythonPackage(self, package, version):
     if not self.isPythonPackageInstalled(package, version):
-      print("installing %s" % package)
+      print "installing %s" % package
       pip = 'pip' + str(version)
       result = subprocess.call([pip, 'install', package])
       if result:
-        print(("error: failed to install python{0} package {1}!".format(version, package)))
+        print("error: failed to install python{0} package {1}!".format(version, package))
         return False
       if not self.isPythonPackageInstalled(package, version):
-        print(("error: python{0} package {1} still not installed!".format(version, package)))
+        print("error: python{0} package {1} still not installed!".format(version, package))
         return False
     return True
 
@@ -146,7 +146,7 @@ class DependencyInstaller(object):
     # this will set everything for this run or for future terminals to work correctly.
     if getenv(env_name) is None:
       environ[env_name] = env_value
-      print(("Set environment variable {} to {}".format(env_name, env_value)))
+      print("Set environment variable {} to {}".format(env_name, env_value))
 
       bash_prof = path.join(home, '.bash_profile')
       export_line = 'export {}={}'.format(env_name, env_value)
@@ -166,7 +166,7 @@ class DependencyInstaller(object):
         if file.closed is True:
           # bash is not optional for this subprocess call.
           if subprocess.call(['source', bash_prof], executable="/bin/bash") != 0:
-            print("warning: unable to source {}".format(bash_prof))
+            print "warning: unable to source {}".format(bash_prof)
 
     return True
 
@@ -174,21 +174,21 @@ class DependencyInstaller(object):
     environ["PIP_REQUIRE_VIRTUALENV"] = ""
     homebrew_deps = self.options.deps
 
-    python3_deps = self.options.python3_deps
+    python2_deps = self.options.python2_deps
     python3_deps = self.options.python3_deps
 
     if not self.testHomebrew():
       return False
 
     # dependency not existing wont break this.
-    self.minimumNeededVersion('python3', self.MINIMUM_PYTHON3)
-    self.minimumNeededVersion('brew', self.APPROVED_BREW_VERSION)
+    self.minimumNeededVersion('python3',self.MINIMUM_PYTHON3)
+    self.minimumNeededVersion('brew',self.APPROVED_BREW_VERSION)
 
     for tool in homebrew_deps:
       if not self.installTool(tool):
         return False
-    if python3_deps:
-      for package in python3_deps:
+    if python2_deps:
+      for package in python2_deps:
         if not self.installPythonPackage(package, 2):
           return False
     if python3_deps:
@@ -205,8 +205,8 @@ def parseArgs(scriptArgs):
                       help='prints extra output')
   parser.add_argument('--dependencies', '-d', dest='deps', action='store', nargs='+',
                       help='list of dependencies to check and install')
-  parser.add_argument('--pip2', dest='python3_deps', action='store', nargs='+',
-                      help='list of python3 packages to check and install via pip2')
+  parser.add_argument('--pip2', dest='python2_deps', action='store', nargs='+',
+                      help='list of python2 packages to check and install via pip2')
   parser.add_argument('--pip3', dest='python3_deps', action='store', nargs='+',
                       help='list of python3 packages to check and install via pip3')
 

@@ -12,9 +12,9 @@ include(webots)
 
 include(anki_build_go)
 
-set(OPUS_INC   "${CMAKE_SOURCE_DIR}/3rd/opus/vicos/include/opus")
-set(OPUS_LIBS  "-L${CMAKE_SOURCE_DIR}/3rd/opus/vicos/lib")
-set(OPUS_PKGCONFIG  "${CMAKE_SOURCE_DIR}/3rd/opus/vicos/lib/pkgconfig")
+set(OPUS_INC   "${CMAKE_SOURCE_DIR}/EXTERNALS/deps/opus/vicos/include/opus")
+set(OPUS_LIBS  "-L${CMAKE_SOURCE_DIR}/EXTERNALS/deps/opus/vicos/lib")
+set(OPUS_PKGCONFIG  "${CMAKE_SOURCE_DIR}/EXTERNALS/deps/opus/vicos/lib/pkgconfig")
 
 #
 # Gateway Protbuf and GRPC configuration
@@ -66,6 +66,16 @@ anki_build_go(
   BUILD_TAGS "vicos nolibopusfile"
 )
 
+anki_build_go(
+  NAME         vic-gateway
+  DIR          "${CMAKE_CURRENT_SOURCE_DIR}"
+  SRC_DIRS     gateway
+  INCLUDE_DIRS "${OPUS_INC}"
+  LINK_FLAGS   "${OPUS_LIBS}"
+  PKG_CONFIG_PATHS "${OPUS_PKGCONFIG}"
+  BUILD_TAGS "vicos nolibopusfile"
+)
+
 set(PROTO_SRC_DIR "${GATEWAY_PROTO_HOME_DIR}/public")
 file(GLOB PROTO_FILES "${PROTO_SRC_DIR}/*.proto")
 
@@ -77,69 +87,63 @@ foreach(proto IN LISTS PROTO_FILES)
   )
 endforeach()
 
-set(PROTO_GO_GEN_FILES
-  ${GATEWAY_GRPC_GO_OUTPUT_DIR}/external_interface_grpc.pb.go
-  ${GATEWAY_GRPC_GO_OUTPUT_DIR}/external_interface.pb.gw.go
-  ${GENERATED_GO_FILES}
-)
-
-anki_build_go(
-  NAME         vic-gateway
-  DIR          "${CMAKE_CURRENT_SOURCE_DIR}"
-  SRC_DIRS     gateway
-  INCLUDE_DIRS "${OPUS_INC}"
-  LINK_FLAGS   "${OPUS_LIBS}"
-  PKG_CONFIG_PATHS "${OPUS_PKGCONFIG}"
-  BUILD_TAGS "vicos nolibopusfile"
-  EXTRA_DEPENDS ${PROTO_GO_GEN_FILES}
-)
-
-# add_custom_command(
-#   OUTPUT ${PROTO_GO_GEN_FILES}
-#   COMMAND ${CMAKE_COMMAND} -E make_directory "${GATEWAY_GRPC_GO_OUTPUT_DIR}"
-#   COMMAND protoc
-#     --proto_path=${PROTO_SRC_DIR}
-#     --go_out=${GATEWAY_GRPC_GO_OUTPUT_DIR}
-#     --go-grpc_out=${GATEWAY_GRPC_GO_OUTPUT_DIR}
-#     --grpc-gateway_out=${GATEWAY_GRPC_GO_OUTPUT_DIR}
-#     --go_opt=paths=source_relative
-#     --go-grpc_opt=paths=source_relative
-#     --grpc-gateway_opt=paths=source_relative
-#     ${PROTO_FILES}
-#   DEPENDS ${PROTO_FILES}
-#   COMMENT "Generating all Go proto sources"
-#   VERBATIM
-# )
-
 add_custom_command(
-  OUTPUT ${PROTO_GO_GEN_FILES}
+  OUTPUT ${GENERATED_GO_FILES}
   COMMAND ${CMAKE_COMMAND} -E make_directory "${GATEWAY_GRPC_GO_OUTPUT_DIR}"
-  # this one runs protoc with your extra bin dir prepended to PATH, nya~
-  COMMAND ${CMAKE_COMMAND} -E env
-          "PATH=${ANKI_GO_BINPATH}:$ENV{PATH}"
-          protoc
-            --proto_path=${PROTO_SRC_DIR}
-            --go_out=${GATEWAY_GRPC_GO_OUTPUT_DIR}
-            --go-grpc_out=${GATEWAY_GRPC_GO_OUTPUT_DIR}
-            --grpc-gateway_out=${GATEWAY_GRPC_GO_OUTPUT_DIR}
-            --go_opt=paths=source_relative
-            --go-grpc_opt=paths=source_relative
-            --grpc-gateway_opt=paths=source_relative
-            ${PROTO_FILES}
+  COMMAND protoc
+    --proto_path=${PROTO_SRC_DIR}
+    --go_out=${GATEWAY_GRPC_GO_OUTPUT_DIR}
+    --go_opt=paths=source_relative
+    ${PROTO_FILES} > /dev/null 2> /dev/null
   DEPENDS ${PROTO_FILES}
-  COMMENT "Generating all Go proto sources"
+  COMMENT "Generating Go proto sources"
   VERBATIM
 )
 
+add_custom_command(
+  OUTPUT ${GATEWAY_GRPC_GO_OUTPUT_DIR}/external_interface_grpc.pb.go
+  COMMAND protoc
+    --proto_path=${PROTO_SRC_DIR}
+    --go-grpc_out=${GATEWAY_GRPC_GO_OUTPUT_DIR}
+    --go-grpc_opt=paths=source_relative
+    ${PROTO_FILES} > /dev/null 2> /dev/null
+  DEPENDS ${PROTO_FILES}
+  COMMENT "Generating Go-GRPC proto sources"
+  VERBATIM
+)
 
-add_custom_target(proto_gen ALL DEPENDS ${PROTO_GO_GEN_FILES})
+add_custom_command(
+  OUTPUT ${GATEWAY_GRPC_GO_OUTPUT_DIR}/external_interface.pb.gw.go
+  COMMAND protoc
+    --proto_path=${PROTO_SRC_DIR}
+    --grpc-gateway_out=${GATEWAY_GRPC_GO_OUTPUT_DIR}
+    --grpc-gateway_opt=paths=source_relative
+    ${PROTO_FILES} > /dev/null 2> /dev/null
+  DEPENDS ${PROTO_FILES}
+  COMMENT "Generating Go-GW proto sources"
+  VERBATIM
+)
+
+add_custom_target(proto_gen
+  DEPENDS ${GENERATED_GO_FILES}
+)
+
+add_custom_target(proto_gen_grpc
+  DEPENDS ${GATEWAY_GRPC_GO_OUTPUT_DIR}/external_interface_grpc.pb.go
+)
+
+add_custom_target(proto_gen_gw
+  DEPENDS ${GATEWAY_GRPC_GO_OUTPUT_DIR}/external_interface.pb.gw.go
+)
 
 add_dependencies(vic-gateway proto_gen)
+add_dependencies(vic-gateway proto_gen_grpc)
+add_dependencies(vic-gateway proto_gen_gw)
 
 add_custom_command(
     OUTPUT "{CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libopus.so.0"
     COMMAND ${CMAKE_COMMAND}
-    ARGS -E copy_if_different "${CMAKE_SOURCE_DIR}/3rd/opus/vicos/lib/libopus.so.0.10.1" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libopus.so.0"
+    ARGS -E copy_if_different "${CMAKE_SOURCE_DIR}/EXTERNALS/deps/opus/vicos/lib/libopus.so.0.10.1" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libopus.so.0"
     COMMENT "copy libopus"
     VERBATIM
 )

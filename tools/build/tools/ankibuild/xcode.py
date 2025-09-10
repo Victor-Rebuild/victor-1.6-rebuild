@@ -4,7 +4,7 @@ import shutil
 import subprocess
 import os
 import plistlib
-from . import util
+import util
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

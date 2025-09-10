@@ -1,13 +1,13 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
-
+from __future__ import print_function
 
 import fnmatch
 import os
 import subprocess
 import sys
 
-from . import util
+import util
 
 class UnityLicense(object):
     """Encapsulate Unity License info & method to activate/deactivate a license key"""

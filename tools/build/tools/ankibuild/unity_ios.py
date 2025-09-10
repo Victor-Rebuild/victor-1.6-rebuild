@@ -3,7 +3,7 @@ import re
 import shutil
 import sys
 
-from . import util
+import util
 
 class UnityBuildPluginIOS(object):
     """Plugin for iOS-specific Unity build tasks"""

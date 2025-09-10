@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
-
+from __future__ import print_function
 
 import argparse
 import os
@@ -10,8 +10,8 @@ import string
 import subprocess
 import sys
 
-from . import toolget
-from . import util
+import toolget
+import util
 
 def get_dep_directory(project, name):
     d = os.path.join(os.path.expanduser("~"), ".anki", "deps", project, name)
