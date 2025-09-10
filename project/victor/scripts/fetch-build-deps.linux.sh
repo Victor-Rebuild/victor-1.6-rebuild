@@ -37,7 +37,7 @@ function check_dep()
 pushd "${TOPLEVEL}" > /dev/null 2>&1
 
 # Check for required programs
-check_dep which python2
+# check_dep which python2
 check_dep which python3
 check_dep which ninja
 # check_dep which git-lfs
@@ -45,8 +45,8 @@ check_dep which ninja
 
 echo `pwd`
 
-vlog "vicos-sdk"
-./tools/build/tools/ankibuild/vicos.py --install 5.3.0-r07
+#vlog "vicos-sdk"
+#./tools/build/tools/ankibuild/vicos.py --install 5.3.0-r07
 
 vlog "CMake"
 ./tools/build/tools/ankibuild/cmake.py

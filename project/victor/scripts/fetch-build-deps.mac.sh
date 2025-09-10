@@ -27,8 +27,7 @@ fi
 
 vlog "Check homebrew dependencies"
 ./tools/build/tools/ankibuild/installBuildDeps.py \
-    -d python2 \
-    ninja \
+    -d ninja \
     python3 \
     libsndfile \
     node \
@@ -36,8 +35,8 @@ vlog "Check homebrew dependencies"
     openssl \
     curl
 
-vlog "vicos sdk"
-./tools/build/tools/ankibuild/vicos.py --install 5.3.0-r07
+#vlog "vicos sdk"
+#./tools/build/tools/ankibuild/vicos.py --install 5.3.0-r07
 
 vlog "CMake"
 ./tools/build/tools/ankibuild/cmake.py

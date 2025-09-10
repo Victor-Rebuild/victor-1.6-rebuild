@@ -1,0 +1,10 @@
+diff a/tools/build/tools/ankibuild/protobuf.py b/tools/build/tools/ankibuild/protobuf.py	(rejected hunks)
+@@ -11,7 +11,7 @@ import subprocess
+ import sys
+ 
+ # ankibuild
+-import toolget
++from . import toolget
+ 
+ PROTOBUF = 'protobuf'
+ 

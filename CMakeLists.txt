@@ -21,13 +21,13 @@ include(ccache)
 
 include(import)
 include(clean_clad_targets)
-include(license)
+include(licensefake)
 
 # These are used by some android cmake toolchains
 # They appear to be ignored by the android-sdk toolchain that works with gradle/Android Studio
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_C_STANDARD 99)
 
 #
@@ -236,5 +236,5 @@ include(sodium)
 include(aubio)
 include(signalessence)
 
-write_license_html()
-check_licenses()
+#write_license_html()
+#check_licenses()

@@ -5,3 +5,5 @@ go/src/golang.org
 go/src/google.golang.org
 go/src/gopkg.in
 **/debug.test
+build/
+go/

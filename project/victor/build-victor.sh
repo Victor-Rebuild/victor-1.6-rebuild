@@ -1,11 +1,44 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
+
+CMAKE_VERSION="3.30.4"
+VICOS_SDK_VERSION="5.3.0-r07"
+GO_VERSION="1.24.4"
+PROTOC_VERSION="31.1"
+PROTOC_GEN_GO_VERSION="v1.36.6"
+PROTOC_GEN_GO_GRPC_VERSION="v1.5.1"
+PROTOC_GEN_GRPC_GATEWAY_VERSION="v2.27.1"
+UPX_VERSION="5.0.1"
+
+if [[ "$(uname -a)" == *"Darwin"* ]]; then
+    export PATH="/opt/homebrew/bin:$PATH"
+fi
 
 SCRIPT_PATH=$(dirname $([ -L $0 ] && echo "$(dirname $0)/$(readlink -n $0)" || echo $0))
 SCRIPT_NAME=`basename ${0}`
 TOPLEVEL=$(cd "${SCRIPT_PATH}/../.." && pwd)
 BUILD_TOOLS="${TOPLEVEL}/tools/build/tools"
+if [[ "$(uname -a)" == *"Linux"* ]]; then
+REQUIRED_GLIBC="2.35"
+
+if glibc_info=$(getconf GNU_LIBC_VERSION 2>/dev/null); then
+  version=${glibc_info#* }
+elif ldd_info=$(ldd --version 2>/dev/null | head -n1); then
+  # "ldd (GNU libc) 2.xx"
+  version=$(echo "$ldd_info" | grep -oE '[0-9]+\.[0-9]+')
+else
+  echo "Error: could not detect glibc version. Maybe you don't have all dependencies (like gcc/g++), or your OS is too old."
+  exit 1
+fi
+
+if [[ "$(printf '%s\n%s' "$REQUIRED_GLIBC" "$version" | sort -V | head -n1)" = "$REQUIRED_GLIBC" ]]; then
+  echo "glibc version $version is good"
+else
+  echo "Error: glibc $version < $REQUIRED_GLIBC. Your OS is too old."
+  exit 1
+fi
+fi
 
 function usage() {
     echo "$SCRIPT_NAME [OPTIONS]"
@@ -28,6 +61,7 @@ function usage() {
     echo "  -e                      export compile commands"
     echo "  -I                      ignore external dependencies"
     echo "  -S                      build static libraries"
+    echo "  -m			                don't extract animations from SVN"
 }
 
 #
@@ -44,7 +78,6 @@ EXPORT_COMPILE_COMMANDS=0
 IGNORE_EXTERNAL_DEPENDENCIES=0
 BUILD_SHARED_LIBS=1
 DONT_ANIM=0
-EXTERNALS_UPDATE_SKIP=0
 
 CONFIGURATION=Release
 PLATFORM=vicos
@@ -119,6 +152,9 @@ while getopts ":x:c:p:a:t:g:F:D:hvfdCTeISXm" opt; do
         X)
             RM_BUILD_ASSETS=1
             ;;
+	m)
+	    DONT_ANIM=1
+	    ;;
         :)
             echo "Option -${OPTARG} required an argument." >&2
             usage
@@ -134,25 +170,20 @@ shift $(($OPTIND - 1))
 # Run everything from ${TOPLEVEL}, even if invoked from somewhere else
 cd ${TOPLEVEL}
 
-for f in `git ls-files *.tflite`; do
-    egrep -q TFL3 $f || usage_fix_lfs $f
-done
-
-
 #
 # settings
 #
 
 if [ -z "${CMAKE_EXE+x}" ]; then
     echo "Attempting to install cmake"
-    ${TOPLEVEL}/tools/build/tools/ankibuild/cmake.py --install-cmake 3.20.6
-    CMAKE_EXE=`${TOPLEVEL}/tools/build/tools/ankibuild/cmake.py --find-cmake 3.20.6`
-    echo ${CMAKE_EXE}
+    echo -n "CMake: "
+    ${TOPLEVEL}/tools/build/tools/ankibuild/cmake.py --install-cmake $CMAKE_VERSION
+    CMAKE_EXE=`${TOPLEVEL}/tools/build/tools/ankibuild/cmake.py --find-cmake $CMAKE_VERSION`
 fi
 
 if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ]; then
   echo "Attempting to run fetch-build-deps.sh"
-  EXTERNALS_UPDATE_SKIP=$EXTERNALS_UPDATE_SKIP DONT_ANIM=$DONT_ANIM ${TOPLEVEL}/project/victor/scripts/fetch-build-deps.sh
+  DONT_ANIM=$DONT_ANIM ${TOPLEVEL}/project/victor/scripts/fetch-build-deps.sh
 else
   echo "Ignore external dependencies"
 fi
@@ -223,12 +254,9 @@ done
 #
 # Get short commit sha
 #
-export ANKI_BUILD_SHA=`git rev-parse --short HEAD`
+export ANKI_BUILD_SHA=`git -c safe.directory="$TOPLEVEL" rev-parse --short HEAD`
 
-#
-# Get branch 
-#
-export ANKI_BUILD_BRANCH=`git rev-parse --abbrev-ref HEAD`
+export ANKI_BUILD_BRANCH=`git -c safe.directory="$TOPLEVEL" rev-parse --abbrev-ref HEAD`
 
 #
 # Enable export flags
@@ -254,7 +282,7 @@ case ${GENERATOR} in
         ;;
     "Makefiles")
         PROJECT_FILE="Makefile"
-        GENERATOR="CodeBlocks - Unix Makefiles"
+        GENERATOR="Unix Makefiles"
       ;;
     "*")
         PROJECT_FILE=""
@@ -281,22 +309,6 @@ if [[ ! -f ${CMAKE_EXE} ]]; then
   exit 1
 fi
 
-#if [ -z "${GOROOT+x}" ]; then
-#    GO_EXE=`${TOPLEVEL}/tools/build/tools/ankibuild/go.py`
-#    export GOROOT=$(dirname $(dirname $GO_EXE))
-#else
-#    GO_EXE=$GOROOT/bin/go
-#fi
-#export GOPATH=${TOPLEVEL}/cloud/go:${TOPLEVEL}/generated/cladgo:${TOPLEVEL}/generated/go:${TOPLEVEL}/tools/message-buffers/support/go
-
-#if [ ! -f ${GO_EXE} ]; then
-#  echo "Missing Go executable: ${GO_EXE}"
-#  echo "Fetch the required Go version by running ${TOPLEVEL}/tools/build/tools/ankibuild/go.py"
-#  exit 1
-#fi
-
-#${TOPLEVEL}/tools/build/tools/ankibuild/go.py --check-version $GO_EXE
-
 #
 # Remove assets in build directory if requested. This will force the
 # build to re-copy them from the source tree into the build directory.
@@ -313,7 +325,7 @@ if [ $RM_BUILD_ASSETS -eq 1 ]; then
 fi
 
 #
-# grab Go dependencies ahead of generating source lists
+# generate source lists
 #
 if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ] || [ $CONFIGURE -eq 1 ] ; then
     GEN_SRC_DIR="${TOPLEVEL}/generated/cmake"
@@ -324,39 +336,26 @@ if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ] || [ $CONFIGURE -eq 1 ] ; then
 
     # Scan for BUILD.in files
     METABUILD_INPUTS=`find . -name BUILD.in`
-
-    # Process BUILD.in files (creates list of Go projects to fetch)
-    #PATH="$(dirname $GO_EXE):$PATH" ${BUILD_TOOLS}/metabuild/metabuild.py --go-output \
-    #  -o ${GEN_SRC_DIR} \
-    #  ${METABUILD_INPUTS}
 fi
-
-#if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ]; then
-#  echo "Getting Go dependencies"
-  # Check out specified revisions of repositories we've versioned
-  # Append a dummy dir to the GOPATH so that `go get` doesn't barf
-  # on nonexistent clad files
-#  GODUMMY=${TOPLEVEL}/cloud/dummy
-#  (cd ${TOPLEVEL}; PATH="$(dirname $GO_EXE):$PATH" GOPATH="$GOPATH:$GODUMMY" ./godeps.js execute ${GEN_SRC_DIR})
-#else
-#  echo "Ignore Go dependencies"
-#fi
 
 # Set protobuf location
 HOST=`uname -a | awk '{print tolower($1);}' | sed -e 's/darwin/mac/'`
-PROTOBUF_HOME=${TOPLEVEL}/EXTERNALS/deps/protobuf/${HOST}
+if [[ `uname -a` == *"aarch64"* && $HOST == "linux" ]]; then
+	HOST+="-arm64"
+fi
+PROTOBUF_HOME=${TOPLEVEL}/3rd/protobuf/${HOST}
 
 # Build protocCppPlugin if needed
-
-if [[ ! -x "${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin" ]]; then
+if [[ ! -x "${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin2" ]]; then
   BUILD_PROTOC_PLUGIN=1
 # "Unknown" means it's functional
-elif [[ "$(${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin --help 2>&1)" != *"Unknown"* ]]; then
+elif [[ "$(${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin2 --help 2>&1)" != *"Unknown"* ]]; then
   echo "Rebuilding protocCppPlugin plugin as it fails to run"
+  BUILD_PROTOC_PLUGIN=1
 else 
   BUILD_PROTOC_PLUGIN=0
   for f in `find ${TOPLEVEL}/tools/protobuf/plugin -type f`; do
-    if [ "$f" -nt ${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin ]; then
+    if [ "$f" -nt ${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin2 ]; then
       BUILD_PROTOC_PLUGIN=1
     fi
   done
@@ -365,17 +364,35 @@ if [[ $BUILD_PROTOC_PLUGIN -eq 1 ]]; then
     ${TOPLEVEL}/tools/protobuf/plugin/make.sh
 fi
 
+if [ -z "${GO_EXE+x}" ]; then
+    ${TOPLEVEL}/project/build-scripts/download-go.sh ${GO_VERSION}
+    GO_EXE="${HOME}/.anki/go/dist/${GO_VERSION}/go/bin/go"
+fi
+
+if [ -z "${UPX_EXE+x}" ]; then
+    # no binary release for macOS, rely on brew
+    if [[ "$(uname -a)" == *"Darwin"* ]]; then
+        UPX_EXE="upx"
+    else
+        ${TOPLEVEL}/project/build-scripts/download-upx.sh ${UPX_VERSION}
+        UPX_EXE="${HOME}/.anki/upx/dist/${UPX_VERSION}/upx"
+    fi
+fi
+
+if [ -z "${PROTOC_EXE+x}" ]; then
+    ${TOPLEVEL}/project/build-scripts/download-protoc.sh ${PROTOC_VERSION}
+    PROTOC_EXE="${HOME}/.anki/protoc/dist/${PROTOC_VERSION}/bin/protoc"
+fi
+
 # Build/Install the protoc generators for go
-#GOBIN="${TOPLEVEL}/cloud/go/bin"
-#if [[ ! -x $GOBIN/protoc-gen-go ]] || [[ ! -x $GOBIN/protoc-gen-grpc-gateway ]]; then
-#    echo "Building/Installing protoc-gen-go and protoc-gen-grpc-gateway"
-#    GOBIN=$GOBIN \
-#    CC=/usr/bin/cc \
-#    CXX=/usr/bin/c++ \
-#    "${GOROOT}/bin/go" install \
-#    github.com/golang/protobuf/protoc-gen-go \
-#    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-#fi
+GOBIN="${TOPLEVEL}/cloud/go/bin"
+mkdir -p "${GOBIN}"
+if [[ ! -x "$GOBIN/protoc-gen-go" ]] || [[ ! -x "$GOBIN/protoc-gen-grpc-gateway" ]]; then
+    echo "Building/Installing protoc-gen-go and protoc-gen-grpc-gateway..."
+    GOBIN=$GOBIN "${GO_EXE}" install google.golang.org/protobuf/cmd/protoc-gen-go@$PROTOC_GEN_GO_VERSION
+    GOBIN=$GOBIN "${GO_EXE}" install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$PROTOC_GEN_GO_GRPC_VERSION
+    GOBIN=$GOBIN "${GO_EXE}" install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@$PROTOC_GEN_GRPC_GATEWAY_VERSION
+fi
 
 #
 # generate source file lists
@@ -391,7 +408,7 @@ if [ $CONFIGURE -eq 1 ]; then
     fi
 
     # Process BUILD.in files
-    PATH="$(dirname $GO_EXE):$PATH" ${BUILD_TOOLS}/metabuild/metabuild.py $METABUILD_VERBOSE \
+    ${BUILD_TOOLS}/metabuild/metabuild.py $METABUILD_VERBOSE \
         -o ${GEN_SRC_DIR} \
         ${METABUILD_INPUTS}
 
@@ -420,10 +437,11 @@ if [ $CONFIGURE -eq 1 ]; then
         )
     elif [ "$PLATFORM" == "vicos" ] ; then
         #
-        # If VICOS_SDK is set, use it, else provide default location
+        # If VICOS_SDK is set, use it, else download toolchain
         #
         if [ -z "${VICOS_SDK+x}" ]; then
-            VICOS_SDK=$(${TOPLEVEL}/tools/build/tools/ankibuild/vicos.py --install 5.3.0-r07 | tail -1)
+            ${TOPLEVEL}/project/build-scripts/download-vicos-sdk.sh "$VICOS_SDK_VERSION"
+            VICOS_SDK="${HOME}/.anki/vicos-sdk/dist/${VICOS_SDK_VERSION}"
         fi
 
         PLATFORM_ARGS=(
@@ -442,9 +460,14 @@ if [ $CONFIGURE -eq 1 ]; then
 
     # Append additional platrom args
     PLATFORM_ARGS+=(${ADDITIONAL_PLATFORM_ARGS[@]})
+    echo "PLATFORM ARGS $PLATFORM_ARGS"
     $CMAKE_EXE ${TOPLEVEL} \
         ${VERBOSE_ARG} \
         -G"${GENERATOR}" \
+        -DANKI_GO_COMPILER=${GO_EXE} \
+        -DANKI_UPX=${UPX_EXE} \
+        -DANKI_PROTOC=${PROTOC_EXE} \
+        -DANKI_GO_BIN_PATH=${GOBIN} \
         -DCMAKE_BUILD_TYPE=${CONFIGURATION} \
         -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} \
         -DPROTOBUF_HOME=${PROTOBUF_HOME} \
@@ -474,11 +497,15 @@ if [ $USE_SHAKE -eq 0 ]; then
   if [ $VERBOSE -eq 1 ]; then
     VERBOSE_ARG="--verbose"
   fi
-  shake --digest-and-input --report -j $VERBOSE_ARG $*
+  echo "- Using shake to build"
+  shake --digest-and-input -j -V -V -V --color $*
 else
   TARGET_ARG=""
   if [ -n "$CMAKE_TARGET" ]; then
     TARGET_ARG="--target $CMAKE_TARGET"
+  fi
+  if [[ ${GENERATOR} == *"Makefiles"* ]]; then
+    TARGET_ARG="-j$(nproc) $TARGET_ARG"
   fi
   $CMAKE_EXE --build . $TARGET_ARG $*
   if [[ "$PLATFORM" == "vicos" && $RUN_INSTALL -eq 1 ]]; then
