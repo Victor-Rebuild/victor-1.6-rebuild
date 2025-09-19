@@ -22,15 +22,15 @@
 #include <thread>
 #include <chrono>
 
-static const char *STATUS_DIR = "/run/update-engine";
-static const char *EXPECTED_DOWNLOAD_SIZE_FILE = "/run/update-engine/expected-download-size";
-static const char *EXPECTED_WRITE_SIZE_FILE = "/run/update-engine/expected-size";
-static const char *PROGRESS_FILE = "/run/update-engine/progress";
-static const char *PHASE_FILE = "/run/update-engine/phase";
-static const char *ERROR_FILE = "/run/update-engine/error";
-static const char *DONE_FILE = "/run/update-engine/done";
-static const char *MANIFEST_FILE = "/run/update-engine/manifest.ini";
-static const char *BOOT_STAGING = "/run/update-engine/boot.img";
+static const char *STATUS_DIR = "/data/update-engine";
+static const char *EXPECTED_DOWNLOAD_SIZE_FILE = "/data/update-engine/expected-download-size";
+static const char *EXPECTED_WRITE_SIZE_FILE = "/data/update-engine/expected-size";
+static const char *PROGRESS_FILE = "/data/update-engine/progress";
+static const char *PHASE_FILE = "/data/update-engine/phase";
+static const char *ERROR_FILE = "/data/update-engine/error";
+static const char *DONE_FILE = "/data/update-engine/done";
+static const char *MANIFEST_FILE = "/data/update-engine/manifest.ini";
+static const char *BOOT_STAGING = "/data/update-engine/boot.img";
 static const char *OTA_PAS = "/anki/etc/ota.pas";
 
 static bool verbose = false;
@@ -309,6 +309,8 @@ static std::map<std::string, std::map<std::string, std::string>> parse_ini(const
   }
   return ret;
 }
+
+
 
 bool should_inhibit()
 {
@@ -658,21 +660,27 @@ int main(int argc, char **argv)
     const char *name = archive_entry_pathname(entry);
     std::string nm(name ? name : "");
     std::string pipeline;
-    if (nm.size() >= 25 && nm.substr(nm.size() - 25) == "apq8009-robot-boot.img.gz")
+    
+    if ((nm.size() >= 25 && nm.substr(nm.size() - 25) == "apq8009-robot-boot.img.gz") || (nm.find("apq8009-robot-sysfs.img.xz") != std::string::npos))
     {
       if (boot_encryption == 1)
       {
         pipeline = std::string("openssl enc -d -aes-256-ctr -md md5 -pass file:") + OTA_PAS + " 2>/dev/null";
         if (boot_compression == "gz")
           pipeline += " | gunzip";
+        else if (boot_compression == "xz")
+          pipeline += " | xzcat";
       }
       else
       {
         if (boot_compression == "gz")
           pipeline = "gunzip";
+        else if (boot_compression == "xz")
+          pipeline = "xzcat";
         else
           pipeline = "cat";
       }
+      
       if (!stream_and_process_entry(a, pipeline, BOOT_STAGING, boot_bytes, written_so_far, total_expected_write))
         die(209, "Boot image pipeline failed");
 
@@ -706,7 +714,7 @@ int main(int argc, char **argv)
       ::unlink(BOOT_STAGING);
       got_boot = true;
     }
-    else if (nm.size() >= 26 && nm.substr(nm.size() - 26) == "apq8009-robot-sysfs.img.gz")
+    else if ((nm.size() >= 26 && nm.substr(nm.size() - 26) == "apq8009-robot-sysfs.img.gz") || (nm.find("apq8009-robot-sysfs.img.xz") != std::string::npos))
     {
       std::string system_slot = get_slot_name("system", target_slot);
       if (system_encryption == 1)
@@ -714,14 +722,19 @@ int main(int argc, char **argv)
         pipeline = std::string("openssl enc -d -aes-256-ctr -md md5 -pass file:") + OTA_PAS + " 2>/dev/null";
         if (system_compression == "gz")
           pipeline += " | gunzip";
+        else if (system_compression == "xz")
+          pipeline += " | xzcat";
       }
       else
       {
         if (system_compression == "gz")
           pipeline = "gunzip";
+        else if (system_compression == "xz")
+          pipeline = "xzcat";
         else
           pipeline = "cat";
       }
+      
       if (!stream_and_process_entry(a, pipeline, system_slot, system_bytes, written_so_far, total_expected_write))
         die(209, "System image pipeline failed");
       got_system = true;
