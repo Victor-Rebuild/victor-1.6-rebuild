@@ -21,7 +21,7 @@
 - Face image overlays (Code used from WireOS)
 - Toggle between anki lights and wireOS lights! (Run `touch /data/data/wirelights` over ssh)
 - Screen doesn't flash as much when booting up (ThommoMC's fix)
-- 
+- Add back the "Pew" sound when petting
 
 ## Behavior related changes
 - Unintentional and Intentional performances ([Anki Commit 1](https://github.com/kercre123/victor/commit/d3fa225) [Anki Commit 2](https://github.com/kercre123/victor/commit/2184b33))
