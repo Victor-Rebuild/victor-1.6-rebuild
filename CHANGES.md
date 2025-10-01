@@ -19,6 +19,9 @@
 - Alt power on eye animations
 - More expressive power on anims
 - Face image overlays (Code used from WireOS)
+- Toggle between anki lights and wireOS lights! (Run `touch /data/data/wirelights` over ssh)
+- Screen doesn't flash as much when booting up (ThommoMC's fix)
+- 
 
 ## Behavior related changes
 - Unintentional and Intentional performances ([Anki Commit 1](https://github.com/kercre123/victor/commit/d3fa225) [Anki Commit 2](https://github.com/kercre123/victor/commit/2184b33))
@@ -27,7 +30,8 @@
 - Blackjack requests (Robot will ask you to play blackjack sometimes)
 
 ## Cloud changes
-- vic-cloud and gateway that works with wirepod and regular servers
+- vic-cloud that works with wirepod and regular servers
+- vic-gateway merged into cloud
 - New public server environment (Setup at https://modder.my.to/1.6 and hosted by [@froggitti](https://github.com/froggitti))
 
 ## Miscellaneous changes
@@ -36,4 +40,5 @@
 - Support for DVT bodyboards
 - Compiling with -O2 and fast math
 - Picovoice 1.5 for customizable wakeword (Code used from WireOS)
+- C++ upgrade engin from wireOS
 
