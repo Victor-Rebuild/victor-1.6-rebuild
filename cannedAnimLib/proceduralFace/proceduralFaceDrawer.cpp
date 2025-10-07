@@ -265,7 +265,7 @@ namespace Vector {
       "/anki/data/assets/cozmo_resources/assets/faceOverlays/pan.jpg",
       "/anki/data/assets/cozmo_resources/assets/faceOverlays/frog.jpg",
       "/anki/data/assets/cozmo_resources/assets/faceOverlays/all.jpg",
-      "/anki/data/assets/cozmo_resources/assets/faceOverlays/Galaxy.jpg"
+      "/anki/data/assets/cozmo_resources/assets/faceOverlays/galaxy.jpg",
       "/data/data/customFaceOverlay.jpg"
     };
     const cv::String kFaceOverlay = kFaceOverlays[kProcFace_CustomEyeOverlay];
