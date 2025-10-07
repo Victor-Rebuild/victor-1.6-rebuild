@@ -3,7 +3,7 @@
 ## Backported features from >1.6
 - Add Vector 2.0 support (Firmware 2.0)
 - Custom Eye Colors (Firmware 1.8)
-- Intent graph backported from firmware 1.8 (The code does exist but doesn't seem to be functional)
+- Intent graph backported from firmware 1.8
 - Fixed occasional bouncy lift ([Anki commit](https://github.com/kercre123/victor/commit/54cfb37))
 - Fixed self confirming fist bump ([Anki Commit](https://github.com/kercre123/victor/commit/2d5213e))
 - Fixed path planning to stop head bobbing loop ([Anki Commit](https://github.com/kercre123/victor/commit/4110afc))
@@ -19,7 +19,7 @@
 - Alt power on eye animations
 - More expressive power on anims
 - Face image overlays (Code used from WireOS)
-- Toggle between anki lights and wireOS lights! (Run `touch /data/data/wirelights` over ssh)
+- Toggle between Anki lights and wireOS lights! (Run `touch /data/data/wirelights` over ssh)
 - Screen doesn't flash as much when booting up (ThommoMC's fix)
 - Add back the "Pew" sound when petting
 
@@ -27,7 +27,6 @@
 - Unintentional and Intentional performances ([Anki Commit 1](https://github.com/kercre123/victor/commit/d3fa225) [Anki Commit 2](https://github.com/kercre123/victor/commit/2184b33))
 - Can now play Blackjack on charger
 - Now plays the wakeup after onboarding is finished from web setup (Code from Viccyware)
-- Blackjack requests (Robot will ask you to play blackjack sometimes)
 
 ## Cloud changes
 - vic-cloud that works with wirepod and regular servers
@@ -35,10 +34,10 @@
 - New public server environment (Setup at https://modder.my.to/1.6 and hosted by [@froggitti](https://github.com/froggitti))
 
 ## Miscellaneous changes
-- Improved Japanese TTS voice
+- Improved Japanese and German TTS voice
 - Upped temprature limit for Vector 2.0
 - Support for DVT bodyboards
 - Compiling with -O2 and fast math
 - Picovoice 1.5 for customizable wakeword (Code used from WireOS)
-- C++ upgrade engin from wireOS
+- C++ upgrade engine from wireOS
 
