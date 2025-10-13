@@ -21,12 +21,13 @@
 - Face image overlays (Code used from WireOS)
 - Toggle between Anki lights and wireOS lights! (Run `touch /data/data/wirelights` over ssh)
 - Screen doesn't flash as much when booting up (ThommoMC's fix)
-- Add back the "Pew" sound when petting
+- Add back the "Pew" sound when petting ([Reverts this Anki Commit](https://github.com/kercre123/victor/commit/48344a779ad6be70e398b96f3c79db069263e8a1))
 
 ## Behavior related changes
 - Unintentional and Intentional performances ([Anki Commit 1](https://github.com/kercre123/victor/commit/d3fa225) [Anki Commit 2](https://github.com/kercre123/victor/commit/2184b33))
 - Can now play Blackjack on charger
 - Now plays the wakeup after onboarding is finished from web setup (Code from Viccyware)
+- Fixed Blackjack so that Vector actually says "Dealer" correctly
 
 ## Cloud changes
 - vic-cloud that works with wirepod and regular servers
