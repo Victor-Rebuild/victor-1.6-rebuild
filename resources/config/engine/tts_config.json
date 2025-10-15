@@ -49,7 +49,8 @@
         { "textLengthMin": 10, "textLengthMax": 9999, "rangeMin": 83, "rangeMax": 83}
       ],
       "pitch": 80,
-      "shaping": 120
+      "shaping": 120,
+      "pausePunctuation_ms": 600
     },
     "ja":
     {
@@ -92,7 +93,8 @@
         { "textLengthMin": 10, "textLengthMax": 9999, "rangeMin": 83, "rangeMax": 83}
       ],
       "pitch": 90,
-      "shaping": 125
+      "shaping": 125,
+      "pausePunctuation_ms": 600
     },
     "ja":
     {
