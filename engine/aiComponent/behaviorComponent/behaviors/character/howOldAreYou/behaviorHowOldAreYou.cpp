@@ -31,6 +31,10 @@ namespace {
   constexpr const char * kSomeDaysKey = "BehaviorHowOldAreYou.SomeDays";
   constexpr const char * kOneMonthKey = "BehaviorHowOldAreYou.OneMonth";
   constexpr const char * kSomeMonthsKey = "BehaviorHowOldAreYou.SomeMonths";
+
+  constexpr const char * kGatewayCertFile = "gateway.cert";
+  constexpr const char * kGatewayCertFolder = "/data/vic-gateway/";
+  constexpr const char * kGatewayCertFullPath = "/data/vic-gateway/gateway.cert";
 }
 
 namespace Anki {
@@ -124,51 +128,52 @@ void BehaviorHowOldAreYou::OnBehaviorActivated()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::chrono::hours BehaviorHowOldAreYou::GetRobotAge()
 {
+  // This used to use the onboarding completion time for date, when authing the dev bot to wp this gets overwritten so instead use the gateway cert file
   // check whether onboardingState file exists
-  const auto* platform = GetBEI().GetRobotInfo().GetContext()->GetDataPlatform();
-  auto saveFolder = platform->pathToResource( Util::Data::Scope::Persistent, BehaviorOnboardingCoordinator::kOnboardingFolder );
-  saveFolder = Util::FileUtils::AddTrailingFileSeparator( saveFolder );
-  const std::string & onboardingDataFilePath = saveFolder + BehaviorOnboardingCoordinator::kOnboardingFilename;
-  if( Util::FileUtils::DirectoryExists( saveFolder ) && Util::FileUtils::FileExists( onboardingDataFilePath ) ) {
+  // const auto* platform = GetBEI().GetRobotInfo().GetContext()->GetDataPlatform();
+  // _saveFolder = "/data/vic-gateway";
+  // saveFolder = Util::FileUtils::AddTrailingFileSeparator( _saveFolder );
+  // const kGatewayCertFilePath = kGatewayCertFolder + kGatewayCertFile;
+  if( Util::FileUtils::DirectoryExists( kGatewayCertFolder ) && Util::FileUtils::FileExists( kGatewayCertFile ) ) {
 
     // file exists
-    const std::string & file_s = Util::FileUtils::ReadFile(onboardingDataFilePath);
+    // const std::string & file_s = Util::FileUtils::ReadFile(onboardingDataFilePath);
     // gotta parse the file
-    Json::Value file_j;
-    Json::Reader reader;
-    bool parsed = reader.parse(file_s, file_j);
-    bool containsBoD = false;
-    if (parsed) {
-      LOG_DEBUG("BehaviorHowOldAreYou.GetRobotAge.ParsedJson", "");
-    } else {
-      LOG_WARNING("BehaviorHowOldAreYou.GetRobotAge.JsonParsingFailed",
-          "%s exists but failed to parse as Json", onboardingDataFilePath.c_str());
-    }
+    // Json::Value file_j;
+    // Json::Reader reader;
+    // bool parsed = false;
+    // bool containsBoD = false;
+    // if (parsed) {
+    //   LOG_DEBUG("BehaviorHowOldAreYou.GetRobotAge.ParsedJson", "");
+    // } else {
+    //   LOG_WARNING("BehaviorHowOldAreYou.GetRobotAge.JsonParsingFailed",
+    //       "%s exists but failed to parse as Json", onboardingDataFilePath.c_str());
+    // }
 
     int64 onboardingTime_sse;
-    if (parsed) {
+    // if (parsed) {
       // check whether born on date is written to file
-      containsBoD = file_j.isMember(BehaviorOnboardingCoordinator::kOnboardingTimeKey);
-      if (containsBoD) {
+    //   containsBoD = file_j.isMember(BehaviorOnboardingCoordinator::kOnboardingTimeKey);
+    //   if (containsBoD) {
         // if so, use that
-        onboardingTime_sse = file_j[BehaviorOnboardingCoordinator::kOnboardingTimeKey].asInt64();
-        LOG_INFO("BehaviorHowOldAreYou.GetRobotAge.ReadOnboardingTime",
-            "Read onboarding time (seconds since epoch): %lld", onboardingTime_sse);
-      } else {
+    //     onboardingTime_sse = file_j[BehaviorOnboardingCoordinator::kOnboardingTimeKey].asInt64();
+    //     LOG_INFO("BehaviorHowOldAreYou.GetRobotAge.ReadOnboardingTime",
+    //         "Read onboarding time (seconds since epoch): %lld", onboardingTime_sse);
+    //   } else {
         // INFO because plenty of robots have onboarded before we introduce the change that writes this value to file.
-        LOG_INFO("BehaviorHowOldAreYou.GetRobotAge.NoOnboardingTime",
-            "%s not a member of onboarding file",
-            BehaviorOnboardingCoordinator::kOnboardingTimeKey.c_str());
-      }
-    }
+    //     LOG_INFO("BehaviorHowOldAreYou.GetRobotAge.NoOnboardingTime",
+    //         "%s not a member of onboarding file",
+    //         BehaviorOnboardingCoordinator::kOnboardingTimeKey.c_str());
+    //   }
+    // }
 
-    if(!parsed || !containsBoD) {
+    // if(!parsed || !containsBoD) {
       // if not we couldn't get born on date from file, use modification time of the file
-      onboardingTime_sse = Util::FileUtils::GetFileLastModificationTime( onboardingDataFilePath ); // seconds since the epoch
+      onboardingTime_sse = Util::FileUtils::GetFileLastModificationTime( kGatewayCertFullPath ); // seconds since the epoch
       LOG_INFO("BehaviorHowOldAreYou.GetRobotAge.ModificationTimeFallback",
-          "Using file modification time as fallback (seconds since epoch): %lld",
+          "Using file modification time of vic-gateway certificate (seconds since epoch): %lld",
           onboardingTime_sse);
-    }
+    // }
 
     // convert seconds since the epoch to age in hours
     // make a duration, in seconds; make a system_clock timepoint from that duration--i.e., that many seconds since the epoch
@@ -185,8 +190,8 @@ std::chrono::hours BehaviorHowOldAreYou::GetRobotAge()
 
     // onboarding save file does not exist; fall back on RobotStatsTracker as done above
     // WARNING because it's really expected that this file exists by the time we get here
-    LOG_WARNING("BehaviorHowOldAreYou.GetRobotAge.NoOnboardingFallback",
-        "no onboarding data found at %s. Falling back on RobotStatsTracker.", onboardingDataFilePath.c_str());
+    // LOG_WARNING("BehaviorHowOldAreYou.GetRobotAge.NoOnboardingFallback",
+    //     "no onboarding data found at %s. Falling back on RobotStatsTracker.");
     const auto& rst = GetBehaviorComp<RobotStatsTracker>();
     const float robotAge_h = rst.GetNumHoursAlive();
     return std::chrono::hours{static_cast<int>(robotAge_h)};
