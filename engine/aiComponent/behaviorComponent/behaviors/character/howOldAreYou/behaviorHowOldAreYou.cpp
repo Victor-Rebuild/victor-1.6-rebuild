@@ -32,9 +32,6 @@ namespace {
   constexpr const char * kOneMonthKey = "BehaviorHowOldAreYou.OneMonth";
   constexpr const char * kSomeMonthsKey = "BehaviorHowOldAreYou.SomeMonths";
 
-  constexpr const char * kGatewayCertFile = "gateway.cert";
-  constexpr const char * kGatewayCertFolder = "/data/vic-gateway/";
-  constexpr const char * kGatewayCertFullPath = "/data/vic-gateway/gateway.cert";
 }
 
 namespace Anki {
@@ -134,7 +131,7 @@ std::chrono::hours BehaviorHowOldAreYou::GetRobotAge()
   // _saveFolder = "/data/vic-gateway";
   // saveFolder = Util::FileUtils::AddTrailingFileSeparator( _saveFolder );
   // const kGatewayCertFilePath = kGatewayCertFolder + kGatewayCertFile;
-  if( Util::FileUtils::DirectoryExists( kGatewayCertFolder ) && Util::FileUtils::FileExists( kGatewayCertFile ) ) {
+  // if( Util::FileUtils::DirectoryExists( kGatewayCertFolder ) && Util::FileUtils::FileExists( kGatewayCertFile ) ) {
 
     // file exists
     // const std::string & file_s = Util::FileUtils::ReadFile(onboardingDataFilePath);
@@ -169,7 +166,7 @@ std::chrono::hours BehaviorHowOldAreYou::GetRobotAge()
 
     // if(!parsed || !containsBoD) {
       // if not we couldn't get born on date from file, use modification time of the file
-      onboardingTime_sse = Util::FileUtils::GetFileLastModificationTime( kGatewayCertFullPath ); // seconds since the epoch
+      onboardingTime_sse = Util::FileUtils::GetFileLastModificationTime( "/data/vic-gateway/gateway.cert" ); // seconds since the epoch
       LOG_INFO("BehaviorHowOldAreYou.GetRobotAge.ModificationTimeFallback",
           "Using file modification time of vic-gateway certificate (seconds since epoch): %lld",
           onboardingTime_sse);
@@ -186,16 +183,16 @@ std::chrono::hours BehaviorHowOldAreYou::GetRobotAge()
                 "robot age from onboarding time: %ld hours", robotAge_dh.count());
     return robotAge_dh;
 
-  } else {
+  // } else {
 
     // onboarding save file does not exist; fall back on RobotStatsTracker as done above
     // WARNING because it's really expected that this file exists by the time we get here
     // LOG_WARNING("BehaviorHowOldAreYou.GetRobotAge.NoOnboardingFallback",
     //     "no onboarding data found at %s. Falling back on RobotStatsTracker.");
-    const auto& rst = GetBehaviorComp<RobotStatsTracker>();
-    const float robotAge_h = rst.GetNumHoursAlive();
-    return std::chrono::hours{static_cast<int>(robotAge_h)};
-  }
+  //   const auto& rst = GetBehaviorComp<RobotStatsTracker>();
+  //   const float robotAge_h = rst.GetNumHoursAlive();
+  //   return std::chrono::hours{static_cast<int>(robotAge_h)};
+  // }
 
 }
 
