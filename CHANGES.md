@@ -28,6 +28,7 @@
 - Can now play Blackjack on charger
 - Now plays the wakeup after onboarding is finished from web setup (Code from Viccyware)
 - Fixed Blackjack so that Vector actually says "Dealer" correctly
+- Added the ability for Vector to say how old Vector is in years once 12 months passes
 
 ## Cloud changes
 - vic-cloud that works with wirepod and regular servers
