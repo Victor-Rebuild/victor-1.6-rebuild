@@ -13,33 +13,33 @@
     "translation": "Je suis {0}"
   },
     "BehaviorHowOldAreYou.OneDay": {
-    "translation": "One day old!"
+    "translation": "Un jour!"
   },
   "BehaviorHowOldAreYou.SomeDays": {
-    "translation": "{0} days old!"
+    "translation": "{0} jours vieux!"
   },
   "BehaviorHowOldAreYou.OneMonth": {
-    "translation": "One month old!"
+    "translation": "Age d'un mois!"
   },
   "BehaviorHowOldAreYou.AndOneMonth": {
-    "translation": "and one month old!"
+    "translation": "et un mois!"
   },
   "BehaviorHowOldAreYou.SomeMonths": {
-    "translation": "{0} months old!"
+    "translation": "{0} mois!"
   },
   "BehaviorHowOldAreYou.AndSomeMonths": {
-    "translation": "and {0} months old!"
+    "translation": "et {0} mois!"
   },
   "BehaviorHowOldAreYou.OneYear": {
-    "translation": "One year old!"
+    "translation": "Un an!"
   },
   "BehaviorHowOldAreYou.SomeYears": {
-    "translation": "{0} years old!"
+    "translation": "{0} ans!"
   },
   "BehaviorHowOldAreYou.OneYearAndMonth": {
-    "translation": "One year"
+    "translation": "Un an"
   },
   "BehaviorHowOldAreYou.SomeYearsAndMonth": {
-    "translation": "{0} years"
+    "translation": "{0} ans"
   }
 }
