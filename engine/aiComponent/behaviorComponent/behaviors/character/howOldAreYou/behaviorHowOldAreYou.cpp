@@ -25,12 +25,19 @@
 
 namespace {
   constexpr const float kMonthsThresh_days = 30.436875; // days at which we start counting in months instead
+  constexpr const float kYearsThresh_months = 12; // days at which we start counting in years instead
 
   // Localization keys
   constexpr const char * kOneDayKey = "BehaviorHowOldAreYou.OneDay";
   constexpr const char * kSomeDaysKey = "BehaviorHowOldAreYou.SomeDays";
   constexpr const char * kOneMonthKey = "BehaviorHowOldAreYou.OneMonth";
+  constexpr const char * kAndOneMonthKey = "BehaviorHowOldAreYou.AndOneMonth";
   constexpr const char * kSomeMonthsKey = "BehaviorHowOldAreYou.SomeMonths";
+  constexpr const char * kAndSomeMonthsKey = "BehaviorHowOldAreYou.AndSomeMonths";
+  constexpr const char * kOneYearKey = "BehaviorHowOldAreYou.OneYear";
+  constexpr const char * kOneYearAndMonthKey = "BehaviorHowOldAreYou.OneYearAndMonth";
+  constexpr const char * kSomeYearsKey = "BehaviorHowOldAreYou.SomeYears";
+  constexpr const char * kSomeYearsAndMonthKey = "BehaviorHowOldAreYou.SomeYearsAndMonth";
 
 }
 
@@ -203,6 +210,7 @@ BehaviorHowOldAreYou::PresentableAge BehaviorHowOldAreYou::PresentableAgeFromHou
   // Handy types that aren't built in until C++20
   using duration_days = std::chrono::duration<int, std::ratio<86400> >;
   using duration_months = std::chrono::duration<int, std::ratio<2629746> >;
+  using duration_years = std::chrono::duration<int, std::ratio<31556952>>;
 
   // translate hours to days
   // we're cool with loss of precision
@@ -214,13 +222,23 @@ BehaviorHowOldAreYou::PresentableAge BehaviorHowOldAreYou::PresentableAgeFromHou
   const duration_months age_months = std::chrono::duration_cast<duration_months>(age_days);
   const int count_months = age_months.count();
 
+  // Translate months to years
+  // Precision: 0 I'm gussing
+  const duration_years age_years = std::chrono::duration_cast<duration_years>(age_months);
+  const int count_years = age_years.count();
+
+  const int remaining_months = count_months - (count_years * 12);
+
   //
   // Use locale component to get localized version of announcement string.
   // This is basically a four-way switch between "one day", "N days", "one month", and "N months".
   // If we're less than kMonthsThresh_days days, use days, else translate to months.
+  // And if we're less than kYearsThresh_months, use months, otherwise use years. -- Raj-jyot / Switch_modder
   //
   // Note: current implementation (at Design's request) is to return the floor:
   // i.e., round everything down until we get to a whole day: 47 hours -> 1 day, 49 hours -> 2 days
+  // 
+  // Note-2: We can't really "return the floor" past one year so the above will be neglected for when the age is over one year  -- Raj-jyot / Switch_modder
   //
   const auto & localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
 
@@ -230,8 +248,34 @@ BehaviorHowOldAreYou::PresentableAge BehaviorHowOldAreYou::PresentableAgeFromHou
     return PresentableAge(count_days, localeComponent.GetString(kSomeDaysKey, std::to_string(count_days)));
   } else if (count_months == 1) {
     return PresentableAge(count_months, localeComponent.GetString(kOneMonthKey));
-  } else {
+  } else if (count_months < kYearsThresh_months) {
     return PresentableAge(count_months, localeComponent.GetString(kSomeMonthsKey, std::to_string(count_months)));
+  } else {
+    std::string ageString;
+    
+    if (count_years == 1 && remaining_months <= 0) {
+      ageString = localeComponent.GetString(kOneYearKey);
+    } else if (count_years == 1 && remaining_months == 1) {
+      ageString = localeComponent.GetString(kOneYearAndMonthKey);
+    } else if (count_years == 1 && remaining_months > 1) {
+      ageString = localeComponent.GetString(kOneYearAndMonthKey);
+    } else if (count_years == 1 && remaining_months > 0 && count_months < 12) {
+      ageString = localeComponent.GetString(kOneYearAndMonthKey);
+    } else if (count_years > 1 && remaining_months == 0) {
+      ageString = localeComponent.GetString(kSomeYearsKey, std::to_string(count_years));
+    } else if (count_years > 1 && remaining_months > 0) {
+      ageString = localeComponent.GetString(kSomeYearsAndMonthKey, std::to_string(count_years));
+    }
+    
+    if ((remaining_months > 0)) {
+      if (remaining_months == 1) {
+        ageString += localeComponent.GetString(kAndOneMonthKey);
+      } else {
+        ageString += localeComponent.GetString(kAndSomeMonthsKey, std::to_string(remaining_months));
+      }
+    }
+    
+    return PresentableAge(count_months, ageString);
   }
 }
 

@@ -11,5 +11,35 @@
   },
   "behavior.DevTest2": {
     "translation": "Je suis {0}"
+  },
+    "BehaviorHowOldAreYou.OneDay": {
+    "translation": "One day old!"
+  },
+  "BehaviorHowOldAreYou.SomeDays": {
+    "translation": "{0} days old!"
+  },
+  "BehaviorHowOldAreYou.OneMonth": {
+    "translation": "One month old!"
+  },
+  "BehaviorHowOldAreYou.AndOneMonth": {
+    "translation": "and one month old!"
+  },
+  "BehaviorHowOldAreYou.SomeMonths": {
+    "translation": "{0} months old!"
+  },
+  "BehaviorHowOldAreYou.AndSomeMonths": {
+    "translation": "and {0} months old!"
+  },
+  "BehaviorHowOldAreYou.OneYear": {
+    "translation": "One year old!"
+  },
+  "BehaviorHowOldAreYou.SomeYears": {
+    "translation": "{0} years old!"
+  },
+  "BehaviorHowOldAreYou.OneYearAndMonth": {
+    "translation": "One year"
+  },
+  "BehaviorHowOldAreYou.SomeYearsAndMonth": {
+    "translation": "{0} years"
   }
 }
