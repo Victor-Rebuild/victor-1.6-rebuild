@@ -40,6 +40,6 @@ if (_is_shared_lib)
 
   add_custom_target(copy_picovoice_libs ALL DEPENDS ${OUTPUT_FILES})
 
-  #anki_build_target_license(pv_porcupine "Commercial")
+  anki_build_target_license(pv_porcupine "Commercial")
   endif(NOT TARGET copy_picovoice_libs)
 endif(_is_shared_lib)
