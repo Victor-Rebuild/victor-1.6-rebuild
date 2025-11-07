@@ -353,10 +353,10 @@ inline void ProceduralFace::SetSaturation(Value saturation) {
     _saturation = saturation;
   }
 
-  if(!Util::InRange(_saturation, Value(0), Value(1)))
+  if(!Util::InRange(_saturation, Value(0), Value(2)))
   {
-    ClipWarnFcn("Saturation", _saturation, Value(0), Value(1));
-    _saturation = Util::Clamp(_saturation, Value(0), Value(1));
+    ClipWarnFcn("Saturation", _saturation, Value(0), Value(2));
+    _saturation = Util::Clamp(_saturation, Value(0), Value(2));
   }
   // Update the saturation image (used for displaying FaceAnimations):
   GetSaturationImage().FillWith(static_cast<u8>(_saturation * std::numeric_limits<u8>::max()));
