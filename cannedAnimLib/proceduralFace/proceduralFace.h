@@ -252,7 +252,7 @@ private:
 inline void ProceduralFace::SetParameter(WhichEye whichEye, Parameter param, Value value)
 {
   if (param == Parameter::Saturation && IsXray()) {
-    value += 0.5f;
+    value += 0.6f;
   }
   _eyeParams[whichEye][static_cast<size_t>(param)] = Clip(whichEye, param, value);
 }
