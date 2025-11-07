@@ -780,7 +780,7 @@ void ProceduralFace::RegisterFaceWithConsoleVars() {
 
    new Util::ConsoleVar<float>(_saturation,
                                "kProcFace_Saturation", CONSOLE_GROUP,
-                               0., 1.f, true);
+                               0., 2.f, true);
 
   for(auto whichEye : {WhichEye::Left, WhichEye::Right}) {
     for (std::underlying_type<Parameter>::type iParam=0; iParam < Util::EnumToUnderlying(Parameter::NumParameters); ++iParam) {
