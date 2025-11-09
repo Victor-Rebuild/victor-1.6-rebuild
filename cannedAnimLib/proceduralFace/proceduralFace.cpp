@@ -705,10 +705,10 @@ static void ClipWarning(const char* paramName,
                         ProceduralFace::Value minVal,
                         ProceduralFace::Value maxVal)
 {
-  PRINT_NAMED_WARNING("ProceduralFace.Clip.OutOfRange",
-                      "Value of %f out of range [%f,%f] for parameter %s. Clipping.",
-                      value, minVal, maxVal, paramName);
-}
+//  PRINT_NAMED_WARNING("ProceduralFace.Clip.OutOfRange",
+//                      "Value of %f out of range [%f,%f] for parameter %s. Clipping.",
+//                      value, minVal, maxVal, paramName);
+};
 
 static void NoClipWarning(const char* paramName,
                           ProceduralFace::Value value,
