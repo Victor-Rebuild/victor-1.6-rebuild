@@ -122,7 +122,7 @@ void TokenClient::SendMessage(const Anki::Vector::TokenRequest& message) {
   std::vector<uint8_t> buffer(message_size);
   message.Pack(buffer.data(), message_size);
 
-  _client.Send((char*)buffer.data(), sizeof(buffer));
+  _client.Send((char*)buffer.data(), buffer.size());
 }
 
 void TokenClient::HandleTokenResponse(Anki::Vector::TokenResponse response) {

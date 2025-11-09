@@ -201,7 +201,7 @@ void EngineMessagingClient::SendMessage(const GMessage& message) {
   message.Pack(buffer.data() + kMessageHeaderLength, message_size);
   memcpy(buffer.data(), &message_size, kMessageHeaderLength);
 
-  _client.Send((char*)buffer.data(), sizeof(buffer));
+  _client.Send((char*)buffer.data(), buffer.size());
 }
 
 void EngineMessagingClient::SetPairingPin(std::string pin) {
