@@ -271,7 +271,7 @@ void BehaviorDisplayWeather::OnBehaviorActivated()
 
   if (IsXray()) {
     // Up the cpu frequency to the max
-    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2' -H 'Accept-Encoding: gzip, deflate' -H 'Referer: http://localhost:8080/' -H 'Connection: keep-alive' -H 'Priority: u=0'");
+    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2'");
   }
 
   auto& uic = GetBehaviorComp<UserIntentComponent>();
@@ -312,7 +312,7 @@ void BehaviorDisplayWeather::OnBehaviorDeactivated()
 
   if (IsXray()) {
     // Now that the behavior has finished set the cpu speed back to something reasonable
-    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1' -H 'Accept-Encoding: gzip, deflate' -H 'Referer: http://localhost:8080/' -H 'Connection: keep-alive' -H 'Priority: u=0'");
+    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1'");
   }
 }
 
