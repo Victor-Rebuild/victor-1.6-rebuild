@@ -97,6 +97,9 @@ private:
   void ParseDisplayTempTimesFromAnim();
   void StartTTSGeneration();
 
+  // For freqchange stuff
+  int _prevcpufreq = 0;
+
 };
 
 } // namespace Vector

@@ -270,6 +270,9 @@ void BehaviorDisplayWeather::OnBehaviorActivated()
   _dVars = DynamicVariables();
 
   if (IsXray()) {
+    // Check current frequency
+    _prevcpufreq = system("curl 'http://localhost:8080/api/mods/FreqChange/get'");
+
     // Up the cpu frequency to the max
     (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2'");
   }
@@ -310,9 +313,18 @@ void BehaviorDisplayWeather::OnBehaviorDeactivated()
     GetBEI().GetTextToSpeechCoordinator().CancelUtterance(_dVars.utteranceID);
   }
 
+  // Now that the behavior has finished set the cpu speed back to *hopefully what it was before
+  // * If it's not set to any of the predetermined values in wired it's gonna get set to Regular
   if (IsXray()) {
-    // Now that the behavior has finished set the cpu speed back to something reasonable
-    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1'");
+    if (_prevcpufreq == 2) {
+      (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2'");
+    } else if (_prevcpufreq == 1) {
+      (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1'");
+    } else if (_prevcpufreq == 0) {
+      (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=0'");
+    } else { // This should never happen, wired should never return a value other than 0, 1, or 2, but in case it does this is the fallback
+      (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=0'");
+    }
   }
 }
 

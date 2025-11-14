@@ -133,6 +133,9 @@ private:
   std::string GetLocalizedString(const std::string & key);
   std::string GetLocalizedString(const std::string & key, const int score);
 
+  // For freqchange stuff
+  int _prevcpufreq = 0;
+
 };
 
 } // namespace Vector
