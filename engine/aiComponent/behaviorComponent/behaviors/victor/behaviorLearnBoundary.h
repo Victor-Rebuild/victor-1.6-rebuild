@@ -16,7 +16,7 @@
 
 #include "engine/aiComponent/behaviorComponent/behaviors/iCozmoBehavior.h"
 
-#include "coretech/common/engine/math/point_fwd.h"
+#include "coretech/common/shared/math/point.h"
 
 #include <vector>
 

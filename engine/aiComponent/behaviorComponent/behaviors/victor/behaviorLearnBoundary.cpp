@@ -77,8 +77,8 @@ void BehaviorLearnBoundary::GetBehaviorOperationModifiers(BehaviorOperationModif
   modifiers.connectToCubeInBackground = true;
 
   // Turn on some vision modes for better marker detection
-  modifiers.visionModesForActiveScope->insert({ VisionMode::DetectingMarkers,         EVisionUpdateFrequency::High });
-  modifiers.visionModesForActiveScope->insert({ VisionMode::FullWidthMarkerDetection, EVisionUpdateFrequency::High });
+  modifiers.visionModesForActiveScope->insert({ VisionMode::Markers,         EVisionUpdateFrequency::High });
+  modifiers.visionModesForActiveScope->insert({ VisionMode::Markers_FullWidth, EVisionUpdateFrequency::High });
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
