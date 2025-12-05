@@ -39,7 +39,6 @@ if [[ ! -d "$ADEPS/wwise/versions/2017.2.7_a" ]]; then
     rm -f wwise-2017.2.7_a.tar.gz
 fi
 
-
 logv "WWISE_SDK_ROOT = ${WWISE_SDK_ROOT}"
 
 NEEDS_INSTALL=0

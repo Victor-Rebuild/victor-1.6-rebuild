@@ -1,6 +1,6 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
-from __future__ import print_function
+
 
 import argparse
 import os
@@ -130,3 +130,4 @@ def main(argv):
 if __name__ == '__main__':
     ret = main(sys.argv)
     sys.exit(ret)
+

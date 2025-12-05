@@ -1,6 +1,6 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
-from __future__ import print_function
+
 
 import argparse
 import os
@@ -11,9 +11,9 @@ import subprocess
 import sys
 
 # ankibuild
-import toolget
+from . import toolget
 
-PROTOBUF = 'deps/protobuf'
+PROTOBUF = 'protobuf'
 
 def get_protoc_version_from_command(exe):
     version = None

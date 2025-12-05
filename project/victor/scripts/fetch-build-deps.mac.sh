@@ -37,7 +37,7 @@ vlog "Check homebrew dependencies"
     curl
 
 vlog "vicos sdk"
-./tools/build/tools/ankibuild/vicos.py --install 5.3.0-r07
+#./tools/build/tools/ankibuild/vicos.py --install 5.3.0-r07
 
 vlog "CMake"
 ./tools/build/tools/ankibuild/cmake.py
