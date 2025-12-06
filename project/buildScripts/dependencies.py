@@ -15,6 +15,8 @@ import argparse
 import glob
 import zipfile
 import shutil
+import concurrent.futures
+from functools import partial
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -59,6 +61,7 @@ SVN_CRED = "--username %s --password %s --no-auth-cache --non-interactive --trus
 PROJECT_ROOT_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', '..'))
 DEPS_FILE = os.path.join(PROJECT_ROOT_DIR, 'DEPS')
 EXTERNALS_DIR = os.path.join(PROJECT_ROOT_DIR, 'EXTERNALS')
+THIRD_PARTY_DIR = os.path.join(PROJECT_ROOT_DIR, '3rd')
 DIFF_BRANCH_MSG = "is already a working copy for a different URL"
 
 # Most animation tar files in SVN are packages of JSON files that should be unpacked in the root
@@ -243,40 +246,29 @@ def is_valid_checksum(url_string):
 
 
 def extract_files_from_tar(extract_dir, file_types, put_in_subdir=False):
-  """
-  Given the path to a directory that contains .tar files and a list
-  of file types, eg. [".json", ".png"], this function will unpack
-  the given file types from all the .tar files.  If the optional
-  'put_in_subdir' input argument is set to True, then the files are
-  unpacked into a sub-directory named after the .tar file.
-  """
-  anim_name_length_mapping = {}
+    anim_name_length_mapping = {}
 
-  for (dir_path, dir_names, file_names) in os.walk(extract_dir):
-    # Generate list of all .tar files in/under the directory provided by the caller (extract_dir)
-    all_files = [os.path.join(dir_path, x) for x in file_names]
-    tar_files = [a_file for a_file in all_files if a_file.endswith('.tar')]
+    for dir_path, dir_names, file_names in os.walk(extract_dir):
+        tar_files = [
+            os.path.join(dir_path, f)
+            for f in file_names
+            if f.endswith('.tar')
+        ]
 
-    if tar_files and not put_in_subdir:
-      # If we have any .tar files to unpack and they will NOT be unpacked into a sub-directory,
-      # then first clean up existing files that may conflict with what will be unpacked. For
-      # example, if a .tar file previously contained foo.json and it now contains bar.json, we
-      # don't want foo.json lingering from a previous unpacking.
-      # PS, if the .tar files WILL be unpacked into a sub-directory, we don't need to do any cleanup
-      # here because unpack_tarball() will first delete the sub-directory if it already exists.
-      file_types_to_cleanup = file_types + [binary_conversion.BIN_FILE_EXT]
-      delete_files_from_dir(file_types_to_cleanup, dir_path, file_names)
+        if tar_files:
+            worker = partial(
+                unpack_tarball,
+                file_types=file_types,
+                put_in_subdir=put_in_subdir,
+            )
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                for mapping in executor.map(worker, tar_files):
+                    anim_name_length_mapping.update(mapping)
 
-    for tar_file in tar_files:
-      anim_name_length_mapping.update(unpack_tarball(tar_file, file_types, put_in_subdir))
-      # No need to remove the tar file here after unpacking it - all tar files are
-      # deleted from cozmo_resources/assets/ on the device by Builder.cs
+        if put_in_subdir:
+            break
 
-    if put_in_subdir:
-      # If we are extracting tar files into subdirs, don't recurse into those subdirs.
-      break
-
-  return anim_name_length_mapping
+    return anim_name_length_mapping
 
 
 def _get_specific_members(members, file_types):
@@ -334,12 +326,12 @@ def get_flatc_dir():
   target_triple = platform_map.get(platform_name)
 
   if target_triple:
-    flatc_dir = os.path.join(EXTERNALS_DIR, 'deps', 
+    flatc_dir = os.path.join(THIRD_PARTY_DIR,
                              'flatbuffers', 'host-prebuilts',
                              'current', target_triple, 'bin')
   else: 
     # default
-    flatc_dir = os.path.join(EXTERNALS_DIR, 'deps',
+    flatc_dir = os.path.join(THIRD_PARTY_DIR,
                              'flatbuffers', 'mac', 'Release')
   #print(flatc_dir)
   return flatc_dir
@@ -1024,4 +1016,5 @@ def main(argv):
 
 if __name__ == '__main__':
     main(sys.argv)
+
 
