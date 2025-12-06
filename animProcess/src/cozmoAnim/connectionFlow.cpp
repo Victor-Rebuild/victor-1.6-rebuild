@@ -45,7 +45,7 @@ namespace {
 u32 _pin = 123456;
 
 const f32 kRobotNameScale = 0.65f;
-const std::string kURL = "modder.my.to/1.6";
+const std::string kURL = "anki2.ca/1.6";
 const ColorRGBA   kColor(0.9f, 0.9f, 0.9f, 1.f);
 
 const char* kShowPinScreenSpriteName = "pairing_icon_key";
