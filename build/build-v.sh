@@ -19,6 +19,11 @@ if [[ "$(uname -a)" == *"Darwin"* ]]; then
     echo
     echo -e "\033[1;32mComplete.\033[0m"
     echo
+elif [[ "${NO_DOCKER}" = "1" ]]; then
+    ./project/victor/scripts/victor_build_release.sh "$@"
+    echo
+    echo -e "\033[1;32mComplete.\033[0m"
+    echo
 else
     if [[ -d build/cache/0 ]]; then
         echo "Rebuilding cache..."
