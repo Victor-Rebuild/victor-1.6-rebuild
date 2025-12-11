@@ -8,7 +8,7 @@ export GIT_PROJ_ROOT="$(
 alias victor_restart="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_restart.sh"
 alias victor_start="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_start.sh"
 alias victor_stop="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_stop.sh"
-alias victor_stage="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/stage.sh -c Release"
+alias victor_stage="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/stage.sh -c Release -b"
 alias watch_backtraces="cd ${GIT_PROJ_ROOT} && echo Waiting for backtraces... && python3 project/victor/scripts/backtracewatcher.py"
 
 alias victor_build_release="cd ${GIT_PROJ_ROOT} && ${GIT_PROJ_ROOT}/project/victor/scripts/victor_build_release.sh"
