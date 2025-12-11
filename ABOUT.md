@@ -47,3 +47,6 @@ Once Vector is booted up follow these steps to connect him to the server
 7. - Wait for Vector to reboot.
 
 8. - Once Vector reboots go to [https://anki2.ca/1.6](https://anki2.ca/1.6) to setup with the server, follow the steps on the website.
+  
+## Hey I found a bug, what should I do?
+Make a bug report at [https://github.com/Victor-Rebuild/victor-1.6-rebuild/issues](https://github.com/Victor-Rebuild/victor-1.6-rebuild/issues) and I'll get to it when I get time.
