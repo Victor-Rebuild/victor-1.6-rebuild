@@ -13,7 +13,7 @@ You can find all the changes I've made over in [CHANGES.md](/CHANGES.md)
 
 1. - Put your robot into recovery mode by putting Vector on the charger and holding the backpack button until Vector's lights turn back on. (You'll know Vector is in recovery when you see anki.com/v, ddl.io/v, anki.com/dev or u.p-2.xyz on Vector's screen)
 
-2. - Go to [https://websetup.froggitti.net/](https://websetup.froggitti.net/) and select the option that says "CUSTOM FIRMWARE" in the stack.
+2. - Go to [https://websetup.froggitti.net/](https://websetup.froggitti.net/) and select the option that says "CUSTOM FIRMWARE" in the stack. (Note for prod users, use [https://anki2.ca/1.6-prod/](https://anki2.ca/1.6-prod/) to install the ota)
 ![websetup_cfw](install-images/stack.png)
 
 3. - Double click the back button so Vector shows the key screen and then connect your robot using the button that says "PAIR WITH VECTOR".
