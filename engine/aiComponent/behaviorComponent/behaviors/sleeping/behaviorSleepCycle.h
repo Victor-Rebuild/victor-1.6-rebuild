@@ -103,6 +103,8 @@ private:
 
   bool WasNightlyReboot() const;
 
+  bool shouldStartAsleep = true;
+
   struct InstanceConfig {
     std::string awakeDelegateName;
     std::string findChargerBehaviorName;

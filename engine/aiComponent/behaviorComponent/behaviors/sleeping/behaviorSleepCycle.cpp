@@ -337,7 +337,7 @@ void BehaviorSleepCycle::OnBehaviorActivated()
   _iConfig.emergencyCondition->SetActive( GetBEI(), true );
 
   // if we just rebooted, and it's night time, then start out asleep
-  const bool shouldStartAsleep = WasNightlyReboot();
+  shouldStartAsleep = WasNightlyReboot();
 
   LOG_INFO("BehaviorSleepCycle.Activated",
            "Starting out %s",
