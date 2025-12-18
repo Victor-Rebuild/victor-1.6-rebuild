@@ -84,7 +84,7 @@ const std::string CreatorWebsite = "https://anki2.ca";
 #define FORCE_TRANSITION_TO_PAIRING 0
 #endif
 
-#define ENABLE_SELF_TEST 1
+// #define ENABLE_SELF_TEST 1
 
 #if !FACTORY_TEST
 
@@ -138,7 +138,7 @@ namespace {
   const char* kAlexaIconSpriteName = "face_alexa_icon";
 
   // TODO (VIC-11606): don't use timeout for mute
-  CONSOLE_VAR_RANGED(f32, kToggleMuteTimeout_s, "FaceInfoScreenManager", 1.2f, 0.001f, 3.0f);
+  // CONSOLE_VAR_RANGED(f32, kToggleMuteTimeout_s, "FaceInfoScreenManager", 1.2f, 0.001f, 3.0f);
   CONSOLE_VAR_RANGED(f32, kAlexaNotificationTimeout_s, "FaceInfoScreenManager", 2.0f, 0.001f, 3.0f);
 
   // How long the button needs to be pressed for before it should trigger shutdown animation
@@ -316,9 +316,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   SET_ENTER_ACTION(Main, mainEnterFcn);
 
   ADD_MENU_ITEM(Main, "EXIT", None);
-#if ENABLE_SELF_TEST
+// #if ENABLE_SELF_TEST
   ADD_MENU_ITEM(Main, IsXray() ? "TEST" : "SELF TEST", SelfTest);
-#endif
+// #endif
   ADD_MENU_ITEM(Main, IsXray() ? "DATA" : "DATA OPTIONS", UserDataSubmenu);
 
   // === User Data Menu ===
@@ -423,7 +423,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   SET_ENTER_ACTION(ToggleMute, toggleMuteEnterAction);
   // TODO (VIC-11606): don't use timeout and instead wait for mute anim to end
-  SET_TIMEOUT(ToggleMute, kToggleMuteTimeout_s, None);
+  SET_TIMEOUT(ToggleMute, 8, None);
   
   // === AlexaNotification ===
   auto alexaNotification = [this]() {
@@ -1302,7 +1302,38 @@ void FaceInfoScreenManager::DrawMain()
   std::transform(esn.begin(), esn.end(), esn.begin(),
     [](unsigned char c){ return std::tolower(c); });
 
-  const std::string serialNo = "ESN: "  + esn;
+  std::string botname;
+  if (esn == "0dd1a41b") {
+    botname = "PinkBot";
+    _knownBot = 1;
+  } else if (esn == "0dd1dd33") {
+    botname = "Starlight";
+    _knownBot = 1;
+  } else if (esn == "00602d79") {
+    botname = "Viccy";
+    _knownBot = 1;
+  } else if (esn == "00601b50") {
+    botname = "WhiteBot(?)";
+    _knownBot = 1;
+  } else if (esn == "00804180") {
+    botname = "OG Patrick";
+    _knownBot = 1;
+  } else if (esn == "00804577") {
+    botname = "Patrick";
+    _knownBot = 1;
+  } else if (esn == "0dd1c7ef") {
+    botname = "Dev";
+    _knownBot = 1;
+  } else if (esn == "00502981") {
+    botname = "Frost";
+    _knownBot = 1;
+  } else {
+    _knownBot = 0;
+  }
+
+  const std::string nameOfBot = "BOT: " + botname;
+
+  const std::string serialNo = "ESN: " + esn;
 
   const std::string hwVer    = "HW: "   + std::to_string(IsXray() ? 8 : Factory::GetEMR()->fields.HW_VER);
 
@@ -1324,18 +1355,25 @@ void FaceInfoScreenManager::DrawMain()
 
   // ESN/serialNo and the HW version are drawn on the same line with serialNo default left aligned and
   // HW version right aligned.
-  ColoredTextLines lines = { { {serialNo}, {hwVer, NamedColors::WHITE, false} },
-                             {osProject},
-                             {osVer},
-                             {ssid}, 
-#if FACTORY_TEST
-                             {"IP: " + ip},
-#else
-                             { {"IP: "}, {ip, (osstate->IsValidIPAddress(ip) ? NamedColors::GREEN : NamedColors::RED)} },
-#endif
-                           };
+  if (_knownBot) {
+    ColoredTextLines lines = { { {nameOfBot}, {hwVer, NamedColors::WHITE, false} },
+                               {serialNo},
+                               {osProject},
+                               {osVer},
+                               {ssid}, 
+                               { {"IP: "}, {ip, (osstate->IsValidIPAddress(ip) ? NamedColors::GREEN : NamedColors::RED)} },
+                             };
+    DrawTextOnScreen(lines);
+  } else {
+    ColoredTextLines lines = { { {serialNo},  {hwVer, NamedColors::WHITE, false} },
+                               {osProject},
+                               {osVer},
+                               {ssid}, 
+                               { {"IP: "}, {ip, (osstate->IsValidIPAddress(ip) ? NamedColors::GREEN : NamedColors::RED)} },
+                             };
 
-  DrawTextOnScreen(lines);
+    DrawTextOnScreen(lines);
+  }
 }
 
 void FaceInfoScreenManager::DrawNetwork()
