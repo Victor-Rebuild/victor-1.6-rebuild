@@ -149,6 +149,7 @@ union dupes_allowed UserIntent
   UserIntent_PlaybackMessage  message_playback,
   UserIntent_RecordMessage    message_record,
   UserIntent_Void             names_ask,
+  UserIntent_Void             namevictor,
   UserIntent_Void             play_anygame,
   UserIntent_Void             play_anytrick,
   UserIntent_Void             play_blackjack,

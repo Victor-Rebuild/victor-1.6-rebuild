@@ -257,6 +257,11 @@
       "app_intent": "intent_names_ask"
     },
     {
+      "user_intent": "namevictor",
+      "cloud_intent": "intent_name_victor",
+      "app_intent": "intent_name_victor"
+    },
+    {
       "user_intent": "silence",
       "cloud_intent": "intent_system_noaudio",
       "test_parsing": false
