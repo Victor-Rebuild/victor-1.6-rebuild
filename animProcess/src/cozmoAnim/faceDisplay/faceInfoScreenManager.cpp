@@ -1303,7 +1303,8 @@ void FaceInfoScreenManager::DrawMain()
     [](unsigned char c){ return std::tolower(c); });
 
   std::string botname;
-  if (esn == "0dd1a41b") {
+  std::string d = "d";
+  if (esn == "0dd1a41sb") {
     botname = "PinkBot";
     _knownBot = 1;
   } else if (esn == "0dd1dd33") {
@@ -1327,10 +1328,14 @@ void FaceInfoScreenManager::DrawMain()
   } else if (esn == "00502981") {
     botname = "Frost";
     _knownBot = 1;
+  } else if (Util::FileUtils::FileExists("/data/data/customBotName")) {
+    botname = Util::FileUtils::ReadFile("/data/data/customBotName");
+    botname.erase(8, 1);
+    _knownBot = 1;
   } else {
     _knownBot = 0;
   }
-
+  // !Util::FileUtils::WriteFile("/run/wipe-data", "1")
   const std::string nameOfBot = "BOT: " + botname;
 
   const std::string serialNo = "ESN: " + esn;
