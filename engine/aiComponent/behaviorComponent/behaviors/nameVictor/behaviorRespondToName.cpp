@@ -33,7 +33,7 @@ namespace JsonKeys {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 BehaviorRespondToName::BehaviorRespondToName(const Json::Value& config)
 : ICozmoBehavior(config)
-, _name("testname123")
+, _name("")
 , _faceID(Vision::UnknownFaceID)
 {
   SubscribeToTags({EngineToGameTag::RobotRenamedEnrolledFace});
@@ -65,36 +65,29 @@ void BehaviorRespondToName::HandleWhileInScopeButNotActivated(const EngineToGame
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool BehaviorRespondToName::WantsToBeActivatedBehavior() const
 {
-  // todo: this behavior shouldn't respond if the vision system didn't actually handle it, which
-  // can happen if the wrong original name is used (maybe we just get rid of that param?)
-  const bool haveValidName = !_name.empty();
-  return haveValidName;
+  auto& uic = GetBehaviorComp<UserIntentComponent>();
+  return uic.IsUserIntentPending(USER_INTENT(namevictor));
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRespondToName::OnBehaviorActivated()
 {
-
-  auto& uic = GetBehaviorComp<UserIntentComponent>();
-  UserIntentPtr activeIntentPtr = uic.GetUserIntentIfActive(USER_INTENT(namevictor));
-  if (activeIntentPtr) {
-    // Log that the behavior was activated
-    PRINT_NAMED_INFO("BehaviorWireTest.OnBehaviorActivated", "Activated 'namevictor' intent");
-
-    // Create and delegate a SayTextAction to say "Hello World"
-    auto* sayHelloAction = new SayTextAction("Hello World", SayTextAction::AudioTtsProcessingStyle::Unprocessed);
-    DelegateIfInControl(sayHelloAction, [](const ActionResult& result) {
-      if (result == ActionResult::SUCCESS) {
-        PRINT_NAMED_INFO("BehaviorWireTest.OnBehaviorActivated", "Successfully said 'Hello World'");
-      } else {
-        PRINT_NAMED_WARNING("BehaviorWireTest.OnBehaviorActivated", "Failed to say 'Hello World'");
-      }
-    });
-  } else {
-    PRINT_NAMED_WARNING("BehaviorWireTest.OnBehaviorActivated", "No active 'namevictor' intent found");
+  // The intent code was used from wireOS (https://github.com/kercre123/victor/blob/snowboy/engine/aiComponent/behaviorComponent/behaviors/victor/behaviorWireTest.cpp)
+  UserIntentPtr intentData = SmartActivateUserIntent(USER_INTENT(namevictor));
+  if (!intentData) {
+    PRINT_NAMED_WARNING("BehaviorWireTest.OnBehaviorActivated", "No pending 'namevictor' intent found");
+    return;
   }
+  
+  // Log that the behavior was activated
+  PRINT_NAMED_INFO("BehaviorWireTest.OnBehaviorActivated", "Activated 'namevictor' intent");
 
+  if (Util::FileUtils::FileExists("/data/data/customBotName")) {
+    _name = Util::FileUtils::ReadFile("/data/data/customBotName");
+  } else {
+    _name = "Vector";
+  }
 
   if(_name.empty())
   {
