@@ -34,7 +34,6 @@ namespace JsonKeys {
 BehaviorRespondToName::BehaviorRespondToName(const Json::Value& config)
 : ICozmoBehavior(config)
 , _name("")
-, _faceID(Vision::UnknownFaceID)
 {
   SubscribeToTags({EngineToGameTag::RobotRenamedEnrolledFace});
   
@@ -58,7 +57,6 @@ void BehaviorRespondToName::HandleWhileInScopeButNotActivated(const EngineToGame
   
   auto & msg = event.GetData().Get_RobotRenamedEnrolledFace();
   _name   = msg.name;
-  _faceID = msg.faceID;
 }
 
 
@@ -66,7 +64,7 @@ void BehaviorRespondToName::HandleWhileInScopeButNotActivated(const EngineToGame
 bool BehaviorRespondToName::WantsToBeActivatedBehavior() const
 {
   auto& uic = GetBehaviorComp<UserIntentComponent>();
-  return uic.IsUserIntentPending(USER_INTENT(namevictor));
+  return uic.IsUserIntentPending(USER_INTENT(name_victor_setname)) || uic.IsUserIntentPending(USER_INTENT(name_victor_sayname));
 }
 
 
@@ -74,14 +72,22 @@ bool BehaviorRespondToName::WantsToBeActivatedBehavior() const
 void BehaviorRespondToName::OnBehaviorActivated()
 {
   // The intent code was used from wireOS (https://github.com/kercre123/victor/blob/snowboy/engine/aiComponent/behaviorComponent/behaviors/victor/behaviorWireTest.cpp)
-  UserIntentPtr intentData = SmartActivateUserIntent(USER_INTENT(namevictor));
-  if (!intentData) {
-    PRINT_NAMED_WARNING("BehaviorWireTest.OnBehaviorActivated", "No pending 'namevictor' intent found");
+  UserIntentPtr intentDataSet = SmartActivateUserIntent(USER_INTENT(name_victor_setname));
+  UserIntentPtr intentDataSay = SmartActivateUserIntent(USER_INTENT(name_victor_sayname));
+
+  if (!intentDataSet && !intentDataSay) {
+    PRINT_NAMED_WARNING("BehaviorRespondToName.OnBehaviorActivated", "No pending 'name_victor_say' intent found");
     return;
   }
   
+  if (intentDataSet) {
+    isSetNameVc = 1;
+  } else if (intentDataSay) {
+    isSetNameVc = 0;
+  }
+
   // Log that the behavior was activated
-  PRINT_NAMED_INFO("BehaviorWireTest.OnBehaviorActivated", "Activated 'namevictor' intent");
+  PRINT_NAMED_INFO("BehaviorRespondToName.OnBehaviorActivated", "Activated 'name_victor_say' intent");
 
   if (Util::FileUtils::FileExists("/data/data/customBotName")) {
     _name = Util::FileUtils::ReadFile("/data/data/customBotName");
@@ -89,10 +95,18 @@ void BehaviorRespondToName::OnBehaviorActivated()
     _name = "Vector";
   }
 
-  if(_name.empty())
+  if (_name.empty())
   {
-    PRINT_NAMED_ERROR("BehaviorRespondToName.InitInternal.EmptyName", "");
-    return;
+    // The only case this can happen is if the custom name file IS made, but is blank,
+    // for that case, we'll default to `Vector`, just like above
+    _name = "Vector";
+    if (_name.empty())
+    {
+      // Now, we should NEVER reach this point where the name is STILL empty because we forcefully set it above.
+      // If we somehow do. we'll restore the original logic.
+      PRINT_NAMED_ERROR("BehaviorRespondToName.InitInternal.EmptyName", "");
+      return;
+    }
   }
   
   //  PRINT_CH_INFO("Behaviors", "BehaviorRespondToName.InitInternal",
@@ -115,31 +129,31 @@ void BehaviorRespondToName::OnBehaviorActivated()
   //  DelegateIfInControl(turnTowardsFace);
   
   auto* action = new CompoundActionSequential();
-  
-  {
-    // 1. Say name once
-    SayTextAction* sayNameAction1 = new SayTextAction(_name);
-    sayNameAction1->SetAnimationTrigger(AnimationTrigger::MeetVictorSayName);
-    action->AddAction(sayNameAction1);
+  if (isSetNameVc) {
+    {
+      // 1. Say name once (If this is setname)
+      SayTextAction* sayNameAction1 = new SayTextAction(_name);
+      sayNameAction1->SetAnimationTrigger(AnimationTrigger::MeetVictorSayName);
+      action->AddAction(sayNameAction1);
+    }
   }
   
   {
     // 2. Repeat name
-    SayTextAction* sayNameAction2 = new SayTextAction(_name);
-    sayNameAction2->SetAnimationTrigger(AnimationTrigger::MeetVictorSayNameAgain);
+    SayTextAction* sayNameAction2 = isSetNameVc ? new SayTextAction(_name) : new SayTextAction("I'm" + _name);
+    isSetNameVc ? sayNameAction2->SetAnimationTrigger(AnimationTrigger::MeetVictorSayNameAgain) : sayNameAction2->SetAnimationTrigger(AnimationTrigger::InteractWithFacesInitialNamed);
     action->AddAction(sayNameAction2);
   }
   
   DelegateIfInControl(action);
   
   _name.clear();
-  _faceID = Vision::UnknownFaceID;
 }
   
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRespondToName::SetName(const std::string& name)
 {
-  if( ANKI_VERIFY( _name.empty(),
+  if (ANKI_VERIFY( _name.empty(),
                    "BehaviorRespondToName.SetName.NameExists",
                    "Attempted to set name with '%s' but already set with '%s'",
                    name.c_str(), _name.c_str()) )

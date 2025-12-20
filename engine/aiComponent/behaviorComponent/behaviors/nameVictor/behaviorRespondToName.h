@@ -40,7 +40,7 @@ protected:
 private:
   
   std::string      _name;
-  Vision::FaceID_t _faceID;
+  bool isSetNameVc = false;
   
 }; // class BehaviorReactToRenameFace
   
