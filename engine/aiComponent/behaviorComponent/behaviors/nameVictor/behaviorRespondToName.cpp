@@ -17,6 +17,7 @@
 #include "engine/actions/sayTextAction.h"
 #include "engine/aiComponent/behaviorComponent/userIntentComponent.h"
 #include "engine/aiComponent/behaviorComponent/userIntents.h"
+#include "engine/components/backpackLights/engineBackpackLightComponent.h"
 #include "engine/events/ankiEvent.h"
 #include "engine/externalInterface/externalInterface.h"
 #include "util/cladHelpers/cladFromJSONHelpers.h"
@@ -59,14 +60,12 @@ void BehaviorRespondToName::HandleWhileInScopeButNotActivated(const EngineToGame
   _name   = msg.name;
 }
 
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool BehaviorRespondToName::WantsToBeActivatedBehavior() const
 {
   auto& uic = GetBehaviorComp<UserIntentComponent>();
   return uic.IsUserIntentPending(USER_INTENT(name_victor_setname)) || uic.IsUserIntentPending(USER_INTENT(name_victor_sayname));
 }
-
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorRespondToName::OnBehaviorActivated()
@@ -149,5 +148,13 @@ void BehaviorRespondToName::OnBehaviorActivated()
   
   _name.clear();
 }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void BehaviorRespondToName::OnBehaviorDeactivated()
+{
+  auto& blc = GetBEI().GetBackpackLightComponent();
+  blc.ClearAllBackpackLightConfigs();
+}
+
 } // namespace Vector
 } // namespace Anki
