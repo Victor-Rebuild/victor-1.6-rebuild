@@ -12,12 +12,14 @@
 
 #include "engine/aiComponent/behaviorComponent/behaviors/nameVictor/behaviorRespondToName.h"
 
+#include "aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
 #include "clad/externalInterface/messageEngineToGame.h"
 #include "engine/actions/basicActions.h"
 #include "engine/actions/sayTextAction.h"
 #include "engine/aiComponent/behaviorComponent/userIntentComponent.h"
 #include "engine/aiComponent/behaviorComponent/userIntents.h"
 #include "engine/components/backpackLights/engineBackpackLightComponent.h"
+#include "engine/components/localeComponent.h"
 #include "engine/events/ankiEvent.h"
 #include "engine/externalInterface/externalInterface.h"
 #include "util/cladHelpers/cladFromJSONHelpers.h"
@@ -28,6 +30,10 @@ namespace Vector {
   
 namespace JsonKeys {
   // static const char * const AnimationTriggerKey = "animationTrigger";
+}
+
+namespace LocalizationKey {
+  const char * kImX = "BehaviorRespondToName.ImX";
 }
   
 
@@ -131,15 +137,17 @@ void BehaviorRespondToName::OnBehaviorActivated()
   if (isSetNameVc) {
     {
       // 1. Say name once (If this is setname)
-      SayTextAction* sayNameAction1 = new SayTextAction(_name);
+      SayTextAction* sayNameAction1 = new SayTextAction(_name + "?");
       sayNameAction1->SetAnimationTrigger(AnimationTrigger::MeetVictorSayName);
       action->AddAction(sayNameAction1);
     }
   }
   
+  const std::string & localizedImName = GetLocalizedImX();
+
   {
-    // 2. Repeat name
-    SayTextAction* sayNameAction2 = isSetNameVc ? new SayTextAction(_name) : new SayTextAction("I'm" + _name);
+    // 2. Repeat name (Or say it once if not setname)
+    SayTextAction* sayNameAction2 = isSetNameVc ? new SayTextAction(_name) : new SayTextAction(localizedImName + _name);
     isSetNameVc ? sayNameAction2->SetAnimationTrigger(AnimationTrigger::MeetVictorSayNameAgain) : sayNameAction2->SetAnimationTrigger(AnimationTrigger::InteractWithFacesInitialNamed);
     action->AddAction(sayNameAction2);
   }
@@ -155,6 +163,20 @@ void BehaviorRespondToName::OnBehaviorDeactivated()
   auto& blc = GetBEI().GetBackpackLightComponent();
   blc.ClearAllBackpackLightConfigs();
 }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Get localized version of "I'm, X"
+std::string BehaviorRespondToName::GetLocalizedImX() const
+{
+  return GetLocalizedString(LocalizationKey::kImX);
+}
+
+std::string BehaviorRespondToName::GetLocalizedString(const std::string & key) const
+{
+  const auto& localeComponent = GetBEI().GetRobotInfo().GetLocaleComponent();
+  return localeComponent.GetString(key);
+}
+
 
 } // namespace Vector
 } // namespace Anki

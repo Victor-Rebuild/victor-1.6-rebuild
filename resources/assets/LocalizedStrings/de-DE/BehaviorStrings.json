@@ -134,5 +134,8 @@
   },
   "UserDefinedBehaviorTree.ConfirmNewBehavior": {
     "translation": "Magst du diese Reaktion?"
+  },
+  "BehaviorRespondToName.ImX": {
+    "translation": "Ich bin"
   }
 }

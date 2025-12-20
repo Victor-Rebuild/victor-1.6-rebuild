@@ -119,5 +119,8 @@
   },
   "BehaviorSayName.DontKnow": {
     "translation": "I don't know"
+  },
+  "BehaviorRespondToName.ImX": {
+    "translation": "I'm"
   }
 }

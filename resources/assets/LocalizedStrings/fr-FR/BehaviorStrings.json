@@ -41,5 +41,8 @@
   },
   "BehaviorHowOldAreYou.SomeYearsAndMonth": {
     "translation": "{0} ans"
+  },
+  "BehaviorRespondToName.ImX": {
+    "translation": "Je suis"
   }
 }

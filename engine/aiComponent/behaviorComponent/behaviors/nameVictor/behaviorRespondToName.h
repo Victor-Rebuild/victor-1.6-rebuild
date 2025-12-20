@@ -40,6 +40,16 @@ private:
   
   std::string      _name;
   bool isSetNameVc = false;
+
+  // Below is taken from behaviorenrollface.cpp/.h
+
+  // Get localized version of "I'm, X"
+  std::string GetLocalizedImX() const;
+
+  // Get localized string "I'm, X"
+  std::string GetLocalizedString(const std::string & key) const;
+  std::string GetLocalizedString(const std::string & key, const std::string & arg0) const;
+  std::string GetLocalizedString(const std::string & key, const std::string & arg0, const std::string & arg1) const;
   
 }; // class BehaviorReactToRenameFace
   
