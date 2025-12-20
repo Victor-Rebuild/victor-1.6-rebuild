@@ -29,8 +29,6 @@ private:
 public:
   virtual bool WantsToBeActivatedBehavior() const override;
   
-  void SetName(const std::string& name);
-  
 protected:
   virtual void GetBehaviorOperationModifiers(BehaviorOperationModifiers& modifiers) const override {}
   virtual void GetBehaviorJsonKeys(std::set<const char*>& expectedKeys) const override;
