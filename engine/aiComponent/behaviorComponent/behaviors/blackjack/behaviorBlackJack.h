@@ -135,7 +135,7 @@ private:
 
   // For freqchange stuff
   int _prevcpufreq = 0;
-  bool _doXrayOverclock = true;
+  bool _doXrayOverclock = false;
 
 };
 
