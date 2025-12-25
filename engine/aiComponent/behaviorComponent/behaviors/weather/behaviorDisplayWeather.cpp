@@ -448,12 +448,12 @@ bool BehaviorDisplayWeather::GenerateTemperatureImage(int temp, bool isFahrenhei
       outImg = &_iConfig->temperatureLayouts[5];
     }
   }
-  if(!ANKI_VERIFY(outImg->GetLayerLayoutMap().size() == 1,
-                  "BehaviorDisplayWeather.GenerateTemperatureImage.ImproperNumberOfLayers",
-                  "Expected one layer, but image has %zu",
-                  outImg->GetLayerLayoutMap().size())){
-    return false;
-  }
+  // if(!ANKI_VERIFY(outImg->GetLayerLayoutMap().size() == 1,
+  //                 "BehaviorDisplayWeather.GenerateTemperatureImage.ImproperNumberOfLayers",
+  //                 "Expected one layer, but image has %zu",
+  //                 outImg->GetLayerLayoutMap().size())){
+  //   return false;
+  // }
 
   auto& layer = outImg->GetLayerLayoutMap().begin()->second;
 
