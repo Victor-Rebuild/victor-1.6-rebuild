@@ -29,6 +29,7 @@
 - Now plays the wakeup after onboarding is finished from web setup (Code from Viccyware)
 - Fixed Blackjack so that Vector actually says "Dealer" correctly
 - Added the ability for Vector to say how old Vector is in years once 12 months passes
+- Vector can be named in <vector-ip>:8080 in a web browser, name can be asked for by asking the "What is your name?" Voice command.
 
 ## Cloud changes
 - vic-cloud that works with wirepod and regular servers
@@ -42,4 +43,5 @@
 - Compiling with -O2 and fast math
 - Picovoice 1.5 for customizable wakeword (Code used from WireOS)
 - C++ upgrade engine from wireOS
+- Reonboard menu to easily connect Vector to the voice command server
 
