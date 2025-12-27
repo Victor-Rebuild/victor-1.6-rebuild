@@ -218,6 +218,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   //const bool hideSpecialDebugScreens = (FACTORY_TEST && Factory::GetEMR()->fields.PLAYPEN_PASSED_FLAG);                        // Use this line in factory branch
 
   ADD_SCREEN_WITH_TEXT(Reonboard, Reonboard, {"REONBOARD?"});
+  ADD_SCREEN_WITH_TEXT(SwitchSlot, SwitchSlot, {"SWAP SYS SLOT?"});
   ADD_SCREEN(None, None);
   ADD_SCREEN(Pairing, Pairing);
   ADD_SCREEN(FAC, None);
@@ -324,6 +325,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === User Data Menu ===
   ADD_MENU_ITEM(UserDataSubmenu, "EXIT", Main);
   ADD_MENU_ITEM(UserDataSubmenu, "REONBOARD", Reonboard);
+  ADD_MENU_ITEM(UserDataSubmenu, "CHANGE SLOT", SwitchSlot);
   ADD_MENU_ITEM(UserDataSubmenu, "CLEAR USER DATA", ClearUserData);
   DISABLE_TIMEOUT(UserDataSubmenu);
 
@@ -374,6 +376,16 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_MENU_ITEM_WITH_ACTION(Reonboard, "CONFIRM", confirmReonboard);
   DISABLE_TIMEOUT(Reonboard);
 
+  // === SwitchSlot screen ===
+  FaceInfoScreen::MenuItemAction confirmSlotSwitch = [this]() {
+      LOG_INFO("FaceInfoScreenManager.SwitchSlot.Confirmed", "");
+      (void)system("sysswitch");
+      this->Reboot();
+      return ScreenName::Rebooting;
+  };
+  ADD_MENU_ITEM(SwitchSlot, "EXIT", UserDataSubmenu);
+  ADD_MENU_ITEM_WITH_ACTION(SwitchSlot, "CONFIRM", confirmSlotSwitch);
+  DISABLE_TIMEOUT(SwitchSlot);
     
   // === Camera screen ===
   FaceInfoScreen::ScreenAction cameraEnterAction = [this]() {
@@ -1083,7 +1095,8 @@ void FaceInfoScreenManager::ProcessMenuNavigation(const RobotState& state)
         (currScreenName != ScreenName::None &&
           currScreenName != ScreenName::FAC &&
           currScreenName != ScreenName::Pairing &&
-          currScreenName != ScreenName::Reonboard) ) {
+          currScreenName != ScreenName::Reonboard &&
+          currScreenName != ScreenName::SwitchSlot) ) {
       SetScreen(_currScreen->GetButtonGotoScreen());
     }
   }

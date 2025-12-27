@@ -22,6 +22,7 @@ enum class ScreenName : uint8_t {
   FAC  = 1, // Needs to be after None
 
   Reonboard,
+  SwitchSlot,
 
   Pairing,
     
