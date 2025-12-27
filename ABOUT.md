@@ -33,20 +33,30 @@ You can find all the changes I've made over in [CHANGES.md](/CHANGES.md)
 Once Vector is booted up follow these steps to connect him to the server
 
 1. - Place Vector onto the charger.
+![charger](install-images/charger.jpg)
 
 2. - Double click Vector's back button so the key icon shows on the screen.
+![backbutton](install-images/backbutton.jpg)
 
 3. - Move the lift up and down to enter CCIS.
+![lift](install-images/lift.jpg)
+![ccis](install-images/ccis.jpg)
 
 4. - Use one of the wheels to scroll to the option that says `DATA OPTIONS` on Vector 1.0 and `DATA` on Vector 2.0 and move the lift up and down to select it.
+![data](install-images/data.jpg)
 
 5. - Use one of the wheels to select `REONBOARD` and move the lift up and down to select it. This will not clear user data.
+![reonboard](install-images/reonboard.jpg)
 
 6. - Use one of the wheels to scroll to `CONFIRM` and move the lift up and down to select it.
+![reonboard-confirm](install-images/reonboardconfirm.jpg)
 
 7. - Wait for Vector to reboot.
 
-8. - Once Vector reboots go to [https://anki2.ca/1.6](https://anki2.ca/1.6) to setup with the server, follow the steps on the website.
+8. - Once Vector reboots go to [https://anki2.ca/1.6/](https://anki2.ca/1.6/) to setup with the server, follow the steps on the website.
   
 ## Hey I found a bug, what should I do?
 Make a bug report at [https://github.com/Victor-Rebuild/victor-1.6-rebuild/issues](https://github.com/Victor-Rebuild/victor-1.6-rebuild/issues) and I'll get to it when I get time.
+
+## I got a complaint and would like to voice my opinion loudly and not in a civil manner.
+Talk is cheap, send patches. [https://github.com/Victor-Rebuild/victor-1.6-rebuild/pulls](https://github.com/Victor-Rebuild/victor-1.6-rebuild/pulls)
