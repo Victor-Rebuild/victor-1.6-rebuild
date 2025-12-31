@@ -25,6 +25,12 @@
 #include "engine/components/cubes/cubeCommsComponent.h"
 #include "engine/components/cubes/cubeConnectionCoordinator.h"
 #include "engine/components/movementComponent.h"
+#include "engine/actions/basicActions.h"
+#include "engine/actions/sayTextAction.h"
+#include "engine/aiComponent/behaviorComponent/userIntentComponent.h"
+#include "engine/aiComponent/behaviorComponent/userIntents.h"
+#include "engine/events/ankiEvent.h"
+#include "engine/externalInterface/externalInterface.h"
 
 #include "clad/externalInterface/messageEngineToGame.h"
 
@@ -156,6 +162,17 @@ void BehaviorCubeDrive::RestartAnimation() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorCubeDrive::OnBehaviorActivated() {
+
+  // The intent code was used from wireOS (https://github.com/kercre123/victor/blob/snowboy/engine/aiComponent/behaviorComponent/behaviors/victor/behaviorWireTest.cpp)
+  UserIntentPtr intentData = SmartActivateUserIntent(USER_INTENT(cube_drive));
+  if (!intentData) {
+    PRINT_NAMED_WARNING("BehaviorWireTest.OnBehaviorActivated", "No pending 'namevictor' intent found");
+    return;
+  }
+
+  // Log that the behavior was activated
+  PRINT_NAMED_INFO("BehaviorWireTest.OnBehaviorActivated", "Activated 'namevictor' intent");
+
   // reset dynamic variables
   _dVars = DynamicVariables();
   SetLiftState(false);
