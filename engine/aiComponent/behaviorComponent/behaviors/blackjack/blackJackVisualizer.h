@@ -59,6 +59,17 @@ public:
   // state like callbacks and bools
   void ReleaseControlAndClearState(BehaviorExternalInterface& bei);
 
+  // Configuration for Charlie black box
+  struct CharlieBoxConfig {
+    int x = 40;           // X position
+    int y = 60;           // Y position
+    int width = 104;      // Width of box
+    int height = 40;      // Height of box
+    uint8_t alpha = 255;  // Opacity (0-255)
+  };
+
+  void SetCharlieBoxConfig(const CharlieBoxConfig& config) { _charlieBoxConfig = config; }
+  const CharlieBoxConfig& GetCharlieBoxConfig() const { return _charlieBoxConfig; }
 
 private:
   // No copy, no default construction
@@ -73,6 +84,7 @@ private:
                                          const std::string&           cardAnimSeqName = "",
                                          const uint                   applyCardSeqAt_ms = 0);
 
+  void DisplayCharlieBlackBox(BehaviorExternalInterface& bei, uint32_t applyAt_ms);
   const BlackJackGame* _game;
   std::unique_ptr<Vision::CompositeImage> _compImg;
 
@@ -83,9 +95,10 @@ private:
   bool                  _shouldClearLocksOnCallback = false;
   bool                  _animCompletedLastFrame = false;
   std::function<void()> _animCompletedCallback = nullptr;
+  
+  CharlieBoxConfig _charlieBoxConfig;
 };
 
 } //namespace Vector
 } //namespace Anki
-
 #endif //__Engine_AiComponent_BehaviorComponent_Behaviors_BlackJackVisualizer__

@@ -62,5 +62,13 @@
   {
     "CladEvent": "DealerCardLayout",
     "LayoutName": "dealer_card_layout"
+  },
+  {
+    "CladEvent": "PlayerCardLayout_Xray",
+    "LayoutName": "player_card_layout_xray"
+  },
+  {
+    "CladEvent": "DealerCardLayout_Xray",
+    "LayoutName": "dealer_card_layout_xray"
   }
 ]

@@ -30,6 +30,10 @@ enum uint_8 CompositeImageLayout
   PlayerCardLayout,
   DealerCardLayout,
 
+  // Same but for 2.0
+  PlayerCardLayout_Xray,
+  DealerCardLayout_Xray,
+
   // Must be last element
   Count
 }
