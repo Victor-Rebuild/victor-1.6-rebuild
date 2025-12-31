@@ -76,7 +76,7 @@ bool DrawStartPairingScreen(Anim::AnimationStreamer* animStreamer)
   cv::Size textSize;
   float scale = 0;
 
-  if (Util::FileUtils::FileExists("/data/data/server_config.json") && Util::FileUtils::FileExists("/data/data/wirepod-cert.crt")) {
+  if (Util::FileUtils::FileExists("/data/data/server_config.json")) {
     isWP = 1;
   } else {
     isWP = 0;
