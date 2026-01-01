@@ -14,6 +14,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/weather/behaviorDisplayWeather.h"
 
 
+#include "anki/cozmo/shared/cozmoConfig.h"
 #include "clad/audio/audioSwitchTypes.h"
 #include "components/textToSpeech/textToSpeechCoordinator.h"
 #include "engine/actions/animActions.h"
@@ -75,6 +76,19 @@ const std::vector<Vision::CompositeImageLayout> kNegTemperatureLayouts  = {
   Vision::CompositeImageLayout::TemperatureNegSingleDig,
   Vision::CompositeImageLayout::TemperatureNegDoubleDig,
   Vision::CompositeImageLayout::TemperatureNegTripleDig
+};
+
+// Positive temperature layouts for Vector 2.0
+const std::vector<Vision::CompositeImageLayout> kPosTemperatureLayouts_Xray  = {
+  Vision::CompositeImageLayout::TemperatureSingleDig_Xray,
+  Vision::CompositeImageLayout::TemperatureDoubleDig_Xray,
+  Vision::CompositeImageLayout::TemperatureTripleDig_Xray
+};
+// Negative temperature layouts for Vector 2.0
+const std::vector<Vision::CompositeImageLayout> kNegTemperatureLayouts_Xray  = {
+  Vision::CompositeImageLayout::TemperatureNegSingleDig_Xray,
+  Vision::CompositeImageLayout::TemperatureNegDoubleDig_Xray,
+  Vision::CompositeImageLayout::TemperatureNegTripleDig_Xray
 };
 
 }
@@ -178,18 +192,33 @@ void BehaviorDisplayWeather::InitBehavior()
   auto& compImgMap = *dataAccessorComp.GetCompImgMap();
   auto& compLayoutMap = *dataAccessorComp.GetCompLayoutMap();
 
-  // Add the temperature layouts to iConfig
-  for(const auto& name : kPosTemperatureLayouts){
-    auto iter = compLayoutMap.find(name);
-    if(iter != compLayoutMap.end()){
-      _iConfig->temperatureLayouts.emplace_back(iter->second);
+  if (IsXray()) {
+    for(const auto& name : kPosTemperatureLayouts_Xray){
+      auto iter = compLayoutMap.find(name);
+      if(iter != compLayoutMap.end()){
+        _iConfig->temperatureLayouts.emplace_back(iter->second);
+      }
     }
-  }
 
-  for(const auto& name : kNegTemperatureLayouts){
-    auto iter = compLayoutMap.find(name);
-    if(iter != compLayoutMap.end()){
-      _iConfig->temperatureLayouts.emplace_back(iter->second);
+    for(const auto& name : kNegTemperatureLayouts_Xray){
+      auto iter = compLayoutMap.find(name);
+      if(iter != compLayoutMap.end()){
+        _iConfig->temperatureLayouts.emplace_back(iter->second);
+      }
+    }
+  } else {
+    for(const auto& name : kPosTemperatureLayouts){
+      auto iter = compLayoutMap.find(name);
+      if(iter != compLayoutMap.end()){
+        _iConfig->temperatureLayouts.emplace_back(iter->second);
+      }
+    }
+
+    for(const auto& name : kNegTemperatureLayouts){
+      auto iter = compLayoutMap.find(name);
+      if(iter != compLayoutMap.end()){
+        _iConfig->temperatureLayouts.emplace_back(iter->second);
+      }
     }
   }
 
