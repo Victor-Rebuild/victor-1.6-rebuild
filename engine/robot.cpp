@@ -2762,7 +2762,7 @@ bool Robot::UpdateGyroCalibChecks(Result& res)
     GetMoveComponent().MoveHeadToAngle(MAX_HEAD_ANGLE,
                                        MAX_HEAD_SPEED_RAD_PER_S,
                                        MAX_HEAD_ACCEL_RAD_PER_S2,
-                                       0.0f);
+                                       1.0f);
     displayedImage = true;
 
   }
