@@ -40,10 +40,12 @@
 
 ## Miscellaneous changes
 - Improved Japanese and German TTS voice
+- OpenCV 4.13, newer than what's in WireOS (4.12)
 - Upped temprature limit for Vector 2.0
 - Support for DVT bodyboards
 - Compiling with -O2 and fast math
 - Picovoice 1.5 for customizable wakeword (Code used from WireOS)
 - C++ upgrade engine from wireOS
 - Reonboard menu to easily connect Vector to the voice command server
+- Change slot option to change Vector's system slot
 
