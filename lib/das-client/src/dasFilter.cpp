@@ -23,8 +23,8 @@ class Anki::DAS::DASFilter::DasFilterImpl {
   public:
     FilterNode(DASLogLevel level) : _logLevel(level) { };
 
-    DASLogLevel GetMinLogLevel(std::vector<const std::string>::const_iterator& logger_cur,
-                               std::vector<const std::string>::const_iterator& logger_end) const
+    DASLogLevel GetMinLogLevel(std::vector<std::string>::const_iterator& logger_cur,
+                               std::vector<std::string>::const_iterator& logger_end) const
     {
       if (logger_cur == logger_end) {
         return _logLevel;
@@ -41,8 +41,8 @@ class Anki::DAS::DASFilter::DasFilterImpl {
       }
     }
 
-    void SetMinLogLevel(std::vector<const std::string>::const_iterator& logger_cur,
-                        std::vector<const std::string>::const_iterator& logger_end,
+    void SetMinLogLevel(std::vector<std::string>::const_iterator& logger_cur,
+                        std::vector<std::string>::const_iterator& logger_end,
                         const DASLogLevel logLevel)
     {
       if (logger_cur == logger_end) {
@@ -82,7 +82,7 @@ public:
   {
     std::istringstream ss(logger);
     std::string token;
-    std::vector<const std::string> splitLogger;
+    std::vector<std::string> splitLogger;
     while(std::getline(ss, token, '.')) {
       splitLogger.emplace_back(token);
     }
@@ -95,7 +95,7 @@ public:
   {
     std::istringstream ss(logger);
     std::string token;
-    std::vector<const std::string> splitLogger;
+    std::vector<std::string> splitLogger;
     while(std::getline(ss, token, '.')) {
       splitLogger.emplace_back(token);
     }

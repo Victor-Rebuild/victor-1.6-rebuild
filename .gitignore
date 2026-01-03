@@ -4,8 +4,11 @@
 *.cache
 *.swp
 matlab.mat
-
+anki-deps
 _build*/
+build/cache
+compile_commands.json
+.clangd
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # build folders
@@ -139,7 +142,6 @@ build/msvc*
 build/xcode*
 project/xcode4/Cozmo/Cozmo.xcodeproj/xcuserdata
 project/xcode4/Cozmo/Cozmo.xcodeproj/project.xcworkspace/xcuserdata
-build/*
 screenshot.png
 *.mvlib
 *.shv*lib
@@ -241,7 +243,7 @@ UnityDASDll/UnityDASDll/bin/*
 
 # Anki specific
 # kercre123 - turn this into a submodule
-EXTERNALS
+# EXTERNALS
 TAGS
 .subtreeconfig
 

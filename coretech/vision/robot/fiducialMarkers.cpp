@@ -824,7 +824,7 @@ namespace Anki
         cv::filter2D(temp, _probeFiltering, _probeFiltering.depth(), kernel,
                      cv::Point(-1,-1), 0, cv::BORDER_REPLICATE);
         //cv::imshow("ProbeFiltering", _probeFiltering);
-        cv::normalize(_probeFiltering, temp, 255.f, 0.f, CV_MINMAX);
+        cv::normalize(_probeFiltering, temp, 255.f, 0.f, cv::NORM_MINMAX);
       }
       
       return RESULT_OK;
@@ -939,8 +939,8 @@ namespace Anki
 
       fixedPointDivider = 1.0f / static_cast<f32>(1 << VisionMarker::NUM_FRACTIONAL_BITS);
 
-      f32 probePointsX_F32[NUM_PROBE_POINTS];
-      f32 probePointsY_F32[NUM_PROBE_POINTS];
+      std::vector<f32> probePointsX_F32(NUM_PROBE_POINTS);
+      std::vector<f32> probePointsY_F32(NUM_PROBE_POINTS);
 
       for(s32 i_pt=0; i_pt<NUM_PROBE_POINTS; i_pt++) {
         probePointsX_F32[i_pt] = static_cast<f32>(ProbePoints_X[i_pt]) * fixedPointDivider;
@@ -1466,7 +1466,7 @@ namespace Anki
       this->numDatabaseImages = imageFilenames.get_size();
 
       {
-        const cv::Mat image = cv::imread(imageFilenames[0], CV_LOAD_IMAGE_UNCHANGED);
+        const cv::Mat image = cv::imread(imageFilenames[0], cv::IMREAD_UNCHANGED);
         this->databaseImageHeight = image.rows;
         this->databaseImageWidth = image.cols;
 
@@ -1483,7 +1483,7 @@ namespace Anki
         databaseLabelIndexes[iFile] = LookupMarkerType(imageFilenames[iFile]);
 
         // Load the image
-        cv::Mat image = cv::imread(imageFilenames[iFile], CV_LOAD_IMAGE_UNCHANGED);
+        cv::Mat image = cv::imread(imageFilenames[iFile], cv::IMREAD_UNCHANGED);
 
         AnkiConditionalErrorAndReturn(image.rows == databaseImageHeight && image.rows == databaseImageWidth,
           "VisionMarkerImages::VisionMarkerImages", "All images must be equal size and square");

@@ -686,10 +686,10 @@ void AnimationComponent::AddKeepFaceAliveDisableLock(const std::string& lockName
 
 void AnimationComponent::RemoveKeepFaceAliveDisableLock(const std::string& lockName)
 {
-  if( ANKI_VERIFY( _numKeepFaceAliveDisableLocks > 0,
-                   "AnimationComponent.RemoveKeepFaceAliveDisableLock.NotLocked",
-                   "Removing lock '%s', but no locks present",
-                   lockName.c_str() ) ) {
+  // if( ANKI_VERIFY( _numKeepFaceAliveDisableLocks > 0,
+  //                  "AnimationComponent.RemoveKeepFaceAliveDisableLock.NotLocked",
+  //                  "Removing lock '%s', but no locks present",
+  //                  lockName.c_str() ) ) {
 
     _numKeepFaceAliveDisableLocks--;
 
@@ -702,7 +702,7 @@ void AnimationComponent::RemoveKeepFaceAliveDisableLock(const std::string& lockN
       // was locked but not anymore, so enable
       _desiredEnableKeepFaceAlive = true;
     }
-  }
+  // }
 }
 
 Result AnimationComponent::SendEnableKeepFaceAlive(bool enable, u32 disableTimeout_ms)

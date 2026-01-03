@@ -67,9 +67,9 @@ int main(int argc, char** argv)
   signal(SIGTERM, handler);
   signal(SIGINT,  handler);
 
-  lcd_init();
-  lcd_clear_screen();
-  lcd_shutdown();
+  // lcd_init();
+  // lcd_clear_screen();
+  // lcd_shutdown();
 
   // Init lcd
   int rc = lcd_init();
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
   // Open animation file for reading
   const char *anim_path = use_santek_sizes() ? _animPathSantek : _animPathMidas;
 
-  int fd = open(anim_path, O_RDONLY);
+  int fd = open(anim_path, O_RDONLY, 644);
   if(fd < 0)
   {
     printf("Failed to open %s\n", anim_path);

@@ -18,6 +18,6 @@ set_target_properties(vl53l1 PROPERTIES LINKER_LANGUAGE C)
 anki_build_strip(TARGET vl53l1)
 
 # VIC-13448 Figure out license(s) for vl53l1 code
-# anki_build_target_license(vl53l1 "")
+anki_build_target_license(vl53l1 "Commercial")
 
 endif()

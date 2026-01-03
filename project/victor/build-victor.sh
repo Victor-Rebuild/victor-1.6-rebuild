@@ -2,6 +2,19 @@
 
 set -e
 
+CMAKE_VERSION="3.30.4"
+VICOS_SDK_VERSION="5.3.0-r07"
+GO_VERSION="1.24.4"
+PROTOC_VERSION="31.1"
+PROTOC_GEN_GO_VERSION="v1.36.6"
+PROTOC_GEN_GO_GRPC_VERSION="v1.5.1"
+PROTOC_GEN_GRPC_GATEWAY_VERSION="v2.27.1"
+UPX_VERSION="5.0.1"
+
+if [[ "$(uname -a)" == *"Darwin"* ]]; then
+    export PATH="/opt/homebrew/bin:$PATH"
+fi
+
 SCRIPT_PATH=$(dirname $([ -L $0 ] && echo "$(dirname $0)/$(readlink -n $0)" || echo $0))
 SCRIPT_NAME=`basename ${0}`
 TOPLEVEL=$(cd "${SCRIPT_PATH}/../.." && pwd)
@@ -53,7 +66,7 @@ FEATURES=""
 DEFINES=""
 ADDITIONAL_PLATFORM_ARGS=()
 
-while getopts ":x:c:p:a:t:g:F:D:hvfdCTeISX" opt; do
+while getopts ":x:c:p:a:t:g:F:D:hvfdCTeISXm" opt; do
     case $opt in
         h)
             usage
@@ -138,16 +151,14 @@ cd ${TOPLEVEL}
 #     egrep -q TFL3 $f || usage_fix_lfs $f
 # done
 
-
 #
 # settings
 #
 
 if [ -z "${CMAKE_EXE+x}" ]; then
-    echo "Attempting to install cmake"
     echo -n "CMake: "
-    ${TOPLEVEL}/tools/build/tools/ankibuild/cmake.py --install-cmake 3.9.6
-    CMAKE_EXE=`${TOPLEVEL}/tools/build/tools/ankibuild/cmake.py --find-cmake 3.9.6`
+    ${TOPLEVEL}/tools/build/tools/ankibuild/cmake.py --install-cmake $CMAKE_VERSION
+    CMAKE_EXE=`${TOPLEVEL}/tools/build/tools/ankibuild/cmake.py --find-cmake $CMAKE_VERSION`
 fi
 
 if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ]; then
@@ -254,7 +265,7 @@ case ${GENERATOR} in
         ;;
     "Makefiles")
         PROJECT_FILE="Makefile"
-        GENERATOR="CodeBlocks - Unix Makefiles"
+        GENERATOR="Unix Makefiles"
       ;;
     "*")
         PROJECT_FILE=""
@@ -274,7 +285,7 @@ fi
 
 : ${CMAKE_MODULE_DIR:="${TOPLEVEL}/cmake"}
 
-if [ ! -f ${CMAKE_EXE} ]; then
+if [[ ! -f ${CMAKE_EXE} ]]; then
   echo "Missing CMake executable: ${CMAKE_EXE}"
   echo "Fetch the required CMake version by running ${TOPLEVEL}/tools/build/tools/ankibuild/cmake.py"
   echo "Alternatively, specify a CMake executable using the -x flag."
@@ -326,9 +337,9 @@ if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ] || [ $CONFIGURE -eq 1 ] ; then
     METABUILD_INPUTS=`find . -name BUILD.in`
 
     # Process BUILD.in files (creates list of Go projects to fetch)
-    PATH="$(dirname $GO_EXE):$PATH" ${BUILD_TOOLS}/metabuild/metabuild.py --go-output \
-      -o ${GEN_SRC_DIR} \
-      ${METABUILD_INPUTS}
+    #PATH="$(dirname $GO_EXE):$PATH" ${BUILD_TOOLS}/metabuild/metabuild.py --go-output \
+    #  -o ${GEN_SRC_DIR} \
+    #  ${METABUILD_INPUTS}
 fi
 
 #if [ $IGNORE_EXTERNAL_DEPENDENCIES -eq 0 ]; then
@@ -353,6 +364,7 @@ if [[ ! -x "${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin" ]]; then
 # "Unknown" means it's functional
 elif [[ "$(${TOPLEVEL}/tools/protobuf/plugin/protocCppPlugin --help 2>&1)" != *"Unknown"* ]]; then
   echo "Rebuilding protocCppPlugin plugin as it fails to run"
+  BUILD_PROTOC_PLUGIN=1
 else 
   BUILD_PROTOC_PLUGIN=0
   for f in `find ${TOPLEVEL}/tools/protobuf/plugin -type f`; do
@@ -365,17 +377,35 @@ if [[ $BUILD_PROTOC_PLUGIN -eq 1 ]]; then
     ${TOPLEVEL}/tools/protobuf/plugin/make.sh
 fi
 
+if [ -z "${GO_EXE+x}" ]; then
+    ${TOPLEVEL}/project/build-scripts/download-go.sh ${GO_VERSION}
+    GO_EXE="${HOME}/.anki/go/dist/${GO_VERSION}/go/bin/go"
+fi
+
+if [ -z "${UPX_EXE+x}" ]; then
+    # no binary release for macOS, rely on brew
+    if [[ "$(uname -a)" == *"Darwin"* ]]; then
+        UPX_EXE="upx"
+    else
+        ${TOPLEVEL}/project/build-scripts/download-upx.sh ${UPX_VERSION}
+        UPX_EXE="${HOME}/.anki/upx/dist/${UPX_VERSION}/upx"
+    fi
+fi
+
+if [ -z "${PROTOC_EXE+x}" ]; then
+    ${TOPLEVEL}/project/build-scripts/download-protoc.sh ${PROTOC_VERSION}
+    PROTOC_EXE="${HOME}/.anki/protoc/dist/${PROTOC_VERSION}/bin/protoc"
+fi
+
 # Build/Install the protoc generators for go
-#GOBIN="${TOPLEVEL}/cloud/go/bin"
-#if [[ ! -x $GOBIN/protoc-gen-go ]] || [[ ! -x $GOBIN/protoc-gen-grpc-gateway ]]; then
-#    echo "Building/Installing protoc-gen-go and protoc-gen-grpc-gateway"
-#    GOBIN=$GOBIN \
-#    CC=/usr/bin/cc \
-#    CXX=/usr/bin/c++ \
-#    "${GOROOT}/bin/go" install \
-#    github.com/golang/protobuf/protoc-gen-go \
-#    github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-#fi
+GOBIN="${TOPLEVEL}/cloud/go/bin"
+mkdir -p "${GOBIN}"
+if [[ ! -x "$GOBIN/protoc-gen-go" ]] || [[ ! -x "$GOBIN/protoc-gen-grpc-gateway" ]]; then
+    echo "Building/Installing protoc-gen-go and protoc-gen-grpc-gateway..."
+    GOBIN=$GOBIN "${GO_EXE}" install google.golang.org/protobuf/cmd/protoc-gen-go@$PROTOC_GEN_GO_VERSION
+    GOBIN=$GOBIN "${GO_EXE}" install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$PROTOC_GEN_GO_GRPC_VERSION
+    GOBIN=$GOBIN "${GO_EXE}" install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@$PROTOC_GEN_GRPC_GATEWAY_VERSION
+fi
 
 #
 # generate source file lists
@@ -423,7 +453,8 @@ if [ $CONFIGURE -eq 1 ]; then
         # If VICOS_SDK is set, use it, else provide default location
         #
         if [ -z "${VICOS_SDK+x}" ]; then
-            VICOS_SDK=$(${TOPLEVEL}/tools/build/tools/ankibuild/vicos.py --install 1.1.0-r04 | tail -1)
+            ${TOPLEVEL}/project/build-scripts/download-vicos-sdk.sh "$VICOS_SDK_VERSION"
+            VICOS_SDK="${HOME}/.anki/vicos-sdk/dist/${VICOS_SDK_VERSION}"
         fi
 
         PLATFORM_ARGS=(
@@ -445,13 +476,17 @@ if [ $CONFIGURE -eq 1 ]; then
     $CMAKE_EXE ${TOPLEVEL} \
         ${VERBOSE_ARG} \
         -G"${GENERATOR}" \
+        -DANKI_GO_COMPILER=${GO_EXE} \
+        -DANKI_UPX=${UPX_EXE} \
+        -DANKI_PROTOC=${PROTOC_EXE} \
+        -DANKI_GO_BIN_PATH=${GOBIN} \
         -DCMAKE_BUILD_TYPE=${CONFIGURATION} \
         -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} \
-        -DGOPATH=${GOPATH} \
-        -DGOROOT=${GOROOT} \
         -DPROTOBUF_HOME=${PROTOBUF_HOME} \
         -DANKI_BUILD_SHA=${ANKI_BUILD_SHA} \
         -DANKI_BUILD_BRANCH=${ANKI_BUILD_BRANCH} \
+        -DCMAKE_COLOR_DIAGNOSTICS=ON \
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
         ${EXPORT_FLAGS} \
         ${FEATURE_FLAGS} \
         ${DEFINES} \
@@ -485,7 +520,18 @@ else
   if [[ "$PLATFORM" == "vicos" && $RUN_INSTALL -eq 1 ]]; then
     # run install target on robot-platforms
     $CMAKE_EXE --build . --target install
+    cp -f compile_commands.json ../../../
+    echo "-- Copied compile_commands.json"
+    ../../../tools/build/build-scripts/gen-clangd.sh
+    echo "-- Generated .clangd"
   fi
 fi
+
+# copied from build-v.sh
+cd $TOPLEVEL
+echo "Copying vic-cloud..."
+cp -a bin/* _build/vicos/Release/bin/
+echo "Copying libopus..."
+cp -a EXTERNALS/deps/opus/libopus.so.0.7.0 _build/vicos/Release/lib/libopus.so.0
 
 popd > /dev/null 2>&1

@@ -187,7 +187,7 @@ void BehaviorCoordinateWhileHeldInPalm::SuppressNonGentleWakeUpBehaviorsIfApprop
   _dVars.persistent.hasStartedSleepingInPalm |= shouldStartSuppressingWakeupBehaviors;
   
   if ( _dVars.persistent.hasStartedSleepingInPalm ) {
-    for (const auto behavior : _iConfig.sleepSuppressedBehaviorSet ) {
+    for (const auto& behavior : _iConfig.sleepSuppressedBehaviorSet ) {
       behavior->SetDontActivateThisTick(GetDebugLabel());
     }
     // We shouldn't suppress the trigger word response behavior, so instead we force it to use new

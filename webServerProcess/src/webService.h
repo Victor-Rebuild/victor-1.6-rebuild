@@ -108,6 +108,8 @@ public:
     
     RT_WebsocketOnSubscribe,
     RT_WebsocketOnData,
+
+    RT_TriggerIntent,
   };
 
   struct Request;

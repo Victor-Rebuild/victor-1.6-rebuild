@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 # Copyright 2015-2016 Anki Inc.
 #
@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import print_function
+
+
 
 import inspect
 import io
@@ -160,7 +160,7 @@ class StructEmitter(ast.NodeVisitor):
                     global defaults_warned
                     if not defaults_warned:
                         defaults_warned = True
-                        print("Warning: The Go emitter does not support default values for members. They have been ignored.")
+                        #print("Warning: The Go emitter does not support default values for members. They have been ignored.")
                     pass
                 self.output.write('\t')
                 visitor.visit(member.type, member_name=goify(member.name))

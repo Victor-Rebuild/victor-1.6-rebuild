@@ -30,10 +30,10 @@ namespace {
   constexpr const char * kVectorWillRestart = "Vector will restart";
 
   const f32 kRobotNameScale = 0.6f;
-  const std::string kAppURL = "anki.com/v";
+  const std::string kAppURL = "anki2.ca/1.6";
   const ColorRGBA kWhiteColor(0.9f, 0.9f, 0.9f, 1.f);
   const int kTextThickness = 1;
-  const int kNormalFont = CV_FONT_NORMAL;
+  const int kNormalFont = cv::QT_FONT_NORMAL;
   const bool kDrawTwice = false;
   const int kRobotNameVerticalPosition = 15;
 }

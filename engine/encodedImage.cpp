@@ -85,8 +85,8 @@ namespace Vector {
   {
     if(chunk.data.size() > static_cast<u32>(ImageConstants::IMAGE_CHUNK_SIZE)) {
       PRINT_NAMED_WARNING("EncodedImage.AddChunk.ChunkTooBig",
-                          "Expecting chunks of size no more than %d, got %zu.",
-                          ImageConstants::IMAGE_CHUNK_SIZE, chunk.data.size());
+                          "Expecting chunks of size no more than %d, got %u.",
+                          static_cast<int>(ImageConstants::IMAGE_CHUNK_SIZE), static_cast<uint32_t>(chunk.data.size()));
       return false;
     }
     
@@ -211,7 +211,7 @@ namespace Vector {
   static inline void DecodeHelper(const std::vector<u8>& buffer, Vision::ImageRGB& decodedImg)
   {
     cv::imdecode(buffer, cv::IMREAD_COLOR, &decodedImg.get_CvMat_());
-    cvtColor(decodedImg.get_CvMat_(), decodedImg.get_CvMat_(), CV_BGR2RGB); // opencv will decode as BGR
+    cvtColor(decodedImg.get_CvMat_(), decodedImg.get_CvMat_(), cv::COLOR_BGR2RGB); // opencv will decode as BGR
   }
   
   static inline void DecodeHelper(const std::vector<u8>& buffer, Vision::Image& decodedImg)

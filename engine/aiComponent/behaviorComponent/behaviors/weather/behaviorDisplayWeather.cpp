@@ -14,6 +14,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/weather/behaviorDisplayWeather.h"
 
 
+#include "anki/cozmo/shared/cozmoConfig.h"
 #include "clad/audio/audioSwitchTypes.h"
 #include "components/textToSpeech/textToSpeechCoordinator.h"
 #include "engine/actions/animActions.h"
@@ -75,6 +76,19 @@ const std::vector<Vision::CompositeImageLayout> kNegTemperatureLayouts  = {
   Vision::CompositeImageLayout::TemperatureNegSingleDig,
   Vision::CompositeImageLayout::TemperatureNegDoubleDig,
   Vision::CompositeImageLayout::TemperatureNegTripleDig
+};
+
+// Positive temperature layouts for Vector 2.0
+const std::vector<Vision::CompositeImageLayout> kPosTemperatureLayouts_Xray  = {
+  Vision::CompositeImageLayout::TemperatureSingleDig_Xray,
+  Vision::CompositeImageLayout::TemperatureDoubleDig_Xray,
+  Vision::CompositeImageLayout::TemperatureTripleDig_Xray
+};
+// Negative temperature layouts for Vector 2.0
+const std::vector<Vision::CompositeImageLayout> kNegTemperatureLayouts_Xray  = {
+  Vision::CompositeImageLayout::TemperatureNegSingleDig_Xray,
+  Vision::CompositeImageLayout::TemperatureNegDoubleDig_Xray,
+  Vision::CompositeImageLayout::TemperatureNegTripleDig_Xray
 };
 
 }
@@ -178,18 +192,33 @@ void BehaviorDisplayWeather::InitBehavior()
   auto& compImgMap = *dataAccessorComp.GetCompImgMap();
   auto& compLayoutMap = *dataAccessorComp.GetCompLayoutMap();
 
-  // Add the temperature layouts to iConfig
-  for(const auto& name : kPosTemperatureLayouts){
-    auto iter = compLayoutMap.find(name);
-    if(iter != compLayoutMap.end()){
-      _iConfig->temperatureLayouts.emplace_back(iter->second);
+  if (IsXray()) {
+    for(const auto& name : kPosTemperatureLayouts_Xray){
+      auto iter = compLayoutMap.find(name);
+      if(iter != compLayoutMap.end()){
+        _iConfig->temperatureLayouts.emplace_back(iter->second);
+      }
     }
-  }
 
-  for(const auto& name : kNegTemperatureLayouts){
-    auto iter = compLayoutMap.find(name);
-    if(iter != compLayoutMap.end()){
-      _iConfig->temperatureLayouts.emplace_back(iter->second);
+    for(const auto& name : kNegTemperatureLayouts_Xray){
+      auto iter = compLayoutMap.find(name);
+      if(iter != compLayoutMap.end()){
+        _iConfig->temperatureLayouts.emplace_back(iter->second);
+      }
+    }
+  } else {
+    for(const auto& name : kPosTemperatureLayouts){
+      auto iter = compLayoutMap.find(name);
+      if(iter != compLayoutMap.end()){
+        _iConfig->temperatureLayouts.emplace_back(iter->second);
+      }
+    }
+
+    for(const auto& name : kNegTemperatureLayouts){
+      auto iter = compLayoutMap.find(name);
+      if(iter != compLayoutMap.end()){
+        _iConfig->temperatureLayouts.emplace_back(iter->second);
+      }
     }
   }
 
@@ -269,12 +298,14 @@ void BehaviorDisplayWeather::OnBehaviorActivated()
   // reset dynamic variables
   _dVars = DynamicVariables();
 
-  if (IsXray()) {
-    // Up the cpu frequency to the max
-    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2' -H 'Accept-Encoding: gzip, deflate' -H 'Referer: http://localhost:8080/' -H 'Connection: keep-alive' -H 'Priority: u=0'");
+  if (_doXrayOverclock) {
+    if (IsXray()) {
+      // Check current frequency
+      _prevcpufreq = system("curl 'http://localhost:8080/api/mods/FreqChange/get'");
 
-    // This is the older method, I'm keeping it to maintain backcompat with otas that have the older wired
-    (void)system("curl 'http://localhost:8080/api/mods/modify/FreqChange' -X POST -H 'Referer: http://localhost:8080/' -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' --data-raw '{\"freq\":2}'");
+      // Up the cpu frequency to the max
+      (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2'");
+    }
   }
 
   auto& uic = GetBehaviorComp<UserIntentComponent>();
@@ -313,12 +344,20 @@ void BehaviorDisplayWeather::OnBehaviorDeactivated()
     GetBEI().GetTextToSpeechCoordinator().CancelUtterance(_dVars.utteranceID);
   }
 
-  if (IsXray()) {
-    // Now that the behavior has finished set the cpu speed back to something reasonable
-    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1' -H 'Accept-Encoding: gzip, deflate' -H 'Referer: http://localhost:8080/' -H 'Connection: keep-alive' -H 'Priority: u=0'");
-
-    // This is the older method, I'm keeping it to maintain backcompat with otas that have the older wired
-    (void)system("curl 'http://localhost:8080/api/mods/modify/FreqChange' -X POST -H 'Referer: http://localhost:8080/' -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' --data-raw '{\"freq\":1}'");
+  // Now that the behavior has finished set the cpu speed back to *hopefully what it was before
+  // * If it's not set to any of the predetermined values in wired it's gonna get set to Regular
+  if (_doXrayOverclock) {
+    if (IsXray()) {
+      if (_prevcpufreq == 2) {
+        (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2'");
+      } else if (_prevcpufreq == 1) {
+        (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1'");
+      } else if (_prevcpufreq == 0) {
+        (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=0'");
+      } else { // This should never happen, wired should never return a value other than 0, 1, or 2, but in case it does this is the fallback
+        (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=0'");
+      }
+    }
   }
 }
 
@@ -438,12 +477,12 @@ bool BehaviorDisplayWeather::GenerateTemperatureImage(int temp, bool isFahrenhei
       outImg = &_iConfig->temperatureLayouts[5];
     }
   }
-  if(!ANKI_VERIFY(outImg->GetLayerLayoutMap().size() == 1,
-                  "BehaviorDisplayWeather.GenerateTemperatureImage.ImproperNumberOfLayers",
-                  "Expected one layer, but image has %zu",
-                  outImg->GetLayerLayoutMap().size())){
-    return false;
-  }
+  // if(!ANKI_VERIFY(outImg->GetLayerLayoutMap().size() == 1,
+  //                 "BehaviorDisplayWeather.GenerateTemperatureImage.ImproperNumberOfLayers",
+  //                 "Expected one layer, but image has %zu",
+  //                 outImg->GetLayerLayoutMap().size())){
+  //   return false;
+  // }
 
   auto& layer = outImg->GetLayerLayoutMap().begin()->second;
 

@@ -25,13 +25,13 @@
     "translation": "{0}"
   },
   "BlackJack.DealerScoreBusted": {
-    "translation": "{0}. Dealer busted."
+    "translation": "{0}. Teel-er busted."
   },
   "BlackJack.DealerScorePush": {
     "translation": "{0}. Push."
   },
   "BlackJack.DealerScoreDealerWins": {
-    "translation": "{0}. Dealer wins!"
+    "translation": "{0}. Teel-er wins!"
   },
   "BlackJack.DealerScorePlayerWins": {
     "translation": "{0}. You win!"
@@ -40,7 +40,7 @@
     "translation": "21!"
   },
   "BlackJack.DealerTurn": {
-    "translation": "Dealer's turn!"
+    "translation": "Teel-er's turn!"
   },
   "BlackJack.PlayerScore": {
     "translation": "{0}"

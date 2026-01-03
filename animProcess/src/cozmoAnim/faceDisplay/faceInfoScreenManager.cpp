@@ -69,8 +69,8 @@
 // ------ I TAKE NO CREDIT, THIS BRANCH SCREEN IS FROM WIREOS ------
 // CHANGE THIS TO BE YOUR PROJECT'S NAME AND BRANCH
 const std::string OSProject = "1.6-rebuild";
-const std::string Creator = "Rebuilt by Ellie";
-const std::string CreatorWebsite = "modder.my.to";
+const std::string Creator = "Rebuilt by Emily";
+const std::string CreatorWebsite = "https://anki2.ca";
 
 // Log options
 #define LOG_CHANNEL    "FaceInfoScreenManager"
@@ -84,7 +84,7 @@ const std::string CreatorWebsite = "modder.my.to";
 #define FORCE_TRANSITION_TO_PAIRING 0
 #endif
 
-#define ENABLE_SELF_TEST 1
+// #define ENABLE_SELF_TEST 1
 
 #if !FACTORY_TEST
 
@@ -138,7 +138,7 @@ namespace {
   const char* kAlexaIconSpriteName = "face_alexa_icon";
 
   // TODO (VIC-11606): don't use timeout for mute
-  CONSOLE_VAR_RANGED(f32, kToggleMuteTimeout_s, "FaceInfoScreenManager", 1.2f, 0.001f, 3.0f);
+  // CONSOLE_VAR_RANGED(f32, kToggleMuteTimeout_s, "FaceInfoScreenManager", 1.2f, 0.001f, 3.0f);
   CONSOLE_VAR_RANGED(f32, kAlexaNotificationTimeout_s, "FaceInfoScreenManager", 2.0f, 0.001f, 3.0f);
 
   // How long the button needs to be pressed for before it should trigger shutdown animation
@@ -217,12 +217,14 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   const bool hideSpecialDebugScreens = (FACTORY_TEST && Factory::GetEMR()->fields.PLAYPEN_PASSED_FLAG) || !ANKI_DEV_CHEATS;  // TODO: Use this line in master
   //const bool hideSpecialDebugScreens = (FACTORY_TEST && Factory::GetEMR()->fields.PLAYPEN_PASSED_FLAG);                        // Use this line in factory branch
 
-  ADD_SCREEN_WITH_TEXT(Recovery, Recovery, {"RECOVERY MODE"});
+  ADD_SCREEN_WITH_TEXT(Reonboard, Reonboard, {"REONBOARD?"});
+  ADD_SCREEN_WITH_TEXT(SwitchSlot, SwitchSlot, {"SWAP SYS SLOT?"});
   ADD_SCREEN(None, None);
   ADD_SCREEN(Pairing, Pairing);
   ADD_SCREEN(FAC, None);
   ADD_SCREEN(CustomText, None);
   ADD_SCREEN(Main, Network);
+  ADD_SCREEN_WITH_TEXT(UserDataSubmenu, UserDataSubmenu, {"DATA OPTIONS"});
   ADD_SCREEN_WITH_TEXT(ClearUserData, Main, {"CLEAR USER DATA?"});
   ADD_SCREEN_WITH_TEXT(ClearUserDataFail, Main, {"CLEAR USER DATA FAILED"});
   ADD_SCREEN_WITH_TEXT(Rebooting, Rebooting, {"REBOOTING..."});
@@ -315,10 +317,17 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   SET_ENTER_ACTION(Main, mainEnterFcn);
 
   ADD_MENU_ITEM(Main, "EXIT", None);
-#if ENABLE_SELF_TEST
+  // #if ENABLE_SELF_TEST
   ADD_MENU_ITEM(Main, IsXray() ? "TEST" : "SELF TEST", SelfTest);
-#endif
-  ADD_MENU_ITEM(Main, IsXray() ? "CLEAR" : "CLEAR USER DATA", ClearUserData);
+  // #endif
+  ADD_MENU_ITEM(Main, IsXray() ? "DATA" : "DATA OPTIONS", UserDataSubmenu);
+
+  // === User Data Menu ===
+  ADD_MENU_ITEM(UserDataSubmenu, "EXIT", Main);
+  ADD_MENU_ITEM(UserDataSubmenu, "REONBOARD", Reonboard);
+  ADD_MENU_ITEM(UserDataSubmenu, "CHANGE SLOT", SwitchSlot);
+  ADD_MENU_ITEM(UserDataSubmenu, "CLEAR USER DATA", ClearUserData);
+  DISABLE_TIMEOUT(UserDataSubmenu);
 
   // === Self test screen ===
   ADD_MENU_ITEM(SelfTest, "EXIT", Main);
@@ -345,9 +354,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     this->Reboot();
     return ScreenName::Rebooting;
   };
-  ADD_MENU_ITEM(ClearUserData, "EXIT", Main);
+  ADD_MENU_ITEM(ClearUserData, "EXIT", UserDataSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(ClearUserData, "CONFIRM", confirmClearUserData);
-  SET_TIMEOUT(ClearUserDataFail, 2.f, Main);
+  SET_TIMEOUT(ClearUserDataFail, 3.f, UserDataSubmenu);
 
 
   // === Network screen ===
@@ -356,17 +365,27 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   SET_ENTER_ACTION(Network, networkEnterFcn);
 
-  // === Recovery screen ===
-  FaceInfoScreen::MenuItemAction rebootAction = [this]() {
-    LOG_INFO("FaceInfoScreenManager.Recovery.Rebooting", "");
-    this->Reboot();
-
-    return ScreenName::Rebooting;
+  // === Reonboard screen ===
+  FaceInfoScreen::MenuItemAction confirmReonboard = [this]() {
+      LOG_INFO("FaceInfoScreenManager.Reonboard.Confirmed", "");
+      (void)system("cd /data/data/com.anki.victor/persistent && rm -f onboarding/onboardingState.json token/token.jwt ../../server_config.json");
+      this->Reboot();
+      return ScreenName::Rebooting;
   };
-  ADD_MENU_ITEM_WITH_ACTION(Recovery, "EXIT", rebootAction);
-  ADD_MENU_ITEM(Recovery, "CONTINUE", None);
-  DISABLE_TIMEOUT(Recovery);
+  ADD_MENU_ITEM(Reonboard, "EXIT", UserDataSubmenu);
+  ADD_MENU_ITEM_WITH_ACTION(Reonboard, "CONFIRM", confirmReonboard);
+  DISABLE_TIMEOUT(Reonboard);
 
+  // === SwitchSlot screen ===
+  FaceInfoScreen::MenuItemAction confirmSlotSwitch = [this]() {
+      LOG_INFO("FaceInfoScreenManager.SwitchSlot.Confirmed", "");
+      (void)system("sysswitch");
+      this->Reboot();
+      return ScreenName::Rebooting;
+  };
+  ADD_MENU_ITEM(SwitchSlot, "EXIT", UserDataSubmenu);
+  ADD_MENU_ITEM_WITH_ACTION(SwitchSlot, "CONFIRM", confirmSlotSwitch);
+  DISABLE_TIMEOUT(SwitchSlot);
     
   // === Camera screen ===
   FaceInfoScreen::ScreenAction cameraEnterAction = [this]() {
@@ -416,7 +435,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   };
   SET_ENTER_ACTION(ToggleMute, toggleMuteEnterAction);
   // TODO (VIC-11606): don't use timeout and instead wait for mute anim to end
-  SET_TIMEOUT(ToggleMute, kToggleMuteTimeout_s, None);
+  SET_TIMEOUT(ToggleMute, 8, None);
   
   // === AlexaNotification ===
   auto alexaNotification = [this]() {
@@ -459,12 +478,12 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
 
   
   // Check if we booted in recovery mode
-  if (OSState::getInstance()->IsInRecoveryMode()) {
-    LOG_WARNING("FaceInfoScreenManager.Init.RecoveryModeFileFound", "Going into recovery mode");
-    SetScreen(ScreenName::Recovery);
-  } else {
+  // if (OSState::getInstance()->IsInRecoveryMode()) {
+  //   LOG_WARNING("FaceInfoScreenManager.Init.RecoveryModeFileFound", "Going into recovery mode");
+  //   SetScreen(ScreenName::Recovery);
+  // } else {
     SetScreen(ScreenName::None);
-  }
+  // }
 }
 
 FaceInfoScreen* FaceInfoScreenManager::GetScreen(ScreenName name)
@@ -505,20 +524,20 @@ void FaceInfoScreenManager::SetShouldDrawFAC(bool draw)
     return;
   }
 
-  bool changed = (_drawFAC != draw);
+  // bool changed = (_drawFAC != draw);
   _drawFAC = draw;
 
-  if(changed && GetCurrScreenName() != ScreenName::Recovery)
-  {
-    if(draw)
-    {
-      SetScreen(ScreenName::FAC);
-    }
-    else
-    {
-      SetScreen(ScreenName::None);
-    }
-  }
+  // if(changed && GetCurrScreenName() != ScreenName::Recovery)
+  // {
+  //   if(draw)
+  //   {
+  //     SetScreen(ScreenName::FAC);
+  //   }
+  //   else
+  //   {
+  //     SetScreen(ScreenName::None);
+  //   }
+  // }
 }
 
 // Returns true if the screen is of the type during which the lift should be disabled
@@ -589,7 +608,7 @@ void FaceInfoScreenManager::SetScreen(ScreenName screen)
   _scratchDrawingImg->FillWith(0);
   DrawScratch();
 
-  LOG_INFO("FaceInfoScreenManager.SetScreen.EnteringScreen", "%hhu", GetCurrScreenName());
+  LOG_INFO("FaceInfoScreenManager.SetScreen.EnteringScreen", "%u", static_cast<uint8_t>(GetCurrScreenName()));
   _currScreen->EnterScreen();
 
   if(!IsAlexaScreen(GetCurrScreenName())) {
@@ -952,7 +971,7 @@ void FaceInfoScreenManager::CheckForButtonEvent(const bool buttonPressed,
 
   // The maximum amount of time allowed between button releases
   // to register as a double press
-  static const u32 kDoublePressWindow_ms   = 700;
+  static const u32 kDoublePressWindow_ms   = 400;
 
   const u32  curTime_ms         = BaseStationTimer::getInstance()->GetCurrentTimeStamp();
   const bool mightBeDoublePress = (lastPressTime_ms > 0) && (curTime_ms - lastPressTime_ms < kDoublePressWindow_ms);
@@ -1076,7 +1095,8 @@ void FaceInfoScreenManager::ProcessMenuNavigation(const RobotState& state)
         (currScreenName != ScreenName::None &&
           currScreenName != ScreenName::FAC &&
           currScreenName != ScreenName::Pairing &&
-          currScreenName != ScreenName::Recovery) ) {
+          currScreenName != ScreenName::Reonboard &&
+          currScreenName != ScreenName::SwitchSlot) ) {
       SetScreen(_currScreen->GetButtonGotoScreen());
     }
   }
@@ -1295,7 +1315,18 @@ void FaceInfoScreenManager::DrawMain()
   std::transform(esn.begin(), esn.end(), esn.begin(),
     [](unsigned char c){ return std::tolower(c); });
 
-  const std::string serialNo = "ESN: "  + esn;
+  std::string botname;
+  if (Util::FileUtils::FileExists("/data/data/customBotName")) {
+    botname = Util::FileUtils::ReadFile("/data/data/customBotName");
+    botname.pop_back();
+    _knownBot = 1;
+  } else {
+    _knownBot = 0;
+  }
+
+  const std::string nameOfBot = "BOT: " + botname;
+
+  const std::string serialNo = "ESN: " + esn;
 
   const std::string hwVer    = "HW: "   + std::to_string(IsXray() ? 8 : Factory::GetEMR()->fields.HW_VER);
 
@@ -1317,18 +1348,25 @@ void FaceInfoScreenManager::DrawMain()
 
   // ESN/serialNo and the HW version are drawn on the same line with serialNo default left aligned and
   // HW version right aligned.
-  ColoredTextLines lines = { { {serialNo}, {hwVer, NamedColors::WHITE, false} },
-                             {osProject},
-                             {osVer},
-                             {ssid}, 
-#if FACTORY_TEST
-                             {"IP: " + ip},
-#else
-                             { {"IP: "}, {ip, (osstate->IsValidIPAddress(ip) ? NamedColors::GREEN : NamedColors::RED)} },
-#endif
-                           };
+  if (_knownBot) {
+    ColoredTextLines lines = { { {nameOfBot}, {hwVer, NamedColors::WHITE, false} },
+                               {serialNo},
+                               {osProject},
+                               {osVer},
+                               {ssid}, 
+                               { {"IP: "}, {ip, (osstate->IsValidIPAddress(ip) ? NamedColors::GREEN : NamedColors::RED)} },
+                             };
+    DrawTextOnScreen(lines);
+  } else {
+    ColoredTextLines lines = { { {serialNo},  {hwVer, NamedColors::WHITE, false} },
+                               {osProject},
+                               {osVer},
+                               {ssid}, 
+                               { {"IP: "}, {ip, (osstate->IsValidIPAddress(ip) ? NamedColors::GREEN : NamedColors::RED)} },
+                             };
 
-  DrawTextOnScreen(lines);
+    DrawTextOnScreen(lines);
+  }
 }
 
 void FaceInfoScreenManager::DrawNetwork()
@@ -1679,7 +1717,7 @@ void FaceInfoScreenManager::DrawAlexaFace()
   {
     textLocationY += ( kTextSpacing * line.scale );
     _scratchDrawingImg->DrawTextCenteredHorizontally( line.text,
-                                                      CV_FONT_NORMAL,
+                                                      cv::QT_FONT_NORMAL,
                                                       kDefaultTextScale * line.scale,
                                                       kTextLineThickness,
                                                       kTextColor,
@@ -1996,7 +2034,12 @@ void FaceInfoScreenManager::EnableMirrorModeScreen(bool enable)
 
 void FaceInfoScreenManager::DrawScratch()
 {
-  _currScreen->DrawMenu(*_scratchDrawingImg);
+
+  if (_currScreen == GetScreen(ScreenName::UserDataSubmenu)) {
+    _currScreen->DrawMenuVertical(*_scratchDrawingImg);
+  } else {
+    _currScreen->DrawMenu(*_scratchDrawingImg);
+  }
 
   // Draw white pixel in top-right corner of main customer support screen
   // to indicate that debug screens are unlocked

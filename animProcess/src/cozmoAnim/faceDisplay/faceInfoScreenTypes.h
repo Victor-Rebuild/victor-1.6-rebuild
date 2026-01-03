@@ -21,7 +21,8 @@ enum class ScreenName : uint8_t {
   None = 0,
   FAC  = 1, // Needs to be after None
 
-  Recovery,
+  Reonboard,
+  SwitchSlot,
 
   Pairing,
     
@@ -49,6 +50,7 @@ enum class ScreenName : uint8_t {
   AlexaPairingFailed,  // server error (has timeout)
   ToggleMute, // Quick animation to show change in microphone mute state
   ToF,
+  UserDataSubmenu,
   
   Count
 };

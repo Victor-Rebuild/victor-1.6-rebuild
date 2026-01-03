@@ -45,12 +45,15 @@ namespace {
 u32 _pin = 123456;
 
 const f32 kRobotNameScale = 0.65f;
-const std::string kURL = "modder.my.to/1.6";
+const std::string kURLDef = "anki2.ca/1.6";
+const std::string kURLWP = "anki2.ca/wp";
 const ColorRGBA   kColor(0.9f, 0.9f, 0.9f, 1.f);
 
 const char* kShowPinScreenSpriteName = "pairing_icon_key";
 
 bool s_enteredAnyScreen = false;
+
+bool isWP = 0;
 }
 
 // Draws BLE name and url to screen
@@ -68,12 +71,19 @@ bool DrawStartPairingScreen(Anim::AnimationStreamer* animStreamer)
   auto* img = new Vision::ImageRGBA(FACE_DISPLAY_HEIGHT, FACE_DISPLAY_WIDTH);
   img->FillWith(Vision::PixelRGBA(0, 0));
 
-  img->DrawTextCenteredHorizontally(robotName, CV_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
+  img->DrawTextCenteredHorizontally(robotName, cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
 
   cv::Size textSize;
   float scale = 0;
-  Vision::Image::MakeTextFillImageWidth(kURL, CV_FONT_NORMAL, 1, img->GetNumCols(), textSize, scale);
-  img->DrawTextCenteredHorizontally(kURL, CV_FONT_NORMAL, scale, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize.height)/2, true);
+
+  if (Util::FileUtils::FileExists("/data/data/server_config.json")) {
+    isWP = 1;
+  } else {
+    isWP = 0;
+  }
+
+  Vision::Image::MakeTextFillImageWidth(isWP ? kURLWP : kURLDef, cv::QT_FONT_NORMAL, 1, img->GetNumCols(), textSize, scale);
+  img->DrawTextCenteredHorizontally(isWP ? kURLWP : kURLDef, cv::QT_FONT_NORMAL, scale, 1, kColor, (FACE_DISPLAY_HEIGHT + textSize.height)/2, true);
 
   auto handle = std::make_shared<Vision::SpriteWrapper>(img);
   const bool shouldRenderInEyeHue = false;
@@ -100,9 +110,9 @@ void DrawShowPinScreen(Anim::AnimationStreamer* animStreamer, const Anim::AnimCo
             (FACE_DISPLAY_HEIGHT - key.GetNumRows())/2);
   img->DrawSubImage(key, p);
 
-  img->DrawTextCenteredHorizontally(OSState::getInstance()->GetRobotName(), CV_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
+  img->DrawTextCenteredHorizontally(OSState::getInstance()->GetRobotName(), cv::QT_FONT_NORMAL, kRobotNameScale, 1, kColor, 15, false);
 
-  img->DrawTextCenteredHorizontally(pin, CV_FONT_NORMAL, 0.8f, 1, kColor, FACE_DISPLAY_HEIGHT-5, false);
+  img->DrawTextCenteredHorizontally(pin, cv::QT_FONT_NORMAL, 0.8f, 1, kColor, FACE_DISPLAY_HEIGHT-5, false);
 
   auto handle = std::make_shared<Vision::SpriteWrapper>(img);
   const bool shouldRenderInEyeHue = false;

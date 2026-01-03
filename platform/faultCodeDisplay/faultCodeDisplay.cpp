@@ -31,6 +31,7 @@ namespace {
   // Map of fault codes that map to images that should be drawn instead of the number
   std::unordered_map<uint16_t, std::string> kFaultImageMap = {
     {FaultCode::SHUTDOWN_BATTERY_CRITICAL_TEMP, "/anki/data/assets/cozmo_resources/config/devOnlySprites/independentSprites/battery_overheated.png"},
+    {FaultCode::SHUTDOWN_BATTERY_CRITICAL_VOLT, "/anki/data/assets/cozmo_resources/config/devOnlySprites/independentSprites/gyro_not_calibrated.png"},
   };
 }
 
@@ -45,7 +46,7 @@ void DrawFaultCode(uint16_t fault, bool willRestart)
   const std::string faultString = std::to_string(fault);
   Vec2f size = Vision::Image::GetTextSize(faultString, 1.5,  1);
   img.DrawTextCenteredHorizontally(faultString,
-				   CV_FONT_NORMAL,
+				   cv::QT_FONT_NORMAL,
 				   1.5,
 				   2,
 				   NamedColors::WHITE,
@@ -55,7 +56,7 @@ void DrawFaultCode(uint16_t fault, bool willRestart)
   // Draw text centered horizontally and slightly above
   // the bottom of the screen
   const std::string & text = (willRestart ? kVectorWillRestart : kSupportURL);
-  const int font = CV_FONT_NORMAL;
+  const int font = cv::QT_FONT_NORMAL;
   const f32 scale = 0.5f;
   const int thickness = 1;
   const auto color = NamedColors::WHITE;
@@ -75,9 +76,9 @@ bool DrawImage(std::string& image_path)
     return false;
   }
 
-  // Fail if the image isn't the right size
+  // Resize if the image isn't the right size
   if (img565.GetNumCols() != FACE_DISPLAY_WIDTH || img565.GetNumRows() != FACE_DISPLAY_HEIGHT) {
-    return false;
+    img565.Resize(FACE_DISPLAY_HEIGHT, FACE_DISPLAY_WIDTH);
   }
 
   lcd_draw_frame2(reinterpret_cast<u16*>(img565.GetDataPointer()), img565.GetNumRows() * img565.GetNumCols() * sizeof(u16));

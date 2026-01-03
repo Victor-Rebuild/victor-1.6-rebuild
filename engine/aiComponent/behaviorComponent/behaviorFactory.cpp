@@ -123,6 +123,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/knowledgeGraph/behaviorKnowledgeGraphQuestion.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/meetCozmo/behaviorEnrollFace.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/meetCozmo/behaviorRespondToRenameFace.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/nameVictor/behaviorRespondToName.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/messaging/behaviorLeaveAMessage.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/messaging/behaviorPlaybackMessage.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/observing/behaviorObservingLookAtFaces.h"
@@ -903,6 +904,12 @@ ICozmoBehaviorPtr BehaviorFactory::CreateBehavior(const Json::Value& config)
       break;
     }
     
+    case BehaviorClass::RespondToName:
+    {
+      newBehavior = ICozmoBehaviorPtr(new BehaviorRespondToName(config));
+      break;
+    }
+
     case BehaviorClass::ObservingLookAtFaces:
     {
       newBehavior = ICozmoBehaviorPtr(new BehaviorObservingLookAtFaces(config));

@@ -14,7 +14,7 @@ list(APPEND CMAKE_MODULE_PATH
 project(victor)
 
 # Build options
-option(USE_DAS "Enable DAS reporting" OFF)
+option(USE_DAS "Enable DAS reporting" ON)
 
 # Use ccache if it is installed
 include(ccache)
@@ -58,7 +58,7 @@ elseif(VICOS)
   set(ANKI_PLATFORM_NAME "vicos")
   set(SYMBOL_VISIBILITY_FLAGS "-fvisibility=hidden")
 else()
-  message(FATAL_ERROR "unsupported platform: ${ANKI_PLATFORM_NAME}")
+
 endif()
 
 message(STATUS "ANKI_PLATFORM_NAME: ${ANKI_PLATFORM_NAME}")

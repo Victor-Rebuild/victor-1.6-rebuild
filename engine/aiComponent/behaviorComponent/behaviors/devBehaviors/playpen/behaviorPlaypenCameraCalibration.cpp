@@ -224,9 +224,9 @@ void BehaviorPlaypenCameraCalibration::HandleCameraCalibration(const CameraCalib
   PLAYPEN_TRY(GetLogger().Append(calibMsg), FactoryTestResultCode::WRITE_TO_LOG_FAILED);
   
   // Write camera calibration to robot
-  u8 buf[calibMsg.Size()];
-  size_t numBytes = calibMsg.Pack(buf, sizeof(buf));
-  WriteToStorage(robot, NVStorage::NVEntryTag::NVEntry_CameraCalib, buf, numBytes,
+  std::vector<u8> buf(calibMsg.Size());
+  size_t numBytes = calibMsg.Pack(buf.data(), sizeof(buf));
+  WriteToStorage(robot, NVStorage::NVEntryTag::NVEntry_CameraCalib, buf.data(), numBytes,
                  FactoryTestResultCode::CAMERA_CALIB_WRITE_FAILED);
   
   

@@ -197,7 +197,7 @@ void ExecCommand(const std::vector<std::string>& args)
   pid_t pID = fork();
   if (pID == 0) // child
   {
-    char* argv_child[args.size() + 1];
+    auto argv_child = std::vector<char*>(args.size() + 1);
 
     for (size_t i = 0; i < args.size(); i++) {
       argv_child[i] = (char *) malloc(args[i].size() + 1);
@@ -205,7 +205,7 @@ void ExecCommand(const std::vector<std::string>& args)
     }
     argv_child[args.size()] = nullptr;
 
-    execv(argv_child[0], argv_child);
+    execv(argv_child[0], argv_child.data());
 
     // We'll only get here if execv fails
     for (size_t i = 0 ; i < args.size() + 1 ; ++i) {
@@ -271,6 +271,55 @@ ProcessRequest(struct mg_connection *conn, WebService::WebService::RequestType r
 }
 
 static int
+TriggerIntent(struct mg_connection *conn, void *cbdata)
+{
+  const mg_request_info* info = mg_get_request_info(conn);
+  std::string query = info->query_string ? info->query_string : "";
+  
+  std::string intentType;
+  std::string intentName;
+  std::string param;
+  
+  size_t pos = 0;
+  while (pos < query.length()) {
+    size_t eq = query.find('=', pos);
+    size_t amp = query.find('&', pos);
+    if (amp == std::string::npos) amp = query.length();
+    
+    if (eq != std::string::npos && eq < amp) {
+      std::string key = query.substr(pos, eq - pos);
+      std::string value = query.substr(eq + 1, amp - eq - 1);
+      
+      if (key == "type") {
+        intentType = value;
+      } else if (key == "intent") {
+        intentName = value;
+      } else if (key == "param") {
+        param = value;
+      }
+    }
+    pos = amp + 1;
+  }
+  
+  if (intentType.empty() || intentName.empty()) {
+    mg_printf(conn, "Error: Missing parameters\n");
+    return 1;
+  }
+  
+  std::string request = intentName;
+  if (!param.empty()) {
+    request += " " + param;
+  }
+  
+  const int returnCode = ProcessRequest(conn, 
+                                       WebService::WebService::RequestType::RT_TriggerIntent, 
+                                       intentType, 
+                                       request);
+  
+  return returnCode;
+}
+
+static int
 ConsoleVarsUI(struct mg_connection *conn, void *cbdata)
 {
   const mg_request_info* info = mg_get_request_info(conn);
@@ -289,10 +338,10 @@ ConsoleVarSet(struct mg_connection *conn, void *cbdata)
   std::string query;
 
   if (info->content_length > 0) {
-    char buf[info->content_length+1];
-    mg_read(conn, buf, sizeof(buf));
-    buf[info->content_length] = 0;
-    query = buf;
+    std::vector<char> buf(static_cast<size_t>(info->content_length) + 1);
+    mg_read(conn, buf.data(), buf.size());
+    buf[static_cast<size_t>(info->content_length)] = 0;
+    query = buf.data();
   }
   else if (info->query_string) {
     query = info->query_string;
@@ -365,10 +414,10 @@ ConsoleFuncCall(struct mg_connection *conn, void *cbdata)
   std::string func;
   std::string args;
   if (info->content_length > 0) {
-    char buf[info->content_length+1];
-    mg_read(conn, buf, sizeof(buf));
-    buf[info->content_length] = 0;
-    func = buf;
+    std::vector<char> buf(static_cast<size_t>(info->content_length) + 1);
+    mg_read(conn, buf.data(), buf.size());
+    buf[static_cast<size_t>(info->content_length)] = 0;
+    func = buf.data();
   }
   else if (info->query_string) {
     func = info->query_string;
@@ -419,10 +468,10 @@ ProcessRequestFromQueryString(struct mg_connection *conn, void *cbdata, WebServi
   const mg_request_info* info = mg_get_request_info(conn);
   std::string request;
   if (info->content_length > 0) {
-    char buf[info->content_length+1];
-    mg_read(conn, buf, sizeof(buf));
-    buf[info->content_length] = 0;
-    request = buf;
+    std::vector<char> buf(static_cast<size_t>(info->content_length) + 1);
+    mg_read(conn, buf.data(), buf.size());
+    buf[static_cast<size_t>(info->content_length)] = 0;
+    request = buf.data();
   }
   else if (info->query_string) {
     request = info->query_string;
@@ -971,6 +1020,7 @@ void WebService::Start(Anki::Util::Data::DataPlatform* platform, const Json::Val
   mg_set_request_handler(_ctx, "/getinitialconfig", GetInitialConfig, 0);
   mg_set_request_handler(_ctx, "/getmainrobotinfo", GetMainRobotInfo, 0);
   mg_set_request_handler(_ctx, "/getperfstats", GetPerfStats, 0);
+  mg_set_request_handler(_ctx, "/triggerIntent", TriggerIntent, 0);
 #ifndef SIMULATOR
   mg_set_request_handler(_ctx, "/systemctl", SystemCtl, 0);
   mg_set_request_handler(_ctx, "/getprocessstatus", GetProcessStatus, 0);
@@ -1212,6 +1262,30 @@ void WebService::Update()
               }
             }
             requestPtr->_done = true; // no one cares about the result, just cleanup immediately
+          }
+          break;
+        case RT_TriggerIntent:
+          {
+            const std::string& intentType = requestPtr->_param1;
+            const std::string& request = requestPtr->_param2;
+            
+            if (intentType == "app") {
+              _appToEngineOnData.emit(request);
+              requestPtr->_result = "App intent triggered: " + request;
+            } else {
+              Json::Value data;
+              data["intentType"] = intentType;
+              data["request"] = request;
+              
+              auto signalIt = _webVizDataSignals.find("intents");
+              if (signalIt != _webVizDataSignals.end()) {
+                auto dummySend = [](const Json::Value&){};
+                signalIt->second.emit(data, dummySend);
+                requestPtr->_result = "Intent triggered: " + intentType + " - " + request;
+              } else {
+                requestPtr->_result = "Error: Intents module not initialized";
+              }
+            }
           }
           break;
       }

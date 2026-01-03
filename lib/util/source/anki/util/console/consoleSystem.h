@@ -105,10 +105,10 @@ public:
   // EditVar Mapping
 public:
   
-  typedef std::vector<const StringID> VariableIdList;
+  typedef std::vector<StringID> VariableIdList;
   typedef std::map<const StringID, IConsoleVariable*> VariableDatabase;
 
-  typedef std::vector<const StringID> FunctionIdList;
+  typedef std::vector<StringID> FunctionIdList;
   typedef std::map<const StringID, IConsoleFunction*> FunctionDatabase;
   
   const VariableIdList& GetVariableIds() const { return varIds_; }

@@ -30,15 +30,14 @@ vlog "Check homebrew dependencies"
     -d python2 \
     ninja \
     python3 \
-    git-lfs \
     libsndfile \
     node \
     rsync \
     openssl \
-    curl-openssl
+    curl
 
 vlog "vicos sdk"
-./tools/build/tools/ankibuild/vicos.py --install 1.1.0-r04
+#./tools/build/tools/ankibuild/vicos.py --install 5.3.0-r07
 
 vlog "CMake"
 ./tools/build/tools/ankibuild/cmake.py
@@ -46,8 +45,8 @@ vlog "CMake"
 #vlog "Go"
 #./tools/build/tools/ankibuild/go.py
 
-vlog "git-lfs"
-$GIT lfs install
+# vlog "git-lfs"
+# $GIT lfs install
 
 if [ -d "/Applications/Webots.app" ]; then
   vlog "check webots version"

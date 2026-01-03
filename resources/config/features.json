@@ -113,7 +113,7 @@
   },
   {
     "feature": "StayOnChargerUntilCharged",
-    "enabled": true
+    "enabled": false
   },
   {
     "feature": "EyeColorVC",

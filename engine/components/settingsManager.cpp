@@ -668,8 +668,7 @@ namespace Anki
 
       std::vector<std::string> command;
       command.push_back("/usr/bin/sudo");
-      command.push_back("/usr/bin/timedatectl");
-      command.push_back("set-timezone");
+      command.push_back("/usr/sbin/set-timezone");
       command.push_back(value);
       const bool success = ExecCommand(command);
       if (!success)
@@ -819,7 +818,7 @@ namespace Anki
       const pid_t pID = fork();
       if (pID == 0) // child
       {
-        char *argv_child[args.size() + 1];
+        std::vector<char*> argv_child(args.size() + 1);
 
         for (size_t i = 0; i < args.size(); i++)
         {
@@ -828,7 +827,7 @@ namespace Anki
         }
         argv_child[args.size()] = nullptr;
 
-        execv(argv_child[0], argv_child);
+        execv(argv_child[0], argv_child.data());
 
         // We'll only get here if execv fails
         for (size_t i = 0; i < args.size() + 1; ++i)

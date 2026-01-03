@@ -181,6 +181,9 @@ enum uint_8 BehaviorClass {
   LeaveAMessage,
   PlaybackMessage,
 
+  // nameVictor
+  RespondToName,
+
   // observing
   ObservingLookAtFaces,
   ObservingWithoutTurn,

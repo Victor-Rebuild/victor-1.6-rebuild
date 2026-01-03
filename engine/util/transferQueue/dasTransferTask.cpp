@@ -26,7 +26,7 @@ void DasTransferTask::OnTransferReady(Dispatch::Queue* queue, const TransferQueu
   #if USE_DAS
   auto callbackWrapper = [completionFunc] (bool success, std::string response) {
     (void) response;
-    LOG_EVENT(success ? "das.upload" : "das.upload.fail", "background");
+    //LOG_EVENT(success ? "das.upload" : "das.upload.fail", "background");
     completionFunc();
   };
   DASForceFlushWithCallback(callbackWrapper);

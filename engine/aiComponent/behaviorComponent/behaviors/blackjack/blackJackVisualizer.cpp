@@ -64,7 +64,7 @@ const std::vector<Vision::SpriteBoxName> kDealerCardSlots = {
 };
 const char* kCharlieFrameSpriteName = "charlieframe";
 // These vectors provide index-based conversion from CardID(0-51) to string AssetName
-const std::vector<const char* const> kPlayerCardAssets = {
+const std::vector<const char*> kPlayerCardAssets = {
   // Spades
   "blackjack_player_spadeace",
   "blackjack_player_spade2",
@@ -124,7 +124,7 @@ const std::vector<const char* const> kPlayerCardAssets = {
 };
 
 const char* kDealerCardBackSpriteName = "blackjack_vector_card_back";
-const std::vector<const char* const> kDealerCardAssets = {
+const std::vector<const char*> kDealerCardAssets = {
   // Spades
   "blackjack_vector_spadeace",
   "blackjack_vector_spade2",
@@ -245,31 +245,34 @@ void BlackJackVisualizer::Init(BehaviorExternalInterface& bei)
   // Init an ongoing image showing all cards dealt thus far
   Vision::HSImageHandle faceHueAndSaturation = ProceduralFace::GetHueSatWrapper();
 
-  if (IsXray()) {
-    _compImg = std::make_unique<Vision::CompositeImage>(dataAccessorComp.GetSpriteCache(),
-                                                    faceHueAndSaturation,
-                                                    160,
-                                                    80);
-  } else {
-    _compImg = std::make_unique<Vision::CompositeImage>(dataAccessorComp.GetSpriteCache(),
-                                                    faceHueAndSaturation,
-                                                    184,
-                                                    96);
-  }
+  _compImg = std::make_unique<Vision::CompositeImage>(dataAccessorComp.GetSpriteCache(),
+                                                  faceHueAndSaturation,
+                                                  FACE_DISPLAY_WIDTH,
+                                                  FACE_DISPLAY_HEIGHT);
 
   auto& compLayoutMap = *dataAccessorComp.GetCompLayoutMap(); 
   // Add the player card layout to the composite image
-  {
+  if (IsXray()) {
+    // 2.0 layouts
+    const auto iter = compLayoutMap.find(Vision::CompositeImageLayout::PlayerCardLayout_Xray);
+    if(iter != compLayoutMap.end()){
+      _compImg->MergeInImage(iter->second);
+    }
+    
+    const auto iter2 = compLayoutMap.find(Vision::CompositeImageLayout::DealerCardLayout_Xray);
+    if(iter2 != compLayoutMap.end()){
+      _compImg->MergeInImage(iter2->second);
+    }
+  } else {
+    // 1.0 layouts
     const auto iter = compLayoutMap.find(Vision::CompositeImageLayout::PlayerCardLayout);
     if(iter != compLayoutMap.end()){
       _compImg->MergeInImage(iter->second);
     }
-  }
-  // Add the dealer card layout to the composite image
-  {
-    const auto iter = compLayoutMap.find(Vision::CompositeImageLayout::DealerCardLayout);
-    if(iter != compLayoutMap.end()){
-      _compImg->MergeInImage(iter->second);
+    
+    const auto iter2 = compLayoutMap.find(Vision::CompositeImageLayout::DealerCardLayout);
+    if(iter2 != compLayoutMap.end()){
+      _compImg->MergeInImage(iter2->second);
     }
   }
 }
@@ -533,14 +536,14 @@ void BlackJackVisualizer::VerifySpriteAssets(BehaviorExternalInterface& bei)
   auto* spritePathMap = dataAccessorComp.GetSpriteCache()->GetSpritePathMap();
 
   for(auto& assetName : kPlayerCardAssets){
-    ANKI_VERIFY(spritePathMap->IsValidAssetName(assetName),
+    ANKI_VERIFY(spritePathMap->IsValidAssetName(std::string(assetName)),
                 "BlackJack.VerifySpriteAssets.InvalidAssetName",
                 "Asset name: %s does not map to a valid sprite",
                 assetName);
   }
 
   for(auto& assetName : kDealerCardAssets){
-    ANKI_VERIFY(spritePathMap->IsValidAssetName(assetName),
+    ANKI_VERIFY(spritePathMap->IsValidAssetName(std::string(assetName)),
                 "BlackJack.VerifySpriteAssets.InvalidAssetName",
                 "Asset name: %s does not map to a valid sprite",
                 assetName);

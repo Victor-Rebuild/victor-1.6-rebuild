@@ -54,10 +54,10 @@ public:
   virtual void SubscribeToTags(IBehavior* subscriber, std::set<RobotInterface::RobotToEngineTag>&& tags) const override;
   virtual void SubscribeToTags(IBehavior* subscriber, std::set<AppToEngineTag>&& tags) const override;
 
-  const std::vector<const GameToEngineEvent>& GetGameToEngineEvents() const   { return _gameToEngineEvents;}
-  const std::vector<const EngineToGameEvent>& GetEngineToGameEvents() const   { return _engineToGameEvents;}
-  const std::vector<const RobotToEngineEvent>& GetRobotToEngineEvents() const { return _robotToEngineEvents;}
-  const std::vector<const AppToEngineEvent>& GetAppToEngineEvents() const { return _appToEngineEvents;}
+  const std::vector<GameToEngineEvent>& GetGameToEngineEvents() const   { return _gameToEngineEvents;}
+  const std::vector<EngineToGameEvent>& GetEngineToGameEvents() const   { return _engineToGameEvents;}
+  const std::vector<RobotToEngineEvent>& GetRobotToEngineEvents() const { return _robotToEngineEvents;}
+  const std::vector<AppToEngineEvent>& GetAppToEngineEvents() const { return _appToEngineEvents;}
 
   const std::vector<ExternalInterface::RobotCompletedAction>& GetActionsCompletedThisTick() const { return _actionsCompletedThisTick;}
   
@@ -65,10 +65,10 @@ protected:
   friend class BehaviorManager;
   friend class BehaviorSystemManager;
   friend class BehaviorStack;
-  std::vector<const GameToEngineEvent>  _gameToEngineEvents;
-  std::vector<const EngineToGameEvent>  _engineToGameEvents;
-  std::vector<const RobotToEngineEvent> _robotToEngineEvents;
-  std::vector<const AppToEngineEvent>   _appToEngineEvents;
+  std::vector<GameToEngineEvent>  _gameToEngineEvents;
+  std::vector<EngineToGameEvent>  _engineToGameEvents;
+  std::vector<RobotToEngineEvent> _robotToEngineEvents;
+  std::vector<AppToEngineEvent>   _appToEngineEvents;
   
   std::vector<ExternalInterface::RobotCompletedAction> _actionsCompletedThisTick;
   

@@ -35,4 +35,5 @@ set(ANKI_BUILD_CXX_COMPILE_OPTIONS
   -Wundef
   -Wunused-variable
   -Wno-unused-command-line-argument
+  -Wno-delete-non-virtual-dtor
 )
