@@ -136,8 +136,7 @@ list(APPEND VICOS_COMPILER_FLAGS_DEBUG
 	-O0
         -fno-limit-debug-info)
 list(APPEND VICOS_COMPILER_FLAGS_RELEASE
-	-O2 -fno-math-errno -fno-trapping-math
-        -DNDEBUG)
+	-O2 -fno-math-errno -fno-trapping-math)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     list(APPEND VICOS_LINKER_FLAGS_EXE
