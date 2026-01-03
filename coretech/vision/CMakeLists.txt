@@ -47,6 +47,15 @@ PRIVATE
 target_include_directories(cti_vision
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..>
+  SYSTEM PRIVATE
+  ${CMAKE_SOURCE_DIR}/EXTERNALS/deps/tensorflow2
+  ${CMAKE_SOURCE_DIR}/EXTERNALS/deps/tensorflow2/tensorflow/lite
+)
+
+set_source_files_properties(
+  ${CMAKE_CURRENT_SOURCE_DIR}/engine/neuralNetRunner.cpp
+  PROPERTIES
+  COMPILE_FLAGS "-I${CMAKE_SOURCE_DIR}/EXTERNALS/deps/tensorflow2/flatbuffers/include"
 )
 
 target_compile_definitions(cti_vision

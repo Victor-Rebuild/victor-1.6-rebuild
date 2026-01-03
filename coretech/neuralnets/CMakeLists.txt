@@ -267,7 +267,7 @@ target_compile_options(cti_neuralnets
 )
 
 target_include_directories(cti_neuralnets
-  PRIVATE
+  PUBLIC
   ${PLATFORM_INCLUDES}
   ${OPENCV_INCLUDE_PATHS}
 )
@@ -275,6 +275,9 @@ target_include_directories(cti_neuralnets
 target_compile_definitions(cti_neuralnets
   PUBLIC
   ${PLATFORM_DEFINITIONS}
+  PRIVATE
+  TFLITE_WITH_STABLE_ABI=0
+  TFLITE_USE_OPAQUE_DELEGATE=0
 )
 target_link_libraries(cti_neuralnets
   PRIVATE
