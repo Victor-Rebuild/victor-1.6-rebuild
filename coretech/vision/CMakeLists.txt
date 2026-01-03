@@ -67,6 +67,8 @@ target_compile_definitions(cti_vision
   FACE_TRACKER_OKAO=3
   FACE_TRACKER_TEST=4
   FACE_TRACKER_PROVIDER=FACE_TRACKER_OKAO
+  TFLITE_WITH_STABLE_ABI=0
+  TFLITE_USE_OPAQUE_DELEGATE=0
   ${additional_defines}
 )
 

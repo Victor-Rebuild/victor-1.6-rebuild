@@ -161,7 +161,8 @@ list(APPEND VICOS_LINKER_FLAGS
 # STL specific flags for libc++
 set(VICOS_STL_PREFIX llvm-libc++)
 list(APPEND VICOS_LINKER_FLAGS
-	-Wl,--exclude-libs,libunwind.a
+    -lunwind
+    -lunwind-arm
 	-lc
 	-latomic
 	-lpthread)
