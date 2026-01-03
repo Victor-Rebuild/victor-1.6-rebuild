@@ -13,18 +13,14 @@
 #include "engine/aiComponent/beiConditions/beiConditionFactory.h"
 #include "engine/aiComponent/beiConditions/iBEICondition.h"
 #include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
-#include "engine/audio/engineRobotAudioClient.h"
 #include "engine/aiComponent/behaviorComponent/behaviorContainer.h"
 
-#include "clad/audio/audioEventTypes.h"
 
 #include <chrono>
 
 namespace Anki {
 namespace Vector {
 
-using AMD_GE_GE = AudioMetaData::GameEvent::GenericEvent;
-using AMD_GOT = AudioMetaData::GameObjectType;
 using Clock = std::chrono::steady_clock;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -128,7 +124,7 @@ void BehaviorPetDetection::AlwaysHandleInScope(const EngineToGameEvent& ev)
 
   const auto& petMsg = ev.GetData().Get_RobotObservedPet();
   // okao hits us with a burst of events whenever a pet is seen.
-  // let's account for false-positives a little bit by needing 3 events
+  // let's account for false-positives a little bit by needing 6 events
   if (!_activate) {
     if (petMsg.numTimesObserved >= 6) {
       if (petMsg.img_rect.height > 100) {
