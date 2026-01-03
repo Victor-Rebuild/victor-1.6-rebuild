@@ -16,8 +16,8 @@
 #include "util/helpers/templateHelpers.h"
 
 #include "opencv2/core.hpp"
-#include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
+#include "opencv2/imgcodecs.hpp"
 
 namespace Anki {
 namespace Vision {
@@ -102,10 +102,10 @@ bool CompressedImage::Decompress(ImageBase<u8>& img) const
 
 void CompressedImage::Display(const std::string& name) const
 {
-  auto img = cv::imdecode(GetCompressedBuffer(),
-                          (GetNumChannels() > 1 ? cv::IMREAD_COLOR : cv::IMREAD_GRAYSCALE));
-  cv::imshow(name.c_str(), img);
-  cv::waitKey(5);
+  // auto img = cv::imdecode(GetCompressedBuffer(),
+  //                         (GetNumChannels() > 1 ? cv::IMREAD_COLOR : cv::IMREAD_GRAYSCALE));
+  // cv::imshow(name.c_str(), img);
+  // cv::waitKey(5);
 }
 
 }

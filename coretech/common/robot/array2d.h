@@ -31,8 +31,8 @@ For internal use only. No part of this code may be used without a signed non-dis
 
 #if ANKICORETECH_EMBEDDED_USE_OPENCV
 #include "opencv2/core.hpp"
-#include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
+#include "opencv2/imgcodecs.hpp"
 #include "opencv2/objdetect.hpp"
 #endif
 
@@ -502,40 +502,6 @@ namespace Anki
 
     template<typename Type> void Array<Type>::Show(const char * const windowName, const bool waitForKeypress, const bool scaleValues, const bool fitImageToWindow) const
     {
-#if ANKICORETECH_EMBEDDED_USE_OPENCV
-      AnkiConditionalError(this->IsValid(), "Array<Type>::Show", "Array<Type> is not valid");
-
-      if(fitImageToWindow) {
-        cv::namedWindow(windowName, cv::WINDOW_NORMAL);
-      } else {
-        cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
-      }
-
-      if(scaleValues) {
-        cv::Mat_<f64> scaledArray;
-
-        if(ArrayToCvMat(*this, &scaledArray) != RESULT_OK)
-          return;
-
-        const f64 minValue = Matrix::Min<Type>(*this);
-        const f64 maxValue = Matrix::Max<Type>(*this);
-        const f64 range = maxValue - minValue;
-
-        scaledArray -= minValue;
-        scaledArray /= range;
-
-        cv::imshow(windowName, scaledArray);
-      } else {
-        cv::Mat_<Type> arrayCopy;
-
-        if(ArrayToCvMat(*this, &arrayCopy) != RESULT_OK)
-          return;
-
-        cv::imshow(windowName, arrayCopy);
-      }
-
-      cv::waitKey(waitForKeypress ? 0 : 1);
-#endif // #if ANKICORETECH_EMBEDDED_USE_OPENCV
     }
 
     template<typename Type> Result Array<Type>::Print(const char * const variableName, const s32 minY, const s32 maxY, const s32 minX, const s32 maxX) const

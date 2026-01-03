@@ -6,6 +6,7 @@
 #include "coretech/common/robot/array2d.h"
 #include "coretech/common/robot/fixedLengthList.h"
 #include "coretech/common/robot/errorHandling.h"
+#include "opencv2/imgcodecs.hpp"
 
 #include <array>
 
@@ -176,56 +177,6 @@ namespace Embedded {
         if(maskedDist < distThreshLeniency*distThreshold) {
           label = closestLabel;
         }
-      }
-      
-      if(DRAW_DEBUG_IMAGES)
-      {
-        const s32 dispSize = 256;
- 
-        cv::Mat probeDisp;
-        cv::resize(_probeValues.reshape(0, VisionMarker::GRIDSIZE), probeDisp,
-                   cv::Size(dispSize,dispSize));
-        cv::imshow("Probes", probeDisp);
-        
-        cv::Mat closestExampleDisp;
-        cv::Mat_<u8> tempClosestExample(VisionMarker::GRIDSIZE, VisionMarker::GRIDSIZE,
-                                        _data[closestIndex]);
-        cv::resize(tempClosestExample, closestExampleDisp, cv::Size(dispSize,dispSize));
-        cv::cvtColor(closestExampleDisp, closestExampleDisp, cv::COLOR_GRAY2BGR);
-      
-        cv::resize(bestDiffImage, bestDiffImage, cv::Size(dispSize,dispSize));
-        cv::imshow("ClosestDiff", bestDiffImage);
-        
-        char closestStr[128];
-        snprintf(closestStr, 127, "Dist: %d(%d), Index: %d, Label: %d",
-                 closestDistance, maskedDist, closestIndex, closestLabel);
-        cv::putText(closestExampleDisp, closestStr, cv::Point(0,closestExampleDisp.rows-2), cv::QT_FONT_NORMAL, 0.4, cv::Scalar(0,0,255));
-        cv::imshow("ClosestExample", closestExampleDisp);
-        
-        if(secondClosestIndex != -1)
-        {
-          cv::resize(secondBestDiffImage, secondBestDiffImage, cv::Size(dispSize,dispSize));
-          cv::imshow("SecondDiff", secondBestDiffImage);
-          
-          cv::Mat secondClosestDisp;
-          cv::Mat_<u8> tempSecondExample(VisionMarker::GRIDSIZE, VisionMarker::GRIDSIZE,
-                                          _data[secondClosestIndex]);
-          cv::resize(tempSecondExample, secondClosestDisp, cv::Size(dispSize,dispSize));
-          cv::cvtColor(secondClosestDisp, secondClosestDisp, cv::COLOR_GRAY2BGR);
-          
-          cv::Mat maskDisp;
-          cv::absdiff(tempClosestExample, tempSecondExample, maskDisp);
-          cv::resize(maskDisp>distThreshold, maskDisp, cv::Size(dispSize, dispSize), cv::INTER_NEAREST);
-          cv::imshow("ExampleDiffMask", maskDisp);
-          
-          char closestStr[128];
-          snprintf(closestStr, 127, "Dist: %d, Index: %d, Label: %d",
-                   secondClosestDistance, secondClosestIndex, secondLabel);
-          cv::putText(secondClosestDisp, closestStr, cv::Point(0,secondClosestDisp.rows-2), cv::QT_FONT_NORMAL, 0.4, cv::Scalar(0,0,255));
-          cv::imshow("SecondExample", secondClosestDisp);
-        }
-        
-        cv::waitKey(1);
       }
     }
     return lastResult;

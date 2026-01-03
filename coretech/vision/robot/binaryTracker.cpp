@@ -382,30 +382,7 @@ namespace Anki
 
       Result BinaryTracker::ShowTemplate(const char * windowName, const bool waitForKeypress, const bool fitImageToWindow, const f32 displayScale) const
       {
-#if !ANKICORETECH_EMBEDDED_USE_OPENCV || defined(__GNUC__)
         return RESULT_FAIL;
-#else
-        //if(!this->IsValid())
-        //  return RESULT_FAIL;
-
-        cv::Mat toShow = this->templateEdges.DrawIndexes(displayScale);
-
-        if(toShow.cols == 0)
-          return RESULT_FAIL;
-
-        if(fitImageToWindow) {
-          cv::namedWindow(windowName, CV_WINDOW_NORMAL);
-        } else {
-          cv::namedWindow(windowName, CV_WINDOW_AUTOSIZE);
-        }
-
-        cv::imshow(windowName, toShow);
-
-        if(waitForKeypress)
-          cv::waitKey();
-
-        return RESULT_OK;
-#endif // #if !ANKICORETECH_EMBEDDED_USE_OPENCV ... #else
       } // Result BinaryTracker::ShowTemplate()
 
       bool BinaryTracker::IsValid() const
