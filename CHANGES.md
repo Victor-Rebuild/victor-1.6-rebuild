@@ -20,9 +20,8 @@
 - More expressive power on anims
 - Face image overlays (Code used from WireOS)
 - Toggle between Anki lights and wireOS lights! (Run `touch /data/data/wirelights` over ssh)
-- Screen doesn't flash as much when booting up (ThommoMC's fix)
+- Screen doesn't flash as much when booting up (Amy's fix)
 - Add back the "Pew" sound when petting ([Reverts this Anki Commit](https://github.com/kercre123/victor/commit/48344a779ad6be70e398b96f3c79db069263e8a1))
-- Add old 1.5-era voice command response timing ([Reverts this anki commit](https://github.com/kercre123/victor/commit/6c3df37c6f3d929cc1562be0572185f10575858d))
 - New onboarding animation
 
 ## Behavior related changes
