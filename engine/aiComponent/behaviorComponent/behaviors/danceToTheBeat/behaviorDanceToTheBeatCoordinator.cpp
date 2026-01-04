@@ -40,12 +40,12 @@ namespace {
   const char* kOnChargerDancingBehavior_key  = "onChargerDancingBehavior";
   
   #define CONSOLE_GROUP "BehaviorDanceToTheBeatCoordinator"
-  CONSOLE_VAR_RANGED(f32, kDancingCooldown_sec, CONSOLE_GROUP, 20.0f, 0.0f, 3600.0f);
-  CONSOLE_VAR_RANGED(f32, kListeningCooldown_sec, CONSOLE_GROUP, 20.0f, 0.0f, 3600.0f);
+  CONSOLE_VAR_RANGED(f32, kDancingCooldown_sec, CONSOLE_GROUP, 10.0f, 0.0f, 3600.0f);
+  CONSOLE_VAR_RANGED(f32, kListeningCooldown_sec, CONSOLE_GROUP, 10.0f, 0.0f, 3600.0f);
   
   // The minimum time allowed between dancing and activation of this behavior (always enforced - even if a strong beat
   // is detected)
-  CONSOLE_VAR_RANGED(f32, kMinIntraDancingPeriod_sec, CONSOLE_GROUP, 10.f, 0.0f, 3600.0f);
+  CONSOLE_VAR_RANGED(f32, kMinIntraDancingPeriod_sec, CONSOLE_GROUP, 5.f, 0.0f, 3600.0f);
 }
   
 #define LOG_FUNCTION_NAME() PRINT_CH_INFO("Behaviors", "BehaviorDanceToTheBeatCoordinator", "BehaviorDanceToTheBeatCoordinator.%s", __func__);
@@ -190,7 +190,8 @@ void BehaviorDanceToTheBeatCoordinator::CheckIfBeatDetected()
   
   const auto& robotInfo = GetBEI().GetRobotInfo();
   const bool isOnCharger = robotInfo.IsOnChargerPlatform();
-  const bool isBatteryFull = (robotInfo.GetBatteryLevel() == BatteryLevel::Full);
+  const bool isBatteryFull = (robotInfo.GetBatteryLevel() == BatteryLevel::Full || 
+                              robotInfo.GetBatteryLevel() == BatteryLevel::Nominal);
   
   if (isOnCharger) {
     if (isBatteryFull) {
@@ -277,7 +278,7 @@ bool BehaviorDanceToTheBeatCoordinator::RecentBackpackActivity() const
 {
   // Has the backpack been fiddled with recently enough to mess up beat detection? A cooldown is necessary since the
   // beat detector can retain its "beat detected" state for some time after the last touch.
-  const float kButtonPressCooldown_sec = 10.f;
+  const float kButtonPressCooldown_sec = 5.f;
   
   const auto& touchSensor = GetBEI().GetTouchSensorComponent();
   const auto now_sec = BaseStationTimer::getInstance()->GetCurrentTimeInSeconds();

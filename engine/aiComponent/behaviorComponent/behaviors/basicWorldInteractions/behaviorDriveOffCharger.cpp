@@ -94,8 +94,8 @@ BehaviorDriveOffCharger::BehaviorDriveOffCharger(const Json::Value& config)
     }
   }
   
-  _iConfig.maxFaceAge_s = config.get( kMaxFaceAgeKey, 10*60 ).asInt();
-  _iConfig.maxCubeAge_s = config.get( kMaxCubeAgeKey, 10*60 ).asInt();
+  _iConfig.maxFaceAge_s = config.get( kMaxFaceAgeKey, 30*60 ).asInt();
+  _iConfig.maxCubeAge_s = config.get( kMaxCubeAgeKey, 30*60 ).asInt();
   
   PRINT_CH_DEBUG("Behaviors", "BehaviorDriveOffCharger.DriveDist",
                  "Driving %fmm off the charger (%f length + %f extra)",
@@ -151,7 +151,15 @@ bool BehaviorDriveOffCharger::WantsToBeActivatedBehavior() const
   // but that caused other issues (if the robot was bumped during wakeup, it wouldn't drive off the
   // charger). Now, we've gone back to OnChargerPlatform but fixed it to work better
   const bool onChargerPlatform = robotInfo.IsOnChargerPlatform();
-  return onChargerPlatform;
+
+  const bool seesRecentFace = GetBEI().GetFaceWorld().HasAnyFaces(_iConfig.maxFaceAge_s * 1000);
+  
+  BlockWorldFilter cubeFilter;
+  cubeFilter.AddFilterFcn(&BlockWorldFilter::IsLightCubeFilter);
+  const auto* recentCube = GetBEI().GetBlockWorld().FindMostRecentlyObservedObject(cubeFilter);
+  const bool seesRecentCube = (recentCube != nullptr);
+  
+  return onChargerPlatform && (seesRecentFace || seesRecentCube);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -193,6 +201,23 @@ void BehaviorDriveOffCharger::BehaviorUpdate()
   }
 
   const auto& robotInfo = GetBEI().GetRobotInfo();
+  
+  if(robotInfo.IsOnChargerPlatform() && !IsControlDelegated()) {
+    
+    const RobotTimeStamp_t recentTime_ms = robotInfo.GetLastImageTimeStamp() - (_iConfig.maxFaceAge_s * 1000);
+    const bool hasRecentFace = GetBEI().GetFaceWorld().HasAnyFaces(recentTime_ms, false);
+    
+    BlockWorldFilter cubeFilter;
+    cubeFilter.AddFilterFcn(&BlockWorldFilter::IsLightCubeFilter);
+    const auto* recentCube = GetBEI().GetBlockWorld().FindMostRecentlyObservedObject(cubeFilter);
+    const bool hasRecentCube = (recentCube != nullptr);
+    
+    if (hasRecentFace || hasRecentCube) {
+      SelectAndDrive();
+      return;
+    }
+  }
+
   if( robotInfo.IsOnChargerPlatform() ) {
     const bool onTreads = GetBEI().GetOffTreadsState() == OffTreadsState::OnTreads;
     if( !onTreads ) {

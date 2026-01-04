@@ -72,7 +72,7 @@ namespace {
 #define LOG_CHANNEL "Behaviors"
 
 CONSOLE_VAR(f32, kSleepCycle_DeepSleep_PersonCheckInterval_s, CONSOLE_GROUP, 4 * 60.0f * 60.0f);
-CONSOLE_VAR(f32, kSleepCycle_LightSleep_PersonCheckInterval_s, CONSOLE_GROUP, 1 * 60.0f * 60.0f);
+CONSOLE_VAR(f32, kSleepCycle_LightSleep_PersonCheckInterval_s, CONSOLE_GROUP, 0.5 * 60.0f * 60.0f);
 
 CONSOLE_VAR(f32, kSleepCycle_ComatoseLength_s, CONSOLE_GROUP, 0.5 * 60.0f);
 
@@ -80,7 +80,7 @@ CONSOLE_VAR(f32, kSleepCycle_ComatoseLength_s, CONSOLE_GROUP, 0.5 * 60.0f);
 CONSOLE_VAR(f32, kSleepCycle_RecentSleepLength_s, CONSOLE_GROUP, 10 * 60.0f);
 
 // minimum amount of sleep debt, to avoid quickly waking up (naturally)
-CONSOLE_VAR(f32, kSleepCycle_MinSleepDebt_s, CONSOLE_GROUP, 50 * 60.0f);
+CONSOLE_VAR(f32, kSleepCycle_MinSleepDebt_s, CONSOLE_GROUP, 30 * 60.0f);
 
 CONSOLE_VAR(bool, kSleepCycle_EnableWiggleWhileSleeping, CONSOLE_GROUP, true);
 
@@ -89,7 +89,7 @@ CONSOLE_VAR(bool, kSleepCycleForceSleep, CONSOLE_GROUP, false);
 CONSOLE_VAR(bool, kSleepCycleForceLightSleep, CONSOLE_GROUP, false);
 // The amount of time that the robot must be on the charger but not actually charging
 // because of overheating battery before he is forced to go to sleep.
-CONSOLE_VAR(f32, kSleepCycle_TooLongOnChargerNotChargingDuration_sec, CONSOLE_GROUP, 5 * 60.f);
+CONSOLE_VAR(f32, kSleepCycle_TooLongOnChargerNotChargingDuration_sec, CONSOLE_GROUP, 10 * 60.f);
 
 CONSOLE_FUNC(ForcePersonCheck, CONSOLE_GROUP);
 
