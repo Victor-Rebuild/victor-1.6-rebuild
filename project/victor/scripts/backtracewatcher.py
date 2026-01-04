@@ -5,7 +5,7 @@ from pathlib import Path
 
 LIBDIR = "./_build/vicos/Release/lib"
 BINDIR = "./_build/vicos/Release/bin"
-SYSROOT_LIBDIR = str(Path.home() / ".anki/vicos-sdk/dist/5.3.0-r07/sysroot/usr/lib")
+SYSROOT_LIBDIR = "anki-deps/vicos-sdk/dist/5.3.0-r07/sysroot/usr/lib"
 
 with open("./robot_ip.txt") as f:
     ROBOT_IP = f.read().strip()
