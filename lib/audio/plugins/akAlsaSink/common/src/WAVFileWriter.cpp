@@ -20,8 +20,8 @@ namespace AK
 
 		WAVFileWriter::WAVFileWriter()
 			: m_pCaptureFile(NULL)
+			//, m_uCaptureStreamDataSize(0)
 			, m_uFramesWritten(0)
-			, m_uCaptureStreamDataSize(0)
 		{
 			AKPLATFORM::AkMemSet(&m_WAVHeader, 0, sizeof(m_WAVHeader));
 		}
@@ -87,7 +87,7 @@ namespace AK
 			int iSeekResult = fseek(m_pCaptureFile, 0, SEEK_SET);
 			if (iSeekResult == 0)
 			{
-				AkUInt32 uOutSize = fwrite(&m_WAVHeader, 1, sizeof(AkWAVEFileHeader), m_pCaptureFile);
+				// AkUInt32 uOutSize = fwrite(&m_WAVHeader, 1, sizeof(AkWAVEFileHeader), m_pCaptureFile);
 			}
 
 			// Kill stream, whether or not we succeeded to write updated header

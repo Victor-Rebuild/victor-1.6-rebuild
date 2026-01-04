@@ -98,7 +98,9 @@ set(VICOS_LINKER_FLAGS_EXE)
 # Generic flags.
 list(APPEND VICOS_COMPILER_FLAGS
     # Remove -Werror if you want to be LAZY
-    #-Werror
+    -Werror
+    # Remove -Wall if you want to be even more LAZY
+    -Wall
     -DVICOS
     -Qunused-arguments
 	-ffunction-sections

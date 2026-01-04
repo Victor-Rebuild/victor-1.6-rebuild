@@ -134,8 +134,9 @@ void *kmGLGetCurrentContext()
 void kmGLClearContext(km_mat4_stack_context *context)
 {
     /* Unlink current context from linked list*/
-    if (context->entry->prev)
+    if (context->entry->prev) {
         context->entry->prev->next = context->entry->next;
+	}
 	
     /*Clear the matrix stacks*/
 	km_mat4_stack_release(&context->modelview_matrix_stack);

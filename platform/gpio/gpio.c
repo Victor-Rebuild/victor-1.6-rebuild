@@ -32,14 +32,14 @@ typedef enum CoreAppErrorCode_t {
   app_DEVICE_OPEN_ERROR = -11,
 } CoreAppErrorCode;
 
-#define error_return(code, msg, ...) \
-  {                                  \
-    va_list args;                    \
-    printf("ERROR %d: ", code);      \
-    printf(msg, ##__VA_ARGS__);      \
-    printf("\n\n");                  \
-    return code;                     \
-  }
+#define error_return(code, msg, ...) // \
+//   {                                  \
+//     va_list args;                    \
+//     printf("ERROR %d: ", code);      \
+//     printf(msg, ##__VA_ARGS__);      \
+//     printf("\n\n");                  \
+//     return code;                     \
+//   }
 
 static int GPIO_BASE_OFFSET = -1;
 
