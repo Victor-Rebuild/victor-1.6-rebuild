@@ -697,9 +697,15 @@ bool BehaviorSleepCycle::GoToSleepIfNeeded()
   };
 
   if( !wokeRecently && checkSuggestion(PostBehaviorSuggestions::SleepOnCharger) ) {
-    TransitionToCharger();
-    SendGoToSleepDasEvent(SleepReason::SleepOnChargerSuggestion);
-    return true;
+    if (denyGoHome >= 3) {
+      denyGoHome = 0;
+      TransitionToCharger();
+      SendGoToSleepDasEvent(SleepReason::SleepOnChargerSuggestion);
+      return true;
+    } else {
+      denyGoHome = denyGoHome + 1;
+      return false;
+    }
   }
 
   if( !wokeRecently && checkSuggestion(PostBehaviorSuggestions::Sleep) ) {
