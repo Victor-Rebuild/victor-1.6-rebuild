@@ -531,13 +531,13 @@ void BehaviorFindFaceAndThen::TransitionToFollowupBehavior()
     std::shared_ptr<ISimpleFaceBehavior> simpleFaceBehavior =
       std::dynamic_pointer_cast<ISimpleFaceBehavior>(_iConfig.behaviorOnceFound);
 
-    // if( ANKI_VERIFY( simpleFaceBehavior != nullptr,
-    //                  "BehaviorFindFaceAndThen.TransitionToFollowupBehavior.InvalidCast",
-    //                  "Behavior '%s' (raw ptr %p) not an ISimpleFaceBehavior",
-    //                  _iConfig.behaviorOnceFoundID.c_str(),
-    //                  _iConfig.behaviorOnceFound.get() ) ) {
+    if( ANKI_VERIFY( simpleFaceBehavior != nullptr,
+                     "BehaviorFindFaceAndThen.TransitionToFollowupBehavior.InvalidCast",
+                     "Behavior '%s' (raw ptr %p) not an ISimpleFaceBehavior",
+                     _iConfig.behaviorOnceFoundID.c_str(),
+                     _iConfig.behaviorOnceFound.get() ) ) {
       simpleFaceBehavior->SetTargetFace( _dVars.targetFace );
-    // }
+    }
   }
 
   if( _iConfig.behaviorOnceFound->WantsToBeActivated() ) {
