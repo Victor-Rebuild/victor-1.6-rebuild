@@ -128,7 +128,7 @@ static ssize_t read_fd(int fd, void *ptr, size_t nbytes, int *recvfd)
   struct msghdr msg;
   struct iovec iov[1];
   ssize_t n;
-  int newfd;
+  // int newfd;
   *recvfd = -1; /* default: descriptor was not passed */
 
   union {
@@ -178,28 +178,28 @@ static int configure_socket(int socket)
   return status;
 }
 
-static ssize_t writen(int fd, const void *vptr, size_t n)
-{
-  ssize_t nleft;
-  ssize_t nwritten;
-  const char *ptr;
+// static ssize_t writen(int fd, const void *vptr, size_t n)
+// {
+//   ssize_t nleft;
+//   ssize_t nwritten;
+//   const char *ptr;
 
-  ptr = vptr;
-  nleft = n;
-  while (nleft > 0) {
-    if ( (nwritten = write(fd, ptr, nleft)) <= 0) {
-      if (nwritten < 0 && errno == EINTR) {
-        nwritten = 0;   /* and call write() again */
-      } else {
-        return (-1);    /* error */
-      }
+//   ptr = vptr;
+//   nleft = n;
+//   while (nleft > 0) {
+//     if ( (nwritten = write(fd, ptr, nleft)) <= 0) {
+//       if (nwritten < 0 && errno == EINTR) {
+//         nwritten = 0;   /* and call write() again */
+//       } else {
+//         return (-1);    /* error */
+//       }
 
-      nleft -= nwritten;
-      ptr += nwritten;
-    }
-  }
-  return (n);
-}
+//       nleft -= nwritten;
+//       ptr += nwritten;
+//     }
+//   }
+//   return (n);
+// }
 
 static int socket_connect(int *out_fd)
 {
@@ -320,8 +320,8 @@ static int mmap_camera_capture_buf(struct client_ctx *ctx)
   }
 
   size_t buf_size = mem_info->size;
-  size_t buf_size_align = (buf_size + 4095U) & (~4095U);
-  assert(buf_size == buf_size_align);
+  // size_t buf_size_align = (buf_size + 4095U) & (~4095U);
+  assert(buf_size == (buf_size + 4095U) & (~4095U));
   uint8_t *buf = mmap(NULL,
                       buf_size,
                       PROT_READ | PROT_WRITE,
@@ -1014,7 +1014,7 @@ int camera_frame_acquire(struct anki_camera_handle *camera,
   uint64_t bestTime = 0;
   uint32_t bestSlot = wSlot;
 
-  uint32_t lock_status = 0;
+  // uint32_t lock_status = 0;
   
   for(uint32_t slot = 0; slot < ANKI_CAMERA_MAX_FRAME_COUNT; slot++)
   {
