@@ -516,10 +516,10 @@ else
   if [ -n "$CMAKE_TARGET" ]; then
     TARGET_ARG="--target $CMAKE_TARGET"
   fi
-  $CMAKE_EXE --build . $TARGET_ARG $*
+  $CMAKE_EXE --build . -j $(nproc) $TARGET_ARG $*
   if [[ "$PLATFORM" == "vicos" && $RUN_INSTALL -eq 1 ]]; then
     # run install target on robot-platforms
-    $CMAKE_EXE --build . --target install
+    $CMAKE_EXE --build . -j $(nproc) --target install
     cp -f compile_commands.json ../../../
     echo "-- Copied compile_commands.json"
     ../../../tools/build/build-scripts/gen-clangd.sh
