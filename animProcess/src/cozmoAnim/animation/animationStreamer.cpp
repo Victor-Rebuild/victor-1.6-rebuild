@@ -2346,9 +2346,9 @@ namespace Anim {
         };
         if (knownIssues.find(animName) == knownIssues.end())
         {
-          LOG_WARNING("AnimationStreamer.InvalidateBannedTracks.UnknownIssue",
-                      "Animation '%s' did not have its body track locked when on the charger",
-                      animName.c_str());
+          // LOG_WARNING("AnimationStreamer.InvalidateBannedTracks.UnknownIssue",
+          //             "Animation '%s' did not have its body track locked when on the charger",
+          //             animName.c_str());
         }
       }
     }

@@ -11,5 +11,38 @@
   },
   "behavior.DevTest2": {
     "translation": "Je suis {0}"
+  },
+    "BehaviorHowOldAreYou.OneDay": {
+    "translation": "Un jour!"
+  },
+  "BehaviorHowOldAreYou.SomeDays": {
+    "translation": "{0} jours vieux!"
+  },
+  "BehaviorHowOldAreYou.OneMonth": {
+    "translation": "Age d'un mois!"
+  },
+  "BehaviorHowOldAreYou.AndOneMonth": {
+    "translation": "et un mois!"
+  },
+  "BehaviorHowOldAreYou.SomeMonths": {
+    "translation": "{0} mois!"
+  },
+  "BehaviorHowOldAreYou.AndSomeMonths": {
+    "translation": "et {0} mois!"
+  },
+  "BehaviorHowOldAreYou.OneYear": {
+    "translation": "Un an!"
+  },
+  "BehaviorHowOldAreYou.SomeYears": {
+    "translation": "{0} ans!"
+  },
+  "BehaviorHowOldAreYou.OneYearAndMonth": {
+    "translation": "Un an"
+  },
+  "BehaviorHowOldAreYou.SomeYearsAndMonth": {
+    "translation": "{0} ans"
+  },
+  "BehaviorRespondToName.ImX": {
+    "translation": "Je suis"
   }
 }

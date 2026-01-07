@@ -178,13 +178,15 @@ void BehaviorBlackJack::OnBehaviorActivated()
          "behavior.blackjack_game_start",
          "A Game of BlackJack has just started");
   DASMSG_SEND();
+  
+  if (_doXrayOverclock) {
+    if (IsXray()) {
+      // Check current frequency
+      _prevcpufreq = system("curl 'http://localhost:8080/api/mods/FreqChange/get'");
 
-  if (IsXray()) {
-    // Up the cpu frequency to the max
-    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2' -H 'Accept-Encoding: gzip, deflate' -H 'Referer: http://localhost:8080/' -H 'Connection: keep-alive' -H 'Priority: u=0'");
-
-    // This is the older method, I'm keeping it to maintain backcompat with otas that have the older wired
-    (void)system("curl 'http://localhost:8080/api/mods/modify/FreqChange' -X POST -H 'Referer: http://localhost:8080/' -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' --data-raw '{\"freq\":2}'");
+      // Up the cpu frequency to the max
+      (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2'");
+    }
   }
 
   // --- On With the Game ---
@@ -196,12 +198,20 @@ void BehaviorBlackJack::OnBehaviorDeactivated()
 {
   _visualizer.ReleaseControlAndClearState(GetBEI());
 
-  if (IsXray()) {
-    // Now that the behavior has finished set the cpu speed back to something reasonable
-    (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1' -H 'Accept-Encoding: gzip, deflate' -H 'Referer: http://localhost:8080/' -H 'Connection: keep-alive' -H 'Priority: u=0'");
-
-    // This is the older method, I'm keeping it to maintain backcompat with otas that have the older wired
-    (void)system("curl 'http://localhost:8080/api/mods/modify/FreqChange' -X POST -H 'Referer: http://localhost:8080/' -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' --data-raw '{\"freq\":1}'");
+  // Now that the behavior has finished set the cpu speed back to *hopefully what it was before
+  // * If it's not set to any of the predetermined values in wired it's gonna get set to Regular
+  if (_doXrayOverclock) {
+    if (IsXray()) {
+      if (_prevcpufreq == 2) {
+        (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=2'");
+      } else if (_prevcpufreq == 1) {
+        (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=1'");
+      } else if (_prevcpufreq == 0) {
+        (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=0'");
+      } else { // This should never happen, wired should never return a value other than 0, 1, or 2, but in case it does this is the fallback
+        (void)system("curl 'http://localhost:8080/api/mods/FreqChange/set?freq=0'");
+      }
+    }
   }
 
   // Log session end DAS events and track DAS related state

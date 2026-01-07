@@ -16,6 +16,14 @@ enum uint_8 CompositeImageLayout
   TemperatureTripleDig,
   TemperatureNegTripleDig,
 
+  // Same but for 2.0
+  TemperatureDoubleDig_Xray,
+  TemperatureNegDoubleDig_Xray,
+  TemperatureSingleDig_Xray,
+  TemperatureNegSingleDig_Xray,
+  TemperatureTripleDig_Xray,
+  TemperatureNegTripleDig_Xray,
+
   // Layouts for weather conditions
   WeatherCondCloudy_01,
   WeatherCondColdClear_01,
@@ -29,6 +37,10 @@ enum uint_8 CompositeImageLayout
   // Layouts for Blackjack
   PlayerCardLayout,
   DealerCardLayout,
+
+  // Same but for 2.0
+  PlayerCardLayout_Xray,
+  DealerCardLayout_Xray,
 
   // Must be last element
   Count

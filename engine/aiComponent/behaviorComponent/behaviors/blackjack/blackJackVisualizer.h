@@ -87,5 +87,4 @@ private:
 
 } //namespace Vector
 } //namespace Anki
-
 #endif //__Engine_AiComponent_BehaviorComponent_Behaviors_BlackJackVisualizer__

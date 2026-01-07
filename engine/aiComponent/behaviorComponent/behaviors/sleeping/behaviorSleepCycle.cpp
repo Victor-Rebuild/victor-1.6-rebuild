@@ -72,7 +72,7 @@ namespace {
 #define LOG_CHANNEL "Behaviors"
 
 CONSOLE_VAR(f32, kSleepCycle_DeepSleep_PersonCheckInterval_s, CONSOLE_GROUP, 4 * 60.0f * 60.0f);
-CONSOLE_VAR(f32, kSleepCycle_LightSleep_PersonCheckInterval_s, CONSOLE_GROUP, 1 * 60.0f * 60.0f);
+CONSOLE_VAR(f32, kSleepCycle_LightSleep_PersonCheckInterval_s, CONSOLE_GROUP, 0.5 * 60.0f * 60.0f);
 
 CONSOLE_VAR(f32, kSleepCycle_ComatoseLength_s, CONSOLE_GROUP, 0.5 * 60.0f);
 
@@ -80,7 +80,7 @@ CONSOLE_VAR(f32, kSleepCycle_ComatoseLength_s, CONSOLE_GROUP, 0.5 * 60.0f);
 CONSOLE_VAR(f32, kSleepCycle_RecentSleepLength_s, CONSOLE_GROUP, 10 * 60.0f);
 
 // minimum amount of sleep debt, to avoid quickly waking up (naturally)
-CONSOLE_VAR(f32, kSleepCycle_MinSleepDebt_s, CONSOLE_GROUP, 50 * 60.0f);
+CONSOLE_VAR(f32, kSleepCycle_MinSleepDebt_s, CONSOLE_GROUP, 30 * 60.0f);
 
 CONSOLE_VAR(bool, kSleepCycle_EnableWiggleWhileSleeping, CONSOLE_GROUP, true);
 
@@ -89,7 +89,7 @@ CONSOLE_VAR(bool, kSleepCycleForceSleep, CONSOLE_GROUP, false);
 CONSOLE_VAR(bool, kSleepCycleForceLightSleep, CONSOLE_GROUP, false);
 // The amount of time that the robot must be on the charger but not actually charging
 // because of overheating battery before he is forced to go to sleep.
-CONSOLE_VAR(f32, kSleepCycle_TooLongOnChargerNotChargingDuration_sec, CONSOLE_GROUP, 5 * 60.f);
+CONSOLE_VAR(f32, kSleepCycle_TooLongOnChargerNotChargingDuration_sec, CONSOLE_GROUP, 10 * 60.f);
 
 CONSOLE_FUNC(ForcePersonCheck, CONSOLE_GROUP);
 
@@ -337,7 +337,7 @@ void BehaviorSleepCycle::OnBehaviorActivated()
   _iConfig.emergencyCondition->SetActive( GetBEI(), true );
 
   // if we just rebooted, and it's night time, then start out asleep
-  const bool shouldStartAsleep = WasNightlyReboot();
+  shouldStartAsleep = WasNightlyReboot();
 
   LOG_INFO("BehaviorSleepCycle.Activated",
            "Starting out %s",
@@ -642,8 +642,9 @@ bool BehaviorSleepCycle::WasNightlyReboot() const
   const float currTime_s = BaseStationTimer::getInstance()->GetCurrentTimeInSeconds();
   const bool engineStartedRecently = currTime_s < kSecondsThatMeanRecentBoot;
   const bool wasReboot = OSState::getInstance()->RebootedForMaintenance();
-  const bool isNight = GetBEI().GetSleepTracker().IsNightTime();
-  const bool wasNightlyReboot = engineStartedRecently && wasReboot && isNight;
+  // const bool isNight = GetBEI().GetSleepTracker().IsNightTime();
+  // const bool wasNightlyReboot = engineStartedRecently && wasReboot && isNight;
+  const bool wasNightlyReboot = engineStartedRecently && wasReboot;
 
   return wasNightlyReboot;
 }
@@ -696,9 +697,15 @@ bool BehaviorSleepCycle::GoToSleepIfNeeded()
   };
 
   if( !wokeRecently && checkSuggestion(PostBehaviorSuggestions::SleepOnCharger) ) {
-    TransitionToCharger();
-    SendGoToSleepDasEvent(SleepReason::SleepOnChargerSuggestion);
-    return true;
+    if (denyGoHome >= 3) {
+      denyGoHome = 0;
+      TransitionToCharger();
+      SendGoToSleepDasEvent(SleepReason::SleepOnChargerSuggestion);
+      return true;
+    } else {
+      denyGoHome = denyGoHome + 1;
+      return false;
+    }
   }
 
   if( !wokeRecently && checkSuggestion(PostBehaviorSuggestions::Sleep) ) {

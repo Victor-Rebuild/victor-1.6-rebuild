@@ -114,9 +114,15 @@ SmartFaceID::SmartFaceID(SmartFaceID&& other)
 
 SmartFaceID& SmartFaceID::operator=(const SmartFaceID& other)
 {
+  if (this == &other) {
+    return *this;
+  }
+
   if( other._impl ) {
     // point to a new copy of others impl
     _impl.reset(new SmartFaceIDImpl(*other._impl));
+  } else {
+    _impl.reset();
   }
 
   return *this;

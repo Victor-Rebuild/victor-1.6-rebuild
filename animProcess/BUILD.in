@@ -28,6 +28,6 @@ cxx_project(
 )
 
 cxx_project(
-    name = 'vic-bootAnim',
+    name = 'vic-bootAnim-stock',
     srcs = glob(['src/bootAnim/bootAnim.cpp'])
 )

@@ -250,19 +250,11 @@ namespace Vision {
   template<typename T>
   void ImageBase<T>::Display(const char *windowName, s32 pauseTime_ms) const
   {
-#   if !defined(ANKI_PLATFORM_OSX)
     {
       PRINT_NAMED_WARNING("ImageBase.Display.NoDisplay",
                           "Ignoring display request for %s", windowName);
       return;
     }
-#   endif
-
-    cv::Mat dispImg;
-    ConvertToShowableFormat(dispImg);
-
-    cv::imshow(windowName, dispImg);
-    cv::waitKey(pauseTime_ms);
   }
 
   template<typename T>

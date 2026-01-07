@@ -1,6 +1,6 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
-from __future__ import print_function
+
 
 import argparse
 import os
@@ -11,6 +11,11 @@ import subprocess
 import sys
 
 # ankibuild
+
+if __package__ is None:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, script_dir)
+
 import toolget
 
 CMAKE = 'cmake'
@@ -18,10 +23,11 @@ CMAKE = 'cmake'
 def get_cmake_version_from_command(cmake_exe):
     version = None
     if cmake_exe and os.path.exists(cmake_exe):
-        output = subprocess.check_output([cmake_exe, '--version'])
+        #output = subprocess.check_output([cmake_exe, '--version'])
+        output = subprocess.check_output([cmake_exe, '--version'], universal_newlines=True)
         if not output:
             return None
-        m = re.match('^cmake version (\d+\.\d+\.\d+)', output)
+        m = re.match(r'^cmake version (\d+\.\d+\.\d+)', output)
         if not m:
             return None
         version = m.group(1)
@@ -44,7 +50,7 @@ def install_cmake(version):
     platform_map = {
         'darwin': 'macos-universal',
         'linux': 'linux-x86_64',
-	    'linux-arm64': 'linux-aarch64',
+	'linux-arm64': 'linux-aarch64',
     }
 
     platform_name = platform.system().lower()
@@ -53,8 +59,9 @@ def install_cmake(version):
         platform_name = 'linux-arm64'
 
     (major, minor, patch) = version.split('.')
-    cmake_short_ver = "{}.{}".format(major, minor)
-    cmake_url_prefix = "https://cmake.org/files/v{}".format(cmake_short_ver)
+    cmake_short_ver = "{}.{}.{}".format(major, minor, patch)
+    #cmake_url_prefix = "https://cmake.org/files/v{}".format(cmake_short_ver)
+    cmake_url_prefix = "https://github.com/Kitware/CMake/releases/download/v{}".format(cmake_short_ver)
 
     cmake_platform = platform_map[platform_name]
     cmake_basename = "cmake-{}-{}".format(version, cmake_platform)
@@ -76,7 +83,7 @@ def install_cmake(version):
 def find_cmake(required_ver, cmake_exe=None):
     if not cmake_exe:
         try:
-            cmake_exe = subprocess.check_output(['which', 'cmake']).rstrip()
+            cmake_exe = subprocess.check_output(['which', 'cmake'], universal_newlines=True).rstrip()
         except subprocess.CalledProcessError as e:
             pass
 
@@ -106,8 +113,8 @@ def setup_cmake(required_ver):
 
 def parseArgs(scriptArgs):
     version = '1.0'
-    default_cmake_version = "3.20.6"
-    parser = argparse.ArgumentParser(description='finds or installs cmake', version=version)
+    default_cmake_version = "4.0.3"
+    parser = argparse.ArgumentParser(description='finds or installs cmake')
     parser.add_argument('--install-cmake',
                         nargs='?',
                         const=default_cmake_version,
@@ -138,3 +145,4 @@ def main(argv):
 if __name__ == '__main__':
     ret = main(sys.argv)
     sys.exit(ret)
+

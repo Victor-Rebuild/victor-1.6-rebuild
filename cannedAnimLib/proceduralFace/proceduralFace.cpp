@@ -705,10 +705,10 @@ static void ClipWarning(const char* paramName,
                         ProceduralFace::Value minVal,
                         ProceduralFace::Value maxVal)
 {
-  PRINT_NAMED_WARNING("ProceduralFace.Clip.OutOfRange",
-                      "Value of %f out of range [%f,%f] for parameter %s. Clipping.",
-                      value, minVal, maxVal, paramName);
-}
+//  PRINT_NAMED_WARNING("ProceduralFace.Clip.OutOfRange",
+//                      "Value of %f out of range [%f,%f] for parameter %s. Clipping.",
+//                      value, minVal, maxVal, paramName);
+};
 
 static void NoClipWarning(const char* paramName,
                           ProceduralFace::Value value,
@@ -780,7 +780,7 @@ void ProceduralFace::RegisterFaceWithConsoleVars() {
 
    new Util::ConsoleVar<float>(_saturation,
                                "kProcFace_Saturation", CONSOLE_GROUP,
-                               0., 1.f, true);
+                               0., 2.f, true);
 
   for(auto whichEye : {WhichEye::Left, WhichEye::Right}) {
     for (std::underlying_type<Parameter>::type iParam=0; iParam < Util::EnumToUnderlying(Parameter::NumParameters); ++iParam) {

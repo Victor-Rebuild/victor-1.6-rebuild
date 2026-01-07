@@ -7,6 +7,8 @@ matlab.mat
 anki-deps
 _build*/
 build/cache
+compile_commands.json
+.clangd
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # build folders

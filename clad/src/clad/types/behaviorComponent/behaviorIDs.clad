@@ -244,6 +244,9 @@ enum uint_16 BehaviorID {
   MessagingRecordTTS,
   PlaybackMessage,
 
+  // victorBehaviorTree/highLevelDelegates/nameVictor
+  RespondToName,
+
   // victorBehaviorTree/highLevelDelegates
   NothingToDo_Idle,
 
@@ -500,6 +503,10 @@ enum uint_16 BehaviorID {
   // victorBehaviorTree/weather
   WeatherResponses,
   WeatherTextToSpeech,
+
+  // victorBehaviorTree
+  PetDetection,
+
 }
 
 }

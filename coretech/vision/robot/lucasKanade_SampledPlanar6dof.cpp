@@ -22,6 +22,7 @@ non-disclosure agreement with Anki, inc.
 #include "coretech/vision/robot/imageProcessing.h"
 #include "coretech/vision/robot/transformations.h"
 #include "coretech/vision/robot/perspectivePoseEstimation.h"
+#include "opencv2/imgcodecs.hpp"
 
 #include <array>
 
@@ -1299,56 +1300,7 @@ namespace Anki
 
       Result LucasKanadeTracker_SampledPlanar6dof::ShowTemplate(const char * windowName, const bool waitForKeypress, const bool fitImageToWindow) const
       {
-#if !ANKICORETECH_EMBEDDED_USE_OPENCV
         return RESULT_FAIL;
-#else
-        //if(!this->IsValid())
-        //  return RESULT_FAIL;
-
-        const s32 scratchSize = 10000000;
-        MemoryStack scratch(malloc(scratchSize), scratchSize);
-
-        Array<u8> image(this->templateImageHeight, this->templateImageWidth, scratch);
-
-        const Point<f32> centerOffset = this->transformation.get_centerOffset(1.0f);
-
-        for(s32 iScale=0; iScale<numPyramidLevels; iScale++) {
-          const s32 numSamples = this->templateSamplePyramid[iScale].get_size();
-
-          image.SetZero();
-
-          const TemplateSample * restrict pTemplateSample = this->templateSamplePyramid[iScale].Pointer(0);
-
-          for(s32 iSample=0; iSample<numSamples; iSample++) {
-            const TemplateSample curTemplateSample = pTemplateSample[iSample];
-
-            const s32 curY = Round<s32>(curTemplateSample.yCoordinate + centerOffset.y);
-            const s32 curX = Round<s32>(curTemplateSample.xCoordinate + centerOffset.x);
-
-            if(curX >= 0 && curY >= 0 && curX < this->templateImageWidth && curY < this->templateImageHeight) {
-              image[curY][curX] = 255;
-            }
-          }
-
-          char windowNameTotal[128];
-          snprintf(windowNameTotal, 128, "%s %d", windowName, iScale);
-
-          if(fitImageToWindow) {
-            cv::namedWindow(windowNameTotal, cv::WINDOW_NORMAL);
-          } else {
-            cv::namedWindow(windowNameTotal, cv::WINDOW_AUTOSIZE);
-          }
-
-          cv::Mat_<u8> image_cvMat;
-          ArrayToCvMat(image, &image_cvMat);
-          cv::imshow(windowNameTotal, image_cvMat);
-        }
-
-        if(waitForKeypress)
-          cv::waitKey();
-
-        return RESULT_OK;
-#endif // #if !ANKICORETECH_EMBEDDED_USE_OPENCV
       }
 
       bool LucasKanadeTracker_SampledPlanar6dof::IsValid() const

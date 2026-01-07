@@ -123,6 +123,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/knowledgeGraph/behaviorKnowledgeGraphQuestion.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/meetCozmo/behaviorEnrollFace.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/meetCozmo/behaviorRespondToRenameFace.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/nameVictor/behaviorRespondToName.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/messaging/behaviorLeaveAMessage.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/messaging/behaviorPlaybackMessage.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/observing/behaviorObservingLookAtFaces.h"
@@ -177,6 +178,7 @@
 #include "engine/aiComponent/behaviorComponent/behaviors/userDefinedBehaviorTree/behaviorUserDefinedBehaviorSelector.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/userDefinedBehaviorTree/behaviorUserDefinedBehaviorTreeRouter.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorConfirmObject.h"
+#include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorPetDetection.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorPoweringRobotOff.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorReactToTouchPetting.h"
 #include "engine/aiComponent/behaviorComponent/behaviors/victor/behaviorReactToUnclaimedIntent.h"
@@ -902,6 +904,12 @@ ICozmoBehaviorPtr BehaviorFactory::CreateBehavior(const Json::Value& config)
       break;
     }
     
+    case BehaviorClass::RespondToName:
+    {
+      newBehavior = ICozmoBehaviorPtr(new BehaviorRespondToName(config));
+      break;
+    }
+
     case BehaviorClass::ObservingLookAtFaces:
     {
       newBehavior = ICozmoBehaviorPtr(new BehaviorObservingLookAtFaces(config));
@@ -1214,6 +1222,12 @@ ICozmoBehaviorPtr BehaviorFactory::CreateBehavior(const Json::Value& config)
       break;
     }
     
+    case BehaviorClass::PetDetection:
+    {
+      newBehavior = ICozmoBehaviorPtr(new BehaviorPetDetection(config));
+      break;
+    }
+
     case BehaviorClass::PoweringRobotOff:
     {
       newBehavior = ICozmoBehaviorPtr(new BehaviorPoweringRobotOff(config));

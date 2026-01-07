@@ -181,6 +181,9 @@ enum uint_8 BehaviorClass {
   LeaveAMessage,
   PlaybackMessage,
 
+  // nameVictor
+  RespondToName,
+
   // observing
   ObservingLookAtFaces,
   ObservingWithoutTurn,
@@ -262,6 +265,7 @@ enum uint_8 BehaviorClass {
 
   // victor
   ConfirmObject,
+  PetDetection,
   PoweringRobotOff,
   ReactToTouchPetting,
   ReactToUnclaimedIntent,

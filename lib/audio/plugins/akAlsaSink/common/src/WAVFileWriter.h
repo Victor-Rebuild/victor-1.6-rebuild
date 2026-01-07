@@ -81,7 +81,7 @@ namespace AK
 			AKRESULT WriteBuffer(float * in_pfData, AkUInt32 in_uNumFrames);
 
 		private:
-			AkUInt32			m_uCaptureStreamDataSize;			// Data size capture counter (bytes)
+			// AkUInt32			m_uCaptureStreamDataSize;			// Data size capture counter (bytes)
 			FILE *				m_pCaptureFile;						
 			AkWAVEFileHeader	m_WAVHeader;
 			unsigned int		m_uFramesWritten;

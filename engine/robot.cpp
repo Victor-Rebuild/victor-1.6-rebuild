@@ -2751,13 +2751,18 @@ bool Robot::UpdateGyroCalibChecks(Result& res)
                                                                          kGyroNotCalibratedImg);
     Vision::ImageRGB img;
     img.Load(imgPath);
+
+    if (img.GetNumCols() != FACE_DISPLAY_WIDTH || img.GetNumRows() != FACE_DISPLAY_HEIGHT) {
+      img.Resize(FACE_DISPLAY_HEIGHT, FACE_DISPLAY_WIDTH);
+    }
+
     // Display the image indefinitely or atleast until something else is displayed
     GetAnimationComponent().DisplayFaceImage(img, 0, true);
     // Move the head to look up to show the image clearly
     GetMoveComponent().MoveHeadToAngle(MAX_HEAD_ANGLE,
                                        MAX_HEAD_SPEED_RAD_PER_S,
                                        MAX_HEAD_ACCEL_RAD_PER_S2,
-                                       1.f);
+                                       1.0f);
     displayedImage = true;
 
   }

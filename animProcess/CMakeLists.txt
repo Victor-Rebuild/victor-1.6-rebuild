@@ -120,16 +120,16 @@ if (VICOS)
   anki_build_strip(TARGET vic-anim)
 
 
-  project(vic-bootAnim)
+  project(vic-bootAnim-stock)
 
-  anki_build_cxx_executable(vic-bootAnim ${ANKI_SRCLIST_DIR})
+  anki_build_cxx_executable(vic-bootAnim-stock ${ANKI_SRCLIST_DIR})
 
-  target_compile_definitions(vic-bootAnim
+  target_compile_definitions(vic-bootAnim-stock
     PRIVATE
     ${PLATFORM_COMPILE_DEFS}
   )
 
-  target_link_libraries(vic-bootAnim
+  target_link_libraries(vic-bootAnim-stock
     PRIVATE
     robot_core
     ${ASAN_EXE_LINKER_FLAGS}
@@ -138,8 +138,11 @@ if (VICOS)
     robot_interface  # Needs to be public for cozmoConfig.h
   )
 
-  anki_build_strip(TARGET vic-bootAnim)
+  install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/src/bootAnim/vic-bootAnim
+  DESTINATION bin)
 
-  anki_build_target_license(vic-bootAnim "ANKI")
+  anki_build_strip(TARGET vic-bootAnim-stock)
+
+  anki_build_target_license(vic-bootAnim-stock "ANKI")
 
 endif()

@@ -134,7 +134,7 @@ void BehaviorOnboardingLookAtPhone::BehaviorUpdate()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void BehaviorOnboardingLookAtPhone::MoveHeadUp()
 {
-  if(_hasBleKeys) {
+  if(_hasBleKeys && !Util::FileUtils::FileExists("/data/data/server_config.json")) {
     GetBehaviorComp<OnboardingMessageHandler>().ShowUrlFace(false);
     auto* action = new TriggerLiftSafeAnimationAction{ AnimationTrigger::OnboardingLookAtPhoneUp };
     action->SetRenderInEyeHue( false );

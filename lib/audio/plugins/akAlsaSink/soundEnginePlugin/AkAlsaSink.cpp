@@ -615,15 +615,15 @@ AkAlsaSink::AkAlsaSink()
 	, m_uOutNumChannels(0)
 	, m_pChannelMap(NULL)
 	, m_uNumBuffers(SinkPluginTypes::kAkAlsaSinkBufferCount)
-	, m_uChannelMask(0)
 	, m_pDeviceName(NULL)
 	, m_bDeviceFound(false)
+	, m_uChannelMask(0)
 	, m_uFrameSize(0)
+	, m_uUnderflowCount(0)
+	, m_uOverflowCount(0)
 	, m_uLatencyMax(0)
 	, m_uLatencyErrorCnt(0)
 	, m_uSampleRate(48000)
-	, m_uUnderflowCount(0)
-	, m_uOverflowCount(0)
 	, m_bDataReady(false)
 	, m_bIsPrimary(false)
 	, m_pSharedParams(NULL)
@@ -1043,7 +1043,7 @@ AKRESULT AkAlsaSink::IsDataNeeded( AkUInt32 & out_uBuffersNeeded )
 {
 	AK_LOG_TRACE(__FUNCTION__);
 	out_uBuffersNeeded = 0;
-	int returnVal=0;
+	// int returnVal=0;
 
 	size_t emptySpace = 0;
 	{

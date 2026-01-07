@@ -17,16 +17,14 @@ endif()
 
 set(OPENCV_LIBS
     calib3d
+    dnn
     features2d
     imgproc 
     core
-    highgui
     objdetect
-    video
     flann
     imgcodecs
-    ml
-    videoio)
+    ml)
 
 # Static libs for mac, shared for android
 set(LIB_EXT a)
@@ -35,7 +33,7 @@ set(LIB_POSTFIX "")
 if(VICOS)
   set(LIB_EXT so)
   set(LIB_TYPE SHARED)
-  set(LIB_POSTFIX .412)
+  set(LIB_POSTFIX .414)
 endif()
 
 # Add the include directory for each OpenCV module:

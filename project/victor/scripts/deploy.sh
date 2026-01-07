@@ -22,7 +22,7 @@ source ${SCRIPT_PATH}/victor_env.sh
 : ${FORCE_DEPLOY:=0}
 : ${IGNORE_COMPATIBILITY_MISMATCH:=0}
 : ${IGNORE_VERSION_MISMATCH:=0}
-: ${ANKI_BUILD_TYPE:="Debug"}
+: ${ANKI_BUILD_TYPE:="Release"}
 : ${INSTALL_ROOT:="/anki"}
 : ${DEVTOOLS_INSTALL_ROOT:="/anki-devtools"}
 : ${DEVICE_RSYNC_BIN_DIR:="${DEVTOOLS_INSTALL_ROOT}/bin"}

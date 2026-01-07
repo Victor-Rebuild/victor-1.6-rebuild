@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import os
 import os.path
 import sys
@@ -15,7 +15,7 @@ class CreateSymlink(object):
         self.options = None
 
 
-    def getOptions(self,scriptArgs):
+    def getOptions(self, scriptArgs):
         version = '1.0'
         parser = argparse.ArgumentParser(
             description='creates symlink only if link_name does not already point to link_target',

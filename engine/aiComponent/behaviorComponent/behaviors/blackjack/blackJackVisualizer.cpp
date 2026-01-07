@@ -245,31 +245,34 @@ void BlackJackVisualizer::Init(BehaviorExternalInterface& bei)
   // Init an ongoing image showing all cards dealt thus far
   Vision::HSImageHandle faceHueAndSaturation = ProceduralFace::GetHueSatWrapper();
 
-  if (IsXray()) {
-    _compImg = std::make_unique<Vision::CompositeImage>(dataAccessorComp.GetSpriteCache(),
-                                                    faceHueAndSaturation,
-                                                    160,
-                                                    80);
-  } else {
-    _compImg = std::make_unique<Vision::CompositeImage>(dataAccessorComp.GetSpriteCache(),
-                                                    faceHueAndSaturation,
-                                                    184,
-                                                    96);
-  }
+  _compImg = std::make_unique<Vision::CompositeImage>(dataAccessorComp.GetSpriteCache(),
+                                                  faceHueAndSaturation,
+                                                  FACE_DISPLAY_WIDTH,
+                                                  FACE_DISPLAY_HEIGHT);
 
   auto& compLayoutMap = *dataAccessorComp.GetCompLayoutMap(); 
   // Add the player card layout to the composite image
-  {
+  if (IsXray()) {
+    // 2.0 layouts
+    const auto iter = compLayoutMap.find(Vision::CompositeImageLayout::PlayerCardLayout_Xray);
+    if(iter != compLayoutMap.end()){
+      _compImg->MergeInImage(iter->second);
+    }
+    
+    const auto iter2 = compLayoutMap.find(Vision::CompositeImageLayout::DealerCardLayout_Xray);
+    if(iter2 != compLayoutMap.end()){
+      _compImg->MergeInImage(iter2->second);
+    }
+  } else {
+    // 1.0 layouts
     const auto iter = compLayoutMap.find(Vision::CompositeImageLayout::PlayerCardLayout);
     if(iter != compLayoutMap.end()){
       _compImg->MergeInImage(iter->second);
     }
-  }
-  // Add the dealer card layout to the composite image
-  {
-    const auto iter = compLayoutMap.find(Vision::CompositeImageLayout::DealerCardLayout);
-    if(iter != compLayoutMap.end()){
-      _compImg->MergeInImage(iter->second);
+    
+    const auto iter2 = compLayoutMap.find(Vision::CompositeImageLayout::DealerCardLayout);
+    if(iter2 != compLayoutMap.end()){
+      _compImg->MergeInImage(iter2->second);
     }
   }
 }

@@ -290,7 +290,7 @@ bool GatewayMessagingServer::SendMessage(const SwitchboardResponse& message) {
     message.Pack(buffer.data() + kMessageHeaderLength, message_size);
     memcpy(buffer.data(), &message_size, kMessageHeaderLength);
 
-    const ssize_t res = _server.Send((const char*)buffer.data(), sizeof(buffer));
+    const ssize_t res = _server.Send((const char*)buffer.data(), buffer.size());
     if (res < 0) {
       _server.Disconnect();
       return false;

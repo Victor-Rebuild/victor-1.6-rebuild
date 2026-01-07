@@ -1,8 +1,3 @@
-# Project slowdown notice
-School is gonna be starting for me soon in the next few weeks so I won't have time to work on Viccyware or 1.6-rebuild much anymore. Updates will still come but be much smaller and less often. Sorry about that but some things have to happen. If you want to make a Pull Request please dont hesitate to, I will try and get to it as soon as possible.
-
--- Ellie
-
 # victor-1.6-rebuild
 
 Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector lives
@@ -11,10 +6,8 @@ Welcome to `victor-1.6-rebuild`. This is where my modifed 1.6 source for Vector 
 
 You can see all the changes made compared to normal 1.6 in [CHANGES.md](/CHANGES.md)
 
-## Prebuilt otas
-There aren't any prebuilt otas for 1.6-rebuild just yet, but they will be coming soon.
-Use [this](http://modder.my.to:81/otas/ota-internal/vicos-2.1.0.0d.ota) OTA as a base to deploy 1.6-rebuild on until otas are available.
-Don't use 1.6-rebuild otas given out by others.
+## Installation
+Check here for info [ABOUT.md](/ABOUT.md)
 
 ## Building (Linux)
 

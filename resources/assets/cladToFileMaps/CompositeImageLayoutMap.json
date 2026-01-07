@@ -22,6 +22,30 @@
   {
     "CladEvent": "TemperatureNegTripleDig",
     "LayoutName": "tripleDigitNegative"
+  },  
+  {
+    "CladEvent": "TemperatureDoubleDig_Xray",
+    "LayoutName": "doubleDigit_xray"
+  },
+  {
+    "CladEvent": "TemperatureNegDoubleDig_Xray",
+    "LayoutName": "doubleDigitNegative_xray"
+  },
+  {
+    "CladEvent": "TemperatureSingleDig_Xray",
+    "LayoutName": "singleDigit_xray"
+  },
+  {
+    "CladEvent": "TemperatureNegSingleDig_Xray",
+    "LayoutName": "singleDigitNegative_xray"
+  },
+  {
+    "CladEvent": "TemperatureTripleDig_Xray",
+    "LayoutName": "tripleDigit_xray"
+  },
+  {
+    "CladEvent": "TemperatureNegTripleDig_Xray",
+    "LayoutName": "tripleDigitNegative_xray"
   },
   {
     "CladEvent": "WeatherCondCloudy_01",
@@ -62,5 +86,13 @@
   {
     "CladEvent": "DealerCardLayout",
     "LayoutName": "dealer_card_layout"
+  },
+  {
+    "CladEvent": "PlayerCardLayout_Xray",
+    "LayoutName": "player_card_layout_xray"
+  },
+  {
+    "CladEvent": "DealerCardLayout_Xray",
+    "LayoutName": "dealer_card_layout_xray"
   }
 ]

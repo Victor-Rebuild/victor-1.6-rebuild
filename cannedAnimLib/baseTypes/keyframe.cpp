@@ -358,12 +358,12 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
       if(updateSpec.spriteBox.spriteBoxName == Vision::SpriteBoxName::Count){
         compImg.ClearLayerByName(updateSpec.layerName);
       }else if(Vision::SpritePathMap::kEmptySpriteBoxID == updateSpec.assetID){
-        if(ANKI_VERIFY(layer, "AnimationStreamer.UpdateCompositeImage.LayerNotFound",
-                       "Attempted to clear SB: %s on Layer: %s, but layer isn't present in image",
-                       EnumToString(updateSpec.spriteBox.spriteBoxName),
-                       EnumToString(updateSpec.layerName))){
-          layer->ClearSpriteBoxByName(updateSpec.spriteBox.spriteBoxName);
-        }
+        // if(ANKI_VERIFY(layer, "AnimationStreamer.UpdateCompositeImage.LayerNotFound",
+        //                "Attempted to clear SB: %s on Layer: %s, but layer isn't present in image",
+        //                EnumToString(updateSpec.spriteBox.spriteBoxName),
+        //                EnumToString(updateSpec.layerName))){
+        //   layer->ClearSpriteBoxByName(updateSpec.spriteBox.spriteBoxName);
+        // }
       }else{
         // If it wasn't a clearing case, add or update as appropriate
         const std::string& assetName = updateSpec.spriteCache->GetSpritePathMap()->GetAssetName(updateSpec.assetID);

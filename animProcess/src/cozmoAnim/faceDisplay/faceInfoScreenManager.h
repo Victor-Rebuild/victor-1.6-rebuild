@@ -240,6 +240,7 @@ private:
   
   bool _drawFAC = false;
   bool _engineLoaded = false;
+  bool _knownBot = false;
 
   std::string _sysconVersion = "";
   
