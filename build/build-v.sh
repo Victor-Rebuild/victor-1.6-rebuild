@@ -25,6 +25,7 @@ elif [[ "${NO_DOCKER}" = "1" ]]; then
     echo -e "\033[1;32mComplete.\033[0m"
     echo
 else
+    echo "No docker is" $NO_DOCKER
     if [[ -d build/cache/0 ]]; then
         echo "Rebuilding cache..."
         rm -rf build/cache

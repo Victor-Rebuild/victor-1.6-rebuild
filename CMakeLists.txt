@@ -13,6 +13,10 @@ list(APPEND CMAKE_MODULE_PATH
 
 project(victor)
 
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR} CACHE PATH "Install prefix" FORCE)
+endif()
+
 # Build options
 option(USE_DAS "Enable DAS reporting" ON)
 
