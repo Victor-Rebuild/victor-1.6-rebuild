@@ -8,6 +8,7 @@
 
 #include "engine/robot.h"
 #include "camera/cameraService.h"
+#include "util/fileUtils/fileUtils.h"
 #include "whiskeyToF/tof.h"
 
 #include "coretech/common/engine/math/poseOriginList.h"
@@ -2771,6 +2772,61 @@ bool Robot::UpdateGyroCalibChecks(Result& res)
   return true;
 }
 
+bool Robot::UpdateBaseOTAChecks(Result& res)
+{
+  // Wait this much time after sending sync to robot before checking if we
+  // should be displaying the disclamer image
+  // Note that by the time that the sync has been sent, the face has already
+  // been blank for around 7 seconds.
+  const float kTimeAfterSyncSent_sec = 2.f;
+
+  static bool displayedImage = false;
+
+  bool officialBuild = 1;
+
+  if (Util::FileUtils::FileExists("../../../../etc/rebuild-dev-or-indev")) {
+    officialBuild = 1;
+  } else {
+    officialBuild = 0;
+  }
+
+  static bool disclamerExists = Util::FileUtils::FileExists("config/devOnlySprites/independentSprites/disclamer.png");
+
+  if(!displayedImage &&
+     _syncRobotSentTime_sec > 0 &&
+     _syncRobotSentTime_sec > kTimeAfterSyncSent_sec &&
+     !_syncRobotAcked && disclamerExists && !officialBuild)
+  {
+    // Manually init AnimationComponent
+    // Normally it would init when we receive syncTime from robot process
+    // but we haven't received syncTime yet likely because the gyro hasn't calibrated
+    GetAnimationComponent().Init();
+
+    static const std::string kDisclamerImg = "config/devOnlySprites/independentSprites/disclamer.png";
+    const std::string imgPath = GetContextDataPlatform()->pathToResource(Anki::Util::Data::Scope::Resources,
+                                                                         kDisclamerImg);
+    Vision::ImageRGB img;
+    img.Load(imgPath);
+
+    if (img.GetNumCols() != FACE_DISPLAY_WIDTH || img.GetNumRows() != FACE_DISPLAY_HEIGHT) {
+      img.Resize(FACE_DISPLAY_HEIGHT, FACE_DISPLAY_WIDTH);
+    }
+
+    // Display the image for 10 seconds
+    GetAnimationComponent().DisplayFaceImage(img, 10000, true);
+    // Move the head to look up to show the image clearly
+    GetMoveComponent().MoveHeadToAngle(MAX_HEAD_ANGLE,
+                                       MAX_HEAD_SPEED_RAD_PER_S,
+                                       MAX_HEAD_ACCEL_RAD_PER_S2,
+                                       1.0f);
+    displayedImage = true;
+
+  }
+
+  res = RESULT_OK;
+  return true;
+}
+
 bool Robot::UpdateStartupChecks(Result& res)
 {
 #define RUN_CHECK(func)        \
@@ -2787,6 +2843,7 @@ bool Robot::UpdateStartupChecks(Result& res)
 
   bool checkDone = true;
   res = RESULT_OK;
+  RUN_CHECK(UpdateBaseOTAChecks);
   RUN_CHECK(UpdateGyroCalibChecks);
   RUN_CHECK(UpdateCameraStartupChecks);
   RUN_CHECK(UpdateToFStartupChecks);
