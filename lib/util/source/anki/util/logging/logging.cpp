@@ -417,7 +417,6 @@ bool sVerifyFailedReturnFalse(const char* file, int line, const char* name, cons
 {
   Anki::Util::DropBreadcrumb(false, file, line);
 
-  bool oldBreakOnError = _errBreakOnError;
   _errBreakOnError = false;
 
   va_list args;
@@ -427,8 +426,6 @@ bool sVerifyFailedReturnFalse(const char* file, int line, const char* name, cons
   sSetErrG();
   sDumpCallstack("VERIFY");
   sLogFlush();
-  
-  _errBreakOnError = oldBreakOnError;
 
   return false;
 }
@@ -519,7 +516,7 @@ void sDebugBreak()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #ifndef ALLOW_BREAK_ON_ERROR
-#define ALLOW_BREAK_ON_ERROR 1
+#define ALLOW_BREAK_ON_ERROR 0
 #endif
 
 void sDebugBreakOnError()
