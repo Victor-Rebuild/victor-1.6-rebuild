@@ -21,6 +21,8 @@
 
 #include "util/logging/logging.h"
 
+#define LOG_CHANNEL    "UnclaimedIntent"
+
 namespace Anki {
 namespace Vector {
 
@@ -75,9 +77,11 @@ void BehaviorReactToUnclaimedIntent::OnBehaviorActivated()
                                                          tracksToLock);
   
   DelegateIfInControl(playAnim, [](const ActionResult& result) {
-    ANKI_VERIFY( result == ActionResult::SUCCESS,
-                 "BehaviorReactToUnclaimedIntent.OnBehaviorActivated.AnimFail",
-                 "Could not play animation" );
+    if( result != ActionResult::SUCCESS ) {
+      LOG_INFO("BehaviorReactToUnclaimedIntent.OnBehaviorActivated.AnimNotSuccess",
+              "Animation completed with result: %s",
+              ActionResultToString(result));
+    }
   });
 }
 
