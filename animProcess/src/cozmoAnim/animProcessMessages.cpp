@@ -865,7 +865,7 @@ Result AnimProcessMessages::MonitorConnectionState(BaseStationTime_t currTime_na
 
   // Amount of time for which we must be disconnected from the engine in order
   // to display the NO_ENGINE_COMMS fault code.
-  static const BaseStationTime_t kDisconnectedTimeout_ns = Util::SecToNanoSec(5.f);
+  static const BaseStationTime_t kDisconnectedTimeout_ns = Util::SecToNanoSec(10.f);
 
   // Check for changes in connection state to engine and send RobotAvailable
   // message when engine connects

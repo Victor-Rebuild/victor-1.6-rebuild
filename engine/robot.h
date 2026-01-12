@@ -692,7 +692,6 @@ protected:
   // Returns true if the check is complete, false if the check is still running
   // If return true, then res will be set appropriately
   bool UpdateStartupChecks(Result& res);
-  bool UpdateBaseOTAChecks(Result& res);
   bool UpdateCameraStartupChecks(Result& res);
   bool UpdateGyroCalibChecks(Result& res);
   bool UpdateToFStartupChecks(Result& res);

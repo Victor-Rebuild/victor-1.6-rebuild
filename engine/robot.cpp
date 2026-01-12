@@ -2736,6 +2736,57 @@ bool Robot::UpdateGyroCalibChecks(Result& res)
   const float currentTime_sec = BaseStationTimer::getInstance()->GetCurrentTimeInSeconds();
 
   static bool displayedImage = false;
+  static bool displayedDisclaimerImage = false;
+  static bool officialBuild = true;
+  static bool checkedBuildType = false;
+  static double disclaimerStartTime_sec = -1.0;
+
+  if (!checkedBuildType) {
+      if (Util::FileUtils::FileExists("/etc/rebuild-dev-or-indev")) {
+          LOG_WARNING("Robot.CheckOffical", "Official Build");
+          officialBuild = true;
+      } else {
+          LOG_WARNING("Robot.CheckOffical", "Unofficial Build");
+          officialBuild = false;
+      }
+      checkedBuildType = true;
+  }
+
+  if (!officialBuild && !displayedDisclaimerImage && _syncRobotAcked) {
+      if (disclaimerStartTime_sec < 0) {
+          LOG_WARNING("Robot.Disclaimer", "Starting disclaimer display at time: %.2f", currentTime_sec);
+          disclaimerStartTime_sec = currentTime_sec;
+      }
+      
+      float elapsed = currentTime_sec - disclaimerStartTime_sec;
+      LOG_WARNING("Robot.Disclaimer", "Time elapsed: %.2f / 10.0 seconds", elapsed);
+      
+      if (elapsed < 3.0) {
+          // Keep re-displaying the image every frame to prevent it from being overridden
+          GetAnimationComponent().Init();
+          static const std::string kDisclamerImg = "config/devOnlySprites/independentSprites/disclamer.png";
+          const std::string imgPath = GetContextDataPlatform()->pathToResource(Anki::Util::Data::Scope::Resources,
+                                                                              kDisclamerImg);
+          Vision::ImageRGB img;
+          img.Load(imgPath);
+          if (img.GetNumCols() != FACE_DISPLAY_WIDTH || img.GetNumRows() != FACE_DISPLAY_HEIGHT) {
+              img.Resize(FACE_DISPLAY_HEIGHT, FACE_DISPLAY_WIDTH);
+          }
+          GetAnimationComponent().DisplayFaceImage(img, 0, true);
+          GetMoveComponent().MoveHeadToAngle(MAX_HEAD_ANGLE,
+                                            MAX_HEAD_SPEED_RAD_PER_S,
+                                            MAX_HEAD_ACCEL_RAD_PER_S2,
+                                            1.0f);
+          
+      } else {
+          displayedDisclaimerImage = true;
+          LOG_WARNING("Robot.Disclaimer", "Disclaimer display complete");  
+          res = RESULT_OK;
+          return true;
+      }
+  }
+
+
 
   if(!displayedImage &&
      _syncRobotSentTime_sec > 0 &&
@@ -2772,61 +2823,6 @@ bool Robot::UpdateGyroCalibChecks(Result& res)
   return true;
 }
 
-bool Robot::UpdateBaseOTAChecks(Result& res)
-{
-  // Wait this much time after sending sync to robot before checking if we
-  // should be displaying the disclamer image
-  // Note that by the time that the sync has been sent, the face has already
-  // been blank for around 7 seconds.
-  const float kTimeAfterSyncSent_sec = 2.f;
-
-  static bool displayedImage = false;
-
-  bool officialBuild = 1;
-
-  if (Util::FileUtils::FileExists("../../../../etc/rebuild-dev-or-indev")) {
-    officialBuild = 1;
-  } else {
-    officialBuild = 0;
-  }
-
-  static bool disclamerExists = Util::FileUtils::FileExists("config/devOnlySprites/independentSprites/disclamer.png");
-
-  if(!displayedImage &&
-     _syncRobotSentTime_sec > 0 &&
-     _syncRobotSentTime_sec > kTimeAfterSyncSent_sec &&
-     !_syncRobotAcked && disclamerExists && !officialBuild)
-  {
-    // Manually init AnimationComponent
-    // Normally it would init when we receive syncTime from robot process
-    // but we haven't received syncTime yet likely because the gyro hasn't calibrated
-    GetAnimationComponent().Init();
-
-    static const std::string kDisclamerImg = "config/devOnlySprites/independentSprites/disclamer.png";
-    const std::string imgPath = GetContextDataPlatform()->pathToResource(Anki::Util::Data::Scope::Resources,
-                                                                         kDisclamerImg);
-    Vision::ImageRGB img;
-    img.Load(imgPath);
-
-    if (img.GetNumCols() != FACE_DISPLAY_WIDTH || img.GetNumRows() != FACE_DISPLAY_HEIGHT) {
-      img.Resize(FACE_DISPLAY_HEIGHT, FACE_DISPLAY_WIDTH);
-    }
-
-    // Display the image for 10 seconds
-    GetAnimationComponent().DisplayFaceImage(img, 10000, true);
-    // Move the head to look up to show the image clearly
-    GetMoveComponent().MoveHeadToAngle(MAX_HEAD_ANGLE,
-                                       MAX_HEAD_SPEED_RAD_PER_S,
-                                       MAX_HEAD_ACCEL_RAD_PER_S2,
-                                       1.0f);
-    displayedImage = true;
-
-  }
-
-  res = RESULT_OK;
-  return true;
-}
-
 bool Robot::UpdateStartupChecks(Result& res)
 {
 #define RUN_CHECK(func)        \
@@ -2843,7 +2839,6 @@ bool Robot::UpdateStartupChecks(Result& res)
 
   bool checkDone = true;
   res = RESULT_OK;
-  RUN_CHECK(UpdateBaseOTAChecks);
   RUN_CHECK(UpdateGyroCalibChecks);
   RUN_CHECK(UpdateCameraStartupChecks);
   RUN_CHECK(UpdateToFStartupChecks);
