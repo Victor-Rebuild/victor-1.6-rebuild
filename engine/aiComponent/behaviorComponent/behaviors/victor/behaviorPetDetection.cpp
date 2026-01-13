@@ -14,6 +14,7 @@
 #include "engine/aiComponent/beiConditions/iBEICondition.h"
 #include "engine/aiComponent/behaviorComponent/behaviorExternalInterface/beiRobotInfo.h"
 #include "engine/aiComponent/behaviorComponent/behaviorContainer.h"
+#include "util/logging/logging.h"
 
 
 #include <chrono>
@@ -100,8 +101,7 @@ void BehaviorPetDetection::PlayAnimation() {
   auto* action = new TriggerLiftSafeAnimationAction(trig);
 
   DelegateIfInControl(action, [](const ActionResult& result) {
-    ANKI_VERIFY( result == ActionResult::SUCCESS,
-                 "BehaviorPetDetection.OnBehaviorActivated.AnimFail",
+    LOG_WARNING( "BehaviorPetDetection.OnBehaviorActivated.AnimFail",
                  "Could not play animation" );
   });
 }
