@@ -228,6 +228,8 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   ADD_SCREEN_WITH_TEXT(ClearUserData, Main, {"CLEAR USER DATA?"});
   ADD_SCREEN_WITH_TEXT(ClearUserDataFail, Main, {"CLEAR USER DATA FAILED"});
   ADD_SCREEN_WITH_TEXT(Rebooting, Rebooting, {"REBOOTING..."});
+  ADD_SCREEN_WITH_TEXT(Reonboarding, Reonboarding, {"REONBOARDING..."});
+  ADD_SCREEN_WITH_TEXT(SwitchSlotReboot, SwitchSlotReboot, {"SWITCHING SLOT..."});
   ADD_SCREEN_WITH_TEXT(SelfTest, Main, {"START SELF TEST?"});
   ADD_SCREEN(SelfTestRunning, SelfTestRunning)
   ADD_SCREEN(Network, SensorInfo);
@@ -370,7 +372,7 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
       LOG_INFO("FaceInfoScreenManager.Reonboard.Confirmed", "");
       (void)system("cd /data/data/com.anki.victor/persistent && rm -f onboarding/onboardingState.json token/token.jwt ../../server_config.json");
       this->Reboot();
-      return ScreenName::Rebooting;
+      return ScreenName::Reonboarding;
   };
   ADD_MENU_ITEM(Reonboard, "EXIT", UserDataSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(Reonboard, "CONFIRM", confirmReonboard);
@@ -379,9 +381,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
   // === SwitchSlot screen ===
   FaceInfoScreen::MenuItemAction confirmSlotSwitch = [this]() {
       LOG_INFO("FaceInfoScreenManager.SwitchSlot.Confirmed", "");
-      (void)system("sysswitch");
+      (void)system("/bin/sysswitch");
       this->Reboot();
-      return ScreenName::Rebooting;
+      return ScreenName::SwitchSlotReboot;
   };
   ADD_MENU_ITEM(SwitchSlot, "EXIT", UserDataSubmenu);
   ADD_MENU_ITEM_WITH_ACTION(SwitchSlot, "CONFIRM", confirmSlotSwitch);
@@ -1318,7 +1320,6 @@ void FaceInfoScreenManager::DrawMain()
   std::string botname;
   if (Util::FileUtils::FileExists("/data/data/customBotName")) {
     botname = Util::FileUtils::ReadFile("/data/data/customBotName");
-    botname.pop_back();
     _knownBot = 1;
   } else {
     _knownBot = 0;
@@ -1545,7 +1546,7 @@ void FaceInfoScreenManager::DrawIMUInfo(const RobotState& state)
           state.gyro.z);
   const std::string accelGyroZ = temp;
 
-  DrawTextOnScreen({"ACC        GYRO", accelGyroX, accelGyroY, accelGyroZ});
+  DrawTextOnScreen({"ACC:       GYRO:", accelGyroX, accelGyroY, accelGyroZ});
 }
 
 void FaceInfoScreenManager::DrawMotorInfo(const RobotState& state)
@@ -1597,7 +1598,7 @@ void FaceInfoScreenManager::DrawMicInfo(const RobotInterface::MicData& micData)
           micData.data[MicData::kSamplesPerBlockPerChannel*3]);
   const std::string micData3 = temp;
 
-  DrawTextOnScreen({"MICS", micData0, micData1, micData2, micData3});
+  DrawTextOnScreen({"MICS:", micData0, micData1, micData2, micData3});
 }
 
 void FaceInfoScreenManager::SetCustomText(const RobotInterface::DrawTextOnScreen& text)
