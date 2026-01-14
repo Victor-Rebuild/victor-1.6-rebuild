@@ -37,6 +37,7 @@
 #include "coretech/vision/shared/compositeImage/compositeImage.h"
 
 #include "clad/types/featureGateTypes.h"
+#include "util/logging/logging.h"
 
 
 namespace Anki {
@@ -695,6 +696,8 @@ void BehaviorDisplayWeather::StartTTSGeneration()
     const auto & robotInfo = bei.GetRobotInfo();
     const auto & localeComponent = robotInfo.GetLocaleComponent();
     const auto & ttsString = localeComponent.GetString(ttsIter->second, std::to_string(temperature));
+
+    LOG_WARNING("Weather.TTS", "Sent string (result %s)", ttsString.c_str());
 
     // Generate TTS utterance for localized string
     auto & ttsCoordinator = bei.GetTextToSpeechCoordinator();

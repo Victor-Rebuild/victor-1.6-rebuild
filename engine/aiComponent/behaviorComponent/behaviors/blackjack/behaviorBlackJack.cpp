@@ -608,6 +608,7 @@ void BehaviorBlackJack::TransitionToGetOut()
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 IBehavior* BehaviorBlackJack::SetUpSpeakingBehavior(const std::string& vocalizationString)
 {
+  LOG_WARNING("Blackjack.TTS", "Busted (result: %s)", vocalizationString.c_str());
   _iConfig.ttsBehavior->SetTextToSay(vocalizationString);
   if(!ANKI_VERIFY(_iConfig.ttsBehavior->WantsToBeActivated(),
                  "BehaviorBlackjack.TTSError",
