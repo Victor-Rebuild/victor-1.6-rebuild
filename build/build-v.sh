@@ -13,8 +13,8 @@ if [[ $(id -u) == 0 ]]; then
 fi
 
 if [[ "$(uname -a)" == *"Darwin"* ]]; then
-    #echo "macOS building does not work right now. This will be fixed soon."
-    #exit 0
+    echo "macOS building does not work right now. This will be fixed soon."
+    exit 0
     ./project/victor/scripts/victor_build_release.sh "$@"
     echo
     echo -e "\033[1;32mComplete.\033[0m"
@@ -25,7 +25,6 @@ elif [[ "${NO_DOCKER}" = "1" ]]; then
     echo -e "\033[1;32mComplete.\033[0m"
     echo
 else
-    echo "No docker is" $NO_DOCKER
     if [[ -d build/cache/0 ]]; then
         echo "Rebuilding cache..."
         rm -rf build/cache

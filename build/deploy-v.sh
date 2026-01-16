@@ -26,7 +26,7 @@ if [[ "$(uname -a)" == *"Darwin"* ]]; then
     ./project/victor/scripts/victor_start.sh
 else
 
-if [[ "${nodocker}" != "" ]]; then
+if [[ "${NO_DOCKER}" != "" ]]; then
     eval $(ssh-agent) && \
     ssh-add robot_sshkey && \
     ./project/victor/scripts/victor_deploy.sh -c Release -b && \
