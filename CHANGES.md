@@ -31,7 +31,7 @@
 - Now plays the wakeup after onboarding is finished from web setup (Code from Viccyware)
 - Fixed Blackjack so that Vector actually says "Dealer" correctly
 - Added the ability for Vector to say how old Vector is in years once 12 months passes
-- Vector can be named in <vector-ip>:8080 in a web browser, name can be asked for by asking the "What is your name?" Voice command.
+- Vector can be named in <vector-ip>:8080 in a web browser, name can be asked for by asking the "What is your name?" Voice command if you're connected to the custom server environment.
 
 ## Cloud changes
 - vic-cloud that works with wirepod and regular servers
@@ -39,7 +39,8 @@
 - New public server environment (Setup at https://anki2.ca/1.6/)
 
 ## Miscellaneous changes
-- Improved Japanese and German TTS voice
+- Improved Japanese, French and German TTS voices
+- Proper translations for each language
 - OpenCV 4.14 mainlined, newer than what's in WireOS (4.12)
 - Upped temprature limit for Vector 2.0
 - Support for DVT bodyboards
@@ -48,4 +49,3 @@
 - C++ upgrade engine from wireOS
 - Reonboard menu to easily connect Vector to the voice command server
 - Change slot option in CCIS to change Vector's system slot
-
