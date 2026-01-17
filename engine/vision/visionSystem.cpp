@@ -12,6 +12,7 @@
 
 #include "visionSystem.h"
 
+#include "clad/types/imageFormats.h"
 #include "coretech/common/engine/jsonTools.h"
 #include "coretech/common/engine/math/linearAlgebra_impl.h"
 #include "coretech/common/engine/math/linearClassifier.h"
@@ -54,6 +55,7 @@
 #include "util/helpers/cleanupHelper.h"
 #include "util/helpers/templateHelpers.h"
 #include "util/helpers/fullEnumToValueArrayChecker.h"
+#include "util/logging/logging.h"
 #include "util/random/randomGenerator.h" // DEBUG
 
 #include <thread>
@@ -69,6 +71,9 @@
 #define DEBUG_DISPLAY_CLAHE_IMAGE 0
 
 #define DRAW_TOOL_CODE_DEBUG 0
+
+cv::Mat _resizeScratchRGB;
+cv::Mat _resizeScratchGray;
 
 namespace Anki {
 namespace Vector {
