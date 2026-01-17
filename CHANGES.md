@@ -46,6 +46,7 @@
 - Support for DVT bodyboards
 - Compiling with -O2 and fast math
 - Picovoice 1.5 for customizable wakeword (Code used from WireOS)
-- C++ upgrade engine from wireOS
+- C++ upgrade engine from WireOS
 - Reonboard menu to easily connect Vector to the voice command server
 - Change slot option in CCIS to change Vector's system slot
+- Gamma correction from WireOS
