@@ -25,24 +25,26 @@ if [[ "$(uname -a)" == *"Darwin"* ]]; then
     ./project/victor/scripts/victor_deploy.sh -c Release -b && \
     ./project/victor/scripts/victor_start.sh
 else
+    if [[ "${NO_DOCKER}" = "1" ]]; then
+        echo "NO DOCKER"
+        eval $(ssh-agent) && \
+        ssh-add robot_sshkey && \
+        ./project/victor/scripts/victor_deploy.sh -c Release -b && \
+        ./project/victor/scripts/victor_start.sh
+        exit 0
 
-if [[ "${NO_DOCKER}" != "" ]]; then
-    eval $(ssh-agent) && \
-    ssh-add robot_sshkey && \
-    ./project/victor/scripts/victor_deploy.sh -c Release -b && \
-    ./project/victor/scripts/victor_start.sh
-    exit 0
-fi
-
-docker run --rm -it \
-    -v $(pwd)/anki-deps:/home/$USER/.anki \
-    -v $(pwd):$(pwd) \
-    -v $(pwd)/build/cache:/home/$USER/.ccache \
-    -v /home/$USER/.ssh:/home/$USER/.ssh \
-    vic-standalone-builder-8 bash -c \
-    "cd $(pwd) && \
-    eval \$(ssh-agent) && \
-    ssh-add robot_sshkey && \
-    ./project/victor/scripts/victor_deploy.sh $@ -c Release -b && \
-    ./project/victor/scripts/victor_start.sh"
+    else
+        echo "DOCKER"
+        docker run --rm -it \
+            -v $(pwd)/anki-deps:/home/$USER/.anki \
+            -v $(pwd):$(pwd) \
+            -v $(pwd)/build/cache:/home/$USER/.ccache \
+            -v /home/$USER/.ssh:/home/$USER/.ssh \
+            vic-standalone-builder-8 bash -c \
+            "cd $(pwd) && \
+            eval \$(ssh-agent) && \
+            ssh-add robot_sshkey && \
+            ./project/victor/scripts/victor_deploy.sh $@ -c Release -b && \
+            ./project/victor/scripts/victor_start.sh"
+    fi
 fi
