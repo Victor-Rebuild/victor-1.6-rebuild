@@ -461,9 +461,6 @@ Result HandleRAW10::RAW10_to_RGB24_FULL(const Debayer::InArgs& inArgs, Debayer::
       BlackLevelAndNormalize(block.val[2]);
       BlackLevelAndNormalize(block.val[3]);
 
-      TemporalDenoiseGreen(block.val[1], store.prevG1, store.prevValid);
-      TemporalDenoiseGreen(block.val[2], store.prevG2, store.prevValid);
-
       // Gamma Correct is the most expensive step timewise. Doing it as a helper function seems to have no effect on
       // the time to complete this step.
       GammaCorrect(store.gammaLUT, store.value_32, block.val[0]);
@@ -711,8 +708,6 @@ Result HandleRAW10::RAW10_to_RGB24_EIGHTH(const Debayer::InArgs& inArgs, Debayer
       BlackLevelAndNormalize(block.val[1]);
       BlackLevelAndNormalize(block.val[2]);
       BlackLevelAndNormalize(block.val[3]);
-      TemporalDenoiseGreen(block.val[1], store.prevG1, store.prevValid);
-      TemporalDenoiseGreen(block.val[2], store.prevG2, store.prevValid);
       GammaCorrect(store.gammaLUT, store.value_32, block.val[0]);
       GammaCorrect(store.gammaLUT, store.value_32, block.val[1]);
       GammaCorrect(store.gammaLUT, store.value_32, block.val[3]);
@@ -818,8 +813,6 @@ Result HandleRAW10::RAW10_to_Y8_FULL(const Debayer::InArgs& inArgs, Debayer::Out
       // the time to complete this step.
       BlackLevelAndNormalize(block.val[1]);
       BlackLevelAndNormalize(block.val[2]);
-      TemporalDenoiseGreen(block.val[1], store.prevG1, store.prevValid);
-      TemporalDenoiseGreen(block.val[2], store.prevG2, store.prevValid);
       GammaCorrect(store.gammaLUT, store.value_32, block.val[1]);
       GammaCorrect(store.gammaLUT, store.value_32, block.val[2]);
 
