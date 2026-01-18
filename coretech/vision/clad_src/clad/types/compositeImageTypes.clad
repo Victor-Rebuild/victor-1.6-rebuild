@@ -59,6 +59,10 @@ enum uint_8 SpriteBoxName
   Colon,
   TensRightOfColon,
   OnesRightOfColon,
+  TensLeftOfColonXray,
+  OnesLeftOfColonXray,
+  TensRightOfColonXray,
+  OnesRightOfColonXray,
 
   // Box for rendering animation keyframes into composite images
   FaceKeyframe,

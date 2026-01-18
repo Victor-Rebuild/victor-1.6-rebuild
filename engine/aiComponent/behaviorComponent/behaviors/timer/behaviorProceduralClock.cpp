@@ -13,6 +13,7 @@
 
 #include "engine/aiComponent/behaviorComponent/behaviors/timer/behaviorProceduralClock.h"
 
+#include "anki/cozmo/shared/factory/emrHelper.h"
 #include "cannedAnimLib/proceduralFace/proceduralFace.h"
 #include "engine/actions/animActions.h"
 #include "engine/actions/basicActions.h"
@@ -33,6 +34,7 @@ namespace Vector {
 
 namespace{
 const char* kClockLayoutKey         = "clockLayout";
+const char* kClockLayoutXrayKey     = "clockLayoutXray";
 const char* kDigitMapKey            = "digitImageMap";
 const char* kGetInTriggerKey        = "getInAnimTrigger";
 const char* kGetOutTriggerKey       = "getOutAnimTrigger";
@@ -49,7 +51,11 @@ const std::vector<Vision::SpriteBoxName> BehaviorProceduralClock::DigitDisplayLi
   Vision::SpriteBoxName::TensLeftOfColon,
   Vision::SpriteBoxName::OnesLeftOfColon,
   Vision::SpriteBoxName::TensRightOfColon,
-  Vision::SpriteBoxName::OnesRightOfColon
+  Vision::SpriteBoxName::OnesRightOfColon,
+  Vision::SpriteBoxName::TensLeftOfColonXray,
+  Vision::SpriteBoxName::OnesLeftOfColonXray,
+  Vision::SpriteBoxName::TensRightOfColonXray,
+  Vision::SpriteBoxName::OnesRightOfColonXray
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -89,6 +95,10 @@ BehaviorProceduralClock::BehaviorProceduralClock(const Json::Value& config)
   if(ANKI_VERIFY(config.isMember(kClockLayoutKey),kDebugStr.c_str(), "Missing layout key")){
     _instanceParams.layout = config[kClockLayoutKey];
   }
+
+  if(config.isMember(kClockLayoutXrayKey)){
+    _instanceParams.layoutXray = config[kClockLayoutXrayKey];
+  }
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -96,6 +106,7 @@ void BehaviorProceduralClock::GetBehaviorJsonKeys(std::set<const char*>& expecte
 {
   const char* list[] = {
     kClockLayoutKey,
+    kClockLayoutXrayKey,
     kDigitMapKey,
     kGetInTriggerKey,
     kGetOutTriggerKey,
@@ -124,10 +135,19 @@ void BehaviorProceduralClock::InitBehavior()
   // Setup the composite image
   auto& dataAccessorComp = GetBEI().GetComponentWrapper(BEIComponentID::DataAccessor).GetComponent<DataAccessorComponent>();
   Vision::HSImageHandle faceHueAndSaturation = ProceduralFace::GetHueSatWrapper();
+  
   _instanceParams.compImg = std::make_unique<Vision::CompositeImage>(dataAccessorComp.GetSpriteCache(),
                                                                      faceHueAndSaturation,
                                                                      _instanceParams.layout, 
                                                                      FACE_DISPLAY_WIDTH, FACE_DISPLAY_HEIGHT);
+  
+  // Create xray composite image if layout exists
+  if(!_instanceParams.layoutXray.isNull()){
+    _instanceParams.compImgXray = std::make_unique<Vision::CompositeImage>(dataAccessorComp.GetSpriteCache(),
+                                                                           faceHueAndSaturation,
+                                                                           _instanceParams.layoutXray, 
+                                                                           FACE_DISPLAY_WIDTH, FACE_DISPLAY_HEIGHT);
+  }
 
   auto& timerUtility = GetBEI().GetAIComponent().GetComponent<TimerUtility>();
   if(_instanceParams.getDigitFunction == nullptr){
@@ -139,22 +159,22 @@ void BehaviorProceduralClock::InitBehavior()
       const int currentTime_s = timerUtility.GetSystemTime_s() + offset;
       // Ten Mins Digit
       {          
-        outMap.emplace(std::make_pair(Vision::SpriteBoxName::TensLeftOfColon, 
+        outMap.emplace(std::make_pair( IsXray() ? Vision::SpriteBoxName::TensLeftOfColonXray : Vision::SpriteBoxName::TensLeftOfColon, 
                                       TimerHandle::SecondsToDisplayMinutes(currentTime_s)/10));
       }
       // One Mins Digit
       {
-        outMap.emplace(std::make_pair(Vision::SpriteBoxName::OnesLeftOfColon, 
+        outMap.emplace(std::make_pair(IsXray() ? Vision::SpriteBoxName::OnesLeftOfColonXray : Vision::SpriteBoxName::OnesLeftOfColon, 
                                             TimerHandle::SecondsToDisplayMinutes(currentTime_s) % 10));
       }
       // Ten seconds digit
       {
-        outMap.emplace(std::make_pair(Vision::SpriteBoxName::TensRightOfColon, 
+        outMap.emplace(std::make_pair(IsXray() ? Vision::SpriteBoxName::TensRightOfColonXray : Vision::SpriteBoxName::TensRightOfColon, 
                                       TimerHandle::SecondsToDisplaySeconds(currentTime_s)/10));
       }
       // One seconds digit
       {
-        outMap.emplace(std::make_pair(Vision::SpriteBoxName::OnesRightOfColon, 
+        outMap.emplace(std::make_pair(IsXray() ? Vision::SpriteBoxName::OnesRightOfColonXray : Vision::SpriteBoxName::OnesRightOfColon, 
                        TimerHandle::SecondsToDisplaySeconds(currentTime_s) % 10));
       }
       return outMap;
@@ -282,21 +302,22 @@ void BehaviorProceduralClock::BuildAndDisplayProceduralClock(const int clockOffs
     }
   }
   
-  
+  auto* currentCompImg = IsXray() && _instanceParams.compImgXray ? 
+                         _instanceParams.compImgXray.get() : 
+                         _instanceParams.compImg.get();
+
   using namespace Vision;
 
-  CompositeImageLayer* digitLayer = _instanceParams.compImg->GetLayerByName(LayerName::Clock_Display);
+  CompositeImageLayer* digitLayer = currentCompImg->GetLayerByName(LayerName::Clock_Display);
 
   if(ANKI_VERIFY(digitLayer != nullptr,
                  "BehaviorProceduralClock.BuildAndDisplayProceduralClock.NoDigitLayer",
                  "Expected digit layout to be specified on Clock_Display")){
-    // Grab the image by name and
     digitLayer->SetImageMap(std::move(imageMap));
   }
 
   if(!_lifetimeParams.hasBaseImageBeenSent){
-    // Send the base image over the wire
-    GetBEI().GetAnimationComponent().DisplayFaceImage(*(_instanceParams.compImg.get()), 
+    GetBEI().GetAnimationComponent().DisplayFaceImage(*currentCompImg, 
                                                       ANIM_TIME_STEP_MS, 
                                                       0, 
                                                       true);

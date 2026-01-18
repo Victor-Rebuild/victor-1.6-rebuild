@@ -124,25 +124,25 @@ BehaviorProceduralClock::GetDigitsFunction BehaviorDisplayWallTime::BuildTimerFu
     // Tens Digit (left of colon)
     {
       const int tensDigit = currentHours/10;
-      outMap.emplace(std::make_pair(Vision::SpriteBoxName::TensLeftOfColon, tensDigit));
+      outMap.emplace(std::make_pair(IsXray() ? Vision::SpriteBoxName::TensLeftOfColonXray : Vision::SpriteBoxName::TensLeftOfColon, tensDigit));
     }
     
     // Ones Digit (left of colon)
     {
       const int onesDigit = currentHours % 10;
-      outMap.emplace(std::make_pair(Vision::SpriteBoxName::OnesLeftOfColon, onesDigit));
+      outMap.emplace(std::make_pair(IsXray() ? Vision::SpriteBoxName::OnesLeftOfColonXray : Vision::SpriteBoxName::OnesLeftOfColon, onesDigit));
     }
 
     // Tens Digit (right of colon)
     {
       const int tensDigit = currentMins/10;
-      outMap.emplace(std::make_pair(Vision::SpriteBoxName::TensRightOfColon, tensDigit));
+      outMap.emplace(std::make_pair(IsXray() ? Vision::SpriteBoxName::TensRightOfColonXray : Vision::SpriteBoxName::TensRightOfColon, tensDigit));
     }
 
     // Ones Digit (right of colon)
     {
       const int onesDigit = currentMins % 10;
-      outMap.emplace(std::make_pair(Vision::SpriteBoxName::OnesRightOfColon, onesDigit));
+      outMap.emplace(std::make_pair(IsXray() ? Vision::SpriteBoxName::OnesRightOfColonXray : Vision::SpriteBoxName::OnesRightOfColon, onesDigit));
     }
 
     return outMap;

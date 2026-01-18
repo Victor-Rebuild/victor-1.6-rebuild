@@ -94,12 +94,14 @@ private:
 
   struct InstanceParams{
     std::unique_ptr<Vision::CompositeImage> compImg;
+    std::unique_ptr<Vision::CompositeImage> compImgXray;
     
     // User facing properties
     AnimationTrigger getInAnim;
     AnimationTrigger getOutAnim;
     bool shouldTurnToFace = false;
     Json::Value layout;
+    Json::Value layoutXray;
     float totalTimeDisplayClock_sec;
     bool shouldPlayAudioOnClockUpdates = true;
 

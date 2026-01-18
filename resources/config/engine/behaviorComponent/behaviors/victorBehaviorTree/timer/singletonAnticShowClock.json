@@ -54,6 +54,53 @@
       }
     ]
   }],
+
+  "clockLayoutXray" : [{  
+    "layerName" : "Clock_Display",
+    "spriteBoxLayout" : [
+      {
+        "spriteBoxName": "TensLeftOfColonXray",
+        "spriteRenderMethod" : "CustomHue",
+        "x": 23,
+        "y": 22,
+        "width": 25,
+        "height": 36
+      },
+      {
+        "spriteBoxName": "OnesLeftOfColonXray",
+        "spriteRenderMethod" : "CustomHue",
+        "x": 50,
+        "y": 22,
+        "width": 25,
+        "height": 36
+      },
+      {
+        "spriteBoxName": "Colon",
+        "spriteRenderMethod" : "CustomHue",
+        "x": 76,
+        "y": 23,
+        "width": 9,
+        "height": 36
+      },
+      {
+        "spriteBoxName": "TensRightOfColonXray",
+        "spriteRenderMethod" : "CustomHue",
+        "x": 85,
+        "y": 22,
+        "width": 25,
+        "height": 36
+      },
+      {
+        "spriteBoxName": "OnesRightOfColonXray",
+        "spriteRenderMethod" : "CustomHue",
+        "x": 111,
+        "y": 22,
+        "width": 25,
+        "height": 36
+      }
+    ]
+  }],
+
   // allows template elements which have a static image to be specified once
   "staticElements":
   {
