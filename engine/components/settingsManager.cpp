@@ -92,6 +92,11 @@ namespace Anki
         {
           ApplyPendingSettingsUpdate(external_interface::RobotSetting::eye_color, false);
         }
+
+        if (IsSettingsUpdateRequestPending(external_interface::RobotSetting::custom_eye_color))
+        {
+          ApplyPendingSettingsUpdate(external_interface::RobotSetting::custom_eye_color, false);
+        }
       } }));
       }
 
@@ -299,7 +304,7 @@ namespace Anki
       customEyeColor[kCustomEyeColorEnabledKey] = false;
       _currentSettings[customEyeColorKey] = customEyeColor;
 
-      return SetRobotSetting(external_interface::RobotSetting::eye_color, valueJson, updateSettingsJdoc, ignoredDueToNoChange);
+      return SetRobotSetting(external_interface::RobotSetting::eye_color, valueJson, updateSettingsJdoc, ignoredDueToNoChange) || SetRobotSetting(external_interface::RobotSetting::custom_eye_color, valueJson, updateSettingsJdoc, ignoredDueToNoChange);
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
