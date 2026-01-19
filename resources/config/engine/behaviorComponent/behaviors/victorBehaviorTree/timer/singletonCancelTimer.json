@@ -37,6 +37,14 @@
         "height": 43
       },
       {
+        "spriteBoxName": "Colon_Dim",
+        "spriteRenderMethod" : "CustomHue",
+        "x": 87,
+        "y": 27,
+        "width": 10,
+        "height": 43
+      },
+      {
         "spriteBoxName": "TensRightOfColon",
         "spriteRenderMethod" : "CustomHue",
         "x": 98,
@@ -83,6 +91,14 @@
         "height": 36
       },
       {
+        "spriteBoxName": "Colon_Dim",
+        "spriteRenderMethod" : "CustomHue",
+        "x": 76,
+        "y": 23,
+        "width": 9,
+        "height": 36
+      },
+      {
         "spriteBoxName": "TensRightOfColonXray",
         "spriteRenderMethod" : "CustomHue",
         "x": 85,
@@ -104,7 +120,8 @@
   // allows template elements which have a static image to be specified once
   "staticElements":
   {
-    "Colon": "clock_colon"
+    "Colon": "clock_colon",
+    "Colon_Dim": "clock_colon_dim"
   },
 
   "digitImageMap": [

@@ -52,6 +52,7 @@ const std::vector<Vision::SpriteBoxName> BehaviorProceduralClock::DigitDisplayLi
   Vision::SpriteBoxName::OnesLeftOfColon,
   Vision::SpriteBoxName::TensRightOfColon,
   Vision::SpriteBoxName::OnesRightOfColon,
+  Vision::SpriteBoxName::Colon_Dim,
   Vision::SpriteBoxName::TensLeftOfColonXray,
   Vision::SpriteBoxName::OnesLeftOfColonXray,
   Vision::SpriteBoxName::TensRightOfColonXray,
@@ -291,6 +292,21 @@ void BehaviorProceduralClock::BuildAndDisplayProceduralClock(const int clockOffs
   const std::map<Vision::SpriteBoxName, int> digitMap = _instanceParams.getDigitFunction(clockOffset_s);
 
   Vision::CompositeImageLayer::ImageMap imageMap = _instanceParams.staticImageMap;
+
+  const bool showBrightColon = (clockOffset_s % 2) == 0;
+  const std::string colonSpriteName = showBrightColon ? "clock_colon" : "clock_colon_dim";
+  
+  // Update both regular and xray colon sprites
+  auto colonEntry = Entry(spriteCache, seqContainer, colonSpriteName);
+  imageMap[Vision::SpriteBoxName::Colon] = colonEntry;
+  
+  // If there's a separate Colon_Dim sprite box, update it too
+  if (_instanceParams.staticElements.find(Vision::SpriteBoxName::Colon_Dim) != 
+      _instanceParams.staticElements.end()) {
+    auto colonDimEntry = Entry(spriteCache, seqContainer, colonSpriteName);
+    imageMap[Vision::SpriteBoxName::Colon_Dim] = colonDimEntry;
+  }
+
   for(auto& pair : digitMap){
     isLeadingZero &= (pair.second == 0);
     if(isLeadingZero){

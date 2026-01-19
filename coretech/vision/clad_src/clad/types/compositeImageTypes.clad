@@ -57,6 +57,7 @@ enum uint_8 SpriteBoxName
   TensLeftOfColon,
   OnesLeftOfColon,
   Colon,
+  Colon_Dim,
   TensRightOfColon,
   OnesRightOfColon,
   TensLeftOfColonXray,
