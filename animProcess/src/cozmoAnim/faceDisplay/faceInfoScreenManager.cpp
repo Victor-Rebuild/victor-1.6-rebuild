@@ -52,6 +52,7 @@
 #include "anki/cozmo/shared/factory/emrHelper.h"
 #include "anki/cozmo/shared/factory/faultCodes.h"
 
+#include "util/logging/logging.h"
 #include "webServerProcess/src/webService.h"
 
 #include <chrono>
@@ -263,7 +264,9 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     ADD_SCREEN(Camera, BuildInfo);
   }
 
-  ADD_SCREEN(BuildInfo, Main);
+  ADD_SCREEN(BuildInfo, ServerInformation);
+
+  ADD_SCREEN(ServerInformation, Main);
 
 
   // ========== Screen Customization ========= 
@@ -366,6 +369,12 @@ void FaceInfoScreenManager::Init(Anim::AnimContext* context, Anim::AnimationStre
     DrawNetwork();
   };
   SET_ENTER_ACTION(Network, networkEnterFcn);
+
+  // === Network screen ===
+  auto serverEnterFcn = [this]() {
+    DrawServerInfo();
+  };
+  SET_ENTER_ACTION(ServerInformation, serverEnterFcn);
 
   // === Reonboard screen ===
   FaceInfoScreen::MenuItemAction confirmReonboard = [this]() {
@@ -1419,6 +1428,50 @@ void FaceInfoScreenManager::DrawNetwork()
                              { {"NETWORK: "}, _testingNetwork ? ColoredText("") : getStatusString(_networkStatus) }
                            };
 #endif
+  DrawTextOnScreen(lines);
+}
+
+void FaceInfoScreenManager::DrawServerInfo()
+{ 
+  std::string servConf;
+  Json::Reader reader;
+  Json::Value config;
+  
+  std::string jsonContents = Anki::Util::FileUtils::ReadFile(kServerConfigCustomFilePath);
+  if (jsonContents.empty()) {
+    jsonContents = Anki::Util::FileUtils::ReadFile(kServerConfigDefaultFilePath);
+    reader.parse(jsonContents, config);
+    std::string chipperUrl = config["chipper"].asString();
+    servConf = chipperUrl;
+    _usesCustServConfig = false;
+    _usesEscapePod = false;
+  }
+  
+  if (_usesCustServConfig) {
+    if (reader.parse(jsonContents, config)) {
+      if (config.isMember("chipper") && config["chipper"].isString()) {
+        std::string chipperUrl = config["chipper"].asString();
+        
+        if (chipperUrl.find("escapepod.local") != std::string::npos) {
+          servConf = chipperUrl;
+        }
+      } else {
+        LOG_WARNING("Failed to Find chipper url in the server config file. Could the config be empty?", "");
+        servConf = "Invalid";
+        _invalidServConfig = true;
+      }
+    } else {
+      servConf = "Invalid";
+      _invalidServConfig = true;
+    }
+  }
+
+  ColoredTextLines lines = {
+                             { {"SERVER TYPE:"}, {_usesEscapePod ? "PRIVATE" : _invalidServConfig ? "INVALID" : "PUBLIC"} },
+                             { {""} },
+                             { {"ENDPOINT:"} },
+                             { {servConf} }
+                           };
   DrawTextOnScreen(lines);
 }
 

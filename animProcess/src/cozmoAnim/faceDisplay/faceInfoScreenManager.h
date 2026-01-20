@@ -188,6 +188,7 @@ private:
   void DrawAlexaFace();
   void DrawMuteAnimation();
   void DrawAlexaNotification();
+  void DrawServerInfo();
   
   // Draw the _scratchDrawingImg to the face
   void DrawScratch();
@@ -237,10 +238,17 @@ private:
   
   std::string _alexaCode;
   std::string _alexaUrl;
+
+  const std::string kServerConfigDefaultFilePath = "/anki/data/assets/cozmo_resources/config/server_config.json";
+  const std::string kServerConfigCustomFilePath = "/data/data/server_config.json";
   
   bool _drawFAC = false;
   bool _engineLoaded = false;
   bool _knownBot = false;
+
+  bool _invalidServConfig = false;
+  bool _usesCustServConfig = true;
+  bool _usesEscapePod = true;
 
   std::string _sysconVersion = "";
   
