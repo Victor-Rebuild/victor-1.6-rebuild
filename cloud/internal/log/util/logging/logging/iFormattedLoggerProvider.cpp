@@ -36,12 +36,12 @@
 
 namespace Anki {
 namespace Util {
-
+    
 #if (PRINT_TID)
     static std::atomic<uint32_t> thread_max {0};
     static pthread_key_t thread_id_key;
     static pthread_once_t thread_id_once = PTHREAD_ONCE_INIT;
-
+    
     static void thread_id_init()
     {
       pthread_key_create(&thread_id_key, nullptr);
@@ -94,7 +94,7 @@ void IFormattedLoggerProvider::ParseLogLevelSettings(const Json::Value& config)
         // parse value
         DEV_ASSERT(logLevelInfo[kLevelEnabledKey].isBool(), "IFormattedLoggerProvider.ParseLogLevelSettings.BadEnableFlag");
         const bool logLevelEnabled = logLevelInfo[kLevelEnabledKey].asBool();
-
+      
         // Register channel
         SetLogLevelEnabled(logLevelVal, logLevelEnabled);
       }
@@ -109,7 +109,7 @@ bool IFormattedLoggerProvider::IsLogLevelEnabled(LogLevel logLevel) const
   const bool ret = _logLevelEnabledFlags[logLevel];
   return ret;
 }
-
+  
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void IFormattedLoggerProvider::FormatAndLog(IFormattedLoggerProvider::LogLevel logLevel, const char* eventName,
                                   const std::vector<std::pair<const char*, const char*>>& keyValues,
@@ -126,14 +126,14 @@ void IFormattedLoggerProvider::FormatAndLogChanneled(ILoggerProvider::LogLevel l
 {
   #if (PRINT_TID)
     pthread_once(&thread_id_once, thread_id_init);
-
+    
     uint32_t thread_id = numeric_cast_clamped<uint32_t>((uintptr_t)pthread_getspecific(thread_id_key));
     if(0 == thread_id) {
       thread_id = ++thread_max;
       pthread_setspecific(thread_id_key, (void*)((uintptr_t)thread_id));
     }
   #endif
-
+      
   #if (PRINT_DAS_EXTRAS_BEFORE_EVENT || PRINT_DAS_EXTRAS_AFTER_EVENT)
     const bool printDasExtras = !PRINT_DAS_EXTRAS_FOR_EVENT_LEVEL_ONLY ||
                                 logLevel == ILoggerProvider::LogLevel::LOG_LEVEL_EVENT;
@@ -145,21 +145,21 @@ void IFormattedLoggerProvider::FormatAndLogChanneled(ILoggerProvider::LogLevel l
       }
     }
   #endif
-
+  
   std::ostringstream stream;
-
+      
   #if (PRINT_TID)
     stream << "(t:" << std::setw(2) << std::setfill('0') << thread_id << ") ";
   #endif
-
+      
   stream << "[" << GetLogLevelString(logLevel) << "]";
-
+      
   #if (PRINT_DAS_EXTRAS_BEFORE_EVENT)
     if(printDasExtras) {
       stream << " " << logString;
     }
   #endif
-
+  
   ASSERT_NAMED(eventName!=nullptr, "IFormattedLoggerProvider.FormatAndLogChanneled logging null eventName");
   ASSERT_NAMED(eventValue!=nullptr, "IFormattedLoggerProvider.FormatAndLogChanneled logging null eventValue");
   static const char* emptyStr = "";
@@ -182,12 +182,12 @@ void IFormattedLoggerProvider::FormatAndLogChanneled(ILoggerProvider::LogLevel l
       stream << " " << logString;
     }
   #endif
-
+      
   stream << std::endl;
-
+      
   Log(logLevel, stream.str());
 }
-
-
+    
+    
 } // end namespace Util
 } // end namespace Anki

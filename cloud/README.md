@@ -36,17 +36,17 @@ index 1d5df2c..564b22f 100644
 +++ b/internal/voice/stream/context.go
 @@ -1,7 +1,9 @@
  package stream
-
+ 
  import (
 -       "bytes"
 +       "regexp"
-+
++       
 +       "bytes"
         "context"
         "encoding/json"
         "fmt"
 @@ -155,6 +157,14 @@ func sendIntentResponse(resp *chipper.IntentResult, receiver Receiver) {
-
+ 
  func sendKGResponse(resp *chipper.KnowledgeGraphResponse, receiver Receiver) {
         var buf bytes.Buffer
 +
@@ -65,16 +65,17 @@ index 1d5df2c..564b22f 100644
 Next compile, copy to Vector, and reboot.
 
 ```bash
-grant@lord-humungus vector-cloud % make vic-cloud
+grant@lord-humungus vector-cloud % make vic-cloud                        
 echo `go version` && cd /Users/grant/src/vector-cloud && go mod download
   ... BUILD LOG OUTPUT ...
 Packed 1 file.
 grant@lh % ssh root@<VECTOR_IP> mount -o remount,rw /
 grant@lh % scp build/vic-cloud root@<VECTOR_IP>:/anki/bin
-vic-cloud                                              100% 4800KB   3.6MB/s   00:01
-grant@lh %
-grant@lh % ssh root@<VECTOR_IP> /sbin/reboot
+vic-cloud                                              100% 4800KB   3.6MB/s   00:01    
+grant@lh %                                                 
+grant@lh % ssh root@<VECTOR_IP> /sbin/reboot            
 ```
 
 And test after the reboot by saying "Hey Vector... Question... What is Area 51?" and
 "Hey Vector... Question... What is DogeCoin?"
+

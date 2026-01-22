@@ -54,17 +54,17 @@ class ChannelFilter : public IChannelFilter, Anki::Util::noncopyable {
 public:
   ChannelFilter() : _initialized(false){}
   ~ChannelFilter();
-
+  
   // initialize with an optional json configuration (can be empty)
   void Initialize(const Json::Value& config = Json::Value());
   inline bool IsInitialized() const{ return _initialized; }
-
+  
   void EnableChannel(const std::string& channelName);
   void DisableChannel(const std::string& channelName);
 
   // IChannelFilter API
   virtual bool IsChannelEnabled(const std::string& channelName) const override;
-
+  
 private:
   std::unordered_map<std::string, ChannelVar*> _channelEnableList;
   bool _initialized;

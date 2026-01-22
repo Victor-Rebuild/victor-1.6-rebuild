@@ -19,12 +19,12 @@
 
 namespace Anki {
   namespace Util {
-
+    
     class IFormattedLoggerProvider : public ILoggerProvider {
-
+      
     public:
       IFormattedLoggerProvider();
-
+      
       inline void PrintLogE(const char* eventName,
                             const std::vector<std::pair<const char*, const char*>>& keyValues,
                             const char* eventValue) override {
@@ -57,23 +57,23 @@ namespace Anki {
         if (!IsLogLevelEnabled(LOG_LEVEL_DEBUG)) {return;}
         FormatAndLogChanneled(LOG_LEVEL_DEBUG, channelName, eventName, keyValues, eventValue);
       }
-
+      
       // sets the minimum log level that is enabled. Levels above this one will also be enabled
       void SetMinLogLevel(LogLevel logLevel);
       // sets whether one specific log level is enabled
       void SetLogLevelEnabled(LogLevel logLevel, bool enabled);
-
+      
       // reads which levels are enabled from json file
       void ParseLogLevelSettings(const Json::Value& config);
-
+      
       // This has to be public for MultiFormattedLoggerProvider to work.
       virtual void Log(ILoggerProvider::LogLevel logLevel, const std::string& message) = 0;
 
     private:
-
+    
       // returns true if the given log level is enabled, false otherwise
       bool IsLogLevelEnabled(LogLevel logLevel) const;
-
+    
       void FormatAndLog(ILoggerProvider::LogLevel logLevel, const char* eventName,
                   const std::vector<std::pair<const char*, const char*>>& keyValues,
                   const char* eventValue);
@@ -81,11 +81,11 @@ namespace Anki {
                   const char* eventName,
                   const std::vector<std::pair<const char*, const char*>>& keyValues,
                   const char* eventValue);
-
+      
       // whether specific log levels are enabled
       std::vector<bool> _logLevelEnabledFlags;
     };
-
+    
   } // end namespace Util
 } // end namespace Anki
 

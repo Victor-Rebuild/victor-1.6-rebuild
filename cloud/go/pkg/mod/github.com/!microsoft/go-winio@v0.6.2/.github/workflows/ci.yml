@@ -1,0 +1,146 @@
+name: CI
+on:
+  - push
+  - pull_request
+
+env:
+  GO_VERSION: "oldstable"
+  GOTESTSUM_VERSION: "latest"
+  GOLANGCILINT_VERSION: "latest"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - name: Install go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: ${{ env.GOLANGCILINT_VERSION }}
+          args: >-
+            --verbose
+            --timeout=5m
+            --config=.golangci.yml
+            --max-issues-per-linter=0
+            --max-same-issues=0
+            --modules-download-mode=readonly
+
+  go-generate:
+    name: Go Generate
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - name: Install go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          # don't really need to cache Go packages, since go generate doesn't require much.
+          # otherwise, the cache used in the `test` stage will be (basically) empty.
+          cache: false
+
+      - name: Run go generate
+        shell: pwsh
+        run: |
+          Write-Output "::group::go generate"
+          go generate -x ./...
+          Write-Output "::endgroup::"
+          if ($LASTEXITCODE -ne 0) {
+            Write-Output "::error title=Go Generate::Error running go generate."
+            exit $LASTEXITCODE
+          }
+
+      - name: Diff
+        shell: pwsh
+        run: |
+          git add -N .
+          Write-Output "::group::git diff"
+          git diff --stat --exit-code
+          Write-Output "::endgroup::"
+          if ($LASTEXITCODE -ne 0) {
+            Write-Output "::error ::Generated files are not up to date. Please run ``go generate ./...``."
+            exit $LASTEXITCODE
+          }
+
+  test:
+    name: Run Tests
+    needs:
+      - go-generate
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019, windows-2022, ubuntu-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - name: Install go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      # avoid needing to download packages during test runs
+      - name: Pre-fill Module Cache
+        run: go mod download -x
+
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@${{ env.GOTESTSUM_VERSION }}
+
+      - name: Test repo
+        shell: pwsh
+        run: |
+          # `go test -race` requires mingw on windows, and there is some weirdness on windows 2019
+          # which causes tests to fail with `"exit status 0xc0000139"`.
+          # Even trying to update mingw with choco still fails.
+          #
+          # see: https://go.dev/doc/articles/race_detector#Requirements
+
+          if ( '${{ matrix.os }}' -ne 'windows-2019' ) {
+            $race = '-race'
+          }
+
+          gotestsum --format standard-verbose --debug -- -gcflags=all=-d=checkptr $race -v ./...
+
+      # !NOTE:
+      # Fuzzing cannot be run across multiple packages, (ie, `go -fuzz "^Fuzz" ./...` fails).
+      # If new fuzzing tests are added, exec additional runs for each package.
+      - name: Fuzz root package
+        run: gotestsum --format standard-verbose --debug -- -run "^#" -fuzztime 1m -fuzz "^Fuzz"
+
+  build:
+    name: Build Repo
+    needs:
+      - test
+    runs-on: "windows-2022"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - name: Install go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - run: go build ./pkg/etw/sample/
+      - run: go build ./tools/etw-provider-gen/
+      - run: go build ./tools/mkwinsyscall/
+      - run: go build ./wim/validate/

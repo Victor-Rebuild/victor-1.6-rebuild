@@ -20,7 +20,7 @@ class AndroidLogPrintLogger : public ILoggerProvider {
 public:
 
   AndroidLogPrintLogger(const std::string& tag = "anki");
-
+  
   // Implements ILoggerProvider
   virtual void PrintEvent(const char * eventName,
     const std::vector<std::pair<const char * , const char *>>& keyValues,
@@ -58,7 +58,7 @@ public:
   {
       Log(LogLevel::LOG_LEVEL_DEBUG, channel, eventName, keyValues, eventValue);
   }
-
+  
   // Implements IFormattedLoggerProvider
   // virtual void Log(ILoggerProvider::LogLevel logLevel, const std::string& message) override;
 
@@ -66,13 +66,13 @@ private:
   std::string _tag;
 
   void Log(LogLevel level,
-    const char * eventName,
+    const char * eventName, 
     const std::vector<std::pair<const char *, const char *>>& keyValues,
     const char * eventValue);
 
-  void Log(LogLevel level,
-    const char * channel,
-    const char * eventName,
+  void Log(LogLevel level, 
+    const char * channel, 
+    const char * eventName, 
     const std::vector<std::pair<const char *, const char *>>& keyValues,
     const char * eventValue);
 

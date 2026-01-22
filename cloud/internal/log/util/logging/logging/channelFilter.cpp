@@ -51,7 +51,7 @@ void ChannelFilter::Initialize(const Json::Value& config)
       _channelEnableList.emplace(channelName, new ChannelVar(channelName, channelEnabled, kUnregisterInDestructor));
     }
   }
-
+  
   // Print which channels are enabled
   {
     std::stringstream enabledStr;

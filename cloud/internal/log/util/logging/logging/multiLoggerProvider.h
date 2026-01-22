@@ -16,26 +16,26 @@
 
 namespace Anki {
   namespace Util {
-
+    
     class MultiLoggerProvider : public ILoggerProvider {
-
+      
     public:
       inline MultiLoggerProvider(const std::vector<ILoggerProvider*>& inVec) {
         for(ILoggerProvider* provider : inVec ) {
           _providers.emplace_back(provider);
         }
       }
-
+      
       inline ~MultiLoggerProvider() {
         for(ILoggerProvider* provider : _providers) {
           delete provider;
         }
         _providers.clear();
       }
-
+      
       MultiLoggerProvider(const MultiLoggerProvider&) = delete;
       MultiLoggerProvider& operator=(const MultiLoggerProvider&) = delete;
-
+      
       inline void PrintEvent(const char* eventName,
                              const std::vector<std::pair<const char*, const char*>>& keyValues,
                              const char* eventValue) override {
@@ -73,27 +73,27 @@ namespace Anki {
           provider->PrintChanneledLogD(channel, eventName, keyValues, eventValue);
         }
       }
-
+      
       inline void Flush() override {
         for (ILoggerProvider* provider : _providers) {
           provider->Flush();
         }
       }
-
+      
       inline ILoggerProvider* GetProvider(int index) {
         return _providers[index];
       }
-
+      
       inline const std::vector<ILoggerProvider*>& GetProviders() {
         return _providers;
       }
-
+      
     protected:
       std::vector<ILoggerProvider*> _providers;
-
-
+      
+      
     };
-
+    
   } // end namespace Util
 } // end namespace Anki
 

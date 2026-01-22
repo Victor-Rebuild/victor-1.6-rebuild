@@ -1,0 +1,101 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * 4"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        goos:
+          - darwin
+          - freebsd
+          - linux
+          - windows
+        goarch:
+          - amd64
+          - arm64
+
+    name: cross-compilation (GOOS=${{ matrix.goos }}, GOARCH=${{ matrix.goarch }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: actions/setup-go@v5.3.0
+        with:
+          go-version: "1.x"
+
+      - run: go build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+
+  test:
+    strategy:
+      matrix:
+        go-version:
+          - "1.23"
+          - "1.24"
+        os:
+          - macos
+          - ubuntu
+          - windows
+        goarch:
+          - 386
+          - amd64
+        exclude:
+          - os: macos
+            goarch: 386
+
+    name: tests (${{ matrix.os }}/go-${{ matrix.go-version }}/${{ matrix.goarch }})
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: actions/setup-go@v5.3.0
+        id: go
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - run: go mod download
+
+      - run: make staticcheck
+        if: matrix.go-version == '1.23'
+
+      - run: make gotest
+        env:
+          GOARCH: ${{ matrix.goarch }}
+          GOPROXY: off
+
+  integration-tests:
+    strategy:
+      matrix:
+        os:
+          - ubuntu
+          - windows
+
+    name: integration tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: actions/setup-go@v5.3.0
+        id: go
+        with:
+          go-version: "1.x"
+
+      - run: make integration
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: golangci/golangci-lint-action@v6.5.0

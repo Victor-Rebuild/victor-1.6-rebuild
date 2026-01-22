@@ -1,2 +1,4 @@
-go/src/gopkg.in
-**/debug.test
+build/
+go/
+*.pb.go
+*.pb.gw.go

@@ -4,7 +4,7 @@
 * Author: damjan stulic
 * Created: 4/25/15
 *
-* Description:
+* Description: 
 *
 * Copyright: Anki, inc. 2015
 *
@@ -22,21 +22,21 @@ public:
   PrintfLoggerProvider();
   PrintfLoggerProvider(ILoggerProvider::LogLevel minToStderrLogLevel,
                        bool colorizeStderrOutput = false);
-
+  
   void Log(ILoggerProvider::LogLevel logLevel, const std::string& message) override;
-
+  
   // Set the minimum level required to print to stderr.
   // Everything above prints to stdout.
   void SetMinToStderrLevel(int level) { _minToStderrLevel = level; };
-
+  
   void SetColorizeStderrOutput(bool b = true) { _colorizeStderrOutput = b; };
 
   void Flush() override;
-
+  
 private:
-
+  
   int _minToStderrLevel;
-
+  
   // Use ANSI escape color codes to colorize printf output to stderr
   bool _colorizeStderrOutput = false;
 };

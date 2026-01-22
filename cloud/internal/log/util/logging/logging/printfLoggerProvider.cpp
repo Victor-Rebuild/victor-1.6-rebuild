@@ -4,7 +4,7 @@
 * Author: damjan stulic
 * Created: 4/25/15
 *
-* Description:
+* Description: 
 *
 * Copyright: Anki, inc. 2015
 *
@@ -37,13 +37,13 @@ void PrintfLoggerProvider::Log(ILoggerProvider::LogLevel logLevel, const std::st
   if (message.empty()) {
     return;
   }
-
+  
   const bool outputToStderr = (logLevel >= _minToStderrLevel);
-
+  
   FILE* outStream = outputToStderr ? stderr : stdout;
-
+  
   const bool colorizeOutput = outputToStderr && _colorizeStderrOutput;
-
+  
   if (colorizeOutput) {
     // Prepend/append color escape codes. Need to move the newline to the end if it exists (due to Webots behavior)
     fprintf(outStream,
