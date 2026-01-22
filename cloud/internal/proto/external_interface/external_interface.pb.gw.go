@@ -14,7 +14,6 @@ import (
 	"io"
 	"net/http"
 
-	"Anki.Vector.external_interface"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
 	"google.golang.org/grpc"
@@ -1562,7 +1561,7 @@ func local_request_ExternalInterface_GetLatestAttentionTransfer_0(ctx context.Co
 
 func request_ExternalInterface_PullJdocs_0(ctx context.Context, marshaler runtime.Marshaler, client ExternalInterfaceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq Anki_Vector_external_interface.PullJdocsRequest
+		protoReq PullJdocsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -1577,7 +1576,7 @@ func request_ExternalInterface_PullJdocs_0(ctx context.Context, marshaler runtim
 
 func local_request_ExternalInterface_PullJdocs_0(ctx context.Context, marshaler runtime.Marshaler, server ExternalInterfaceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq Anki_Vector_external_interface.PullJdocsRequest
+		protoReq PullJdocsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -1589,7 +1588,7 @@ func local_request_ExternalInterface_PullJdocs_0(ctx context.Context, marshaler 
 
 func request_ExternalInterface_UpdateSettings_0(ctx context.Context, marshaler runtime.Marshaler, client ExternalInterfaceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq Anki_Vector_external_interface.UpdateSettingsRequest
+		protoReq UpdateSettingsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -1604,7 +1603,7 @@ func request_ExternalInterface_UpdateSettings_0(ctx context.Context, marshaler r
 
 func local_request_ExternalInterface_UpdateSettings_0(ctx context.Context, marshaler runtime.Marshaler, server ExternalInterfaceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq Anki_Vector_external_interface.UpdateSettingsRequest
+		protoReq UpdateSettingsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -1616,7 +1615,7 @@ func local_request_ExternalInterface_UpdateSettings_0(ctx context.Context, marsh
 
 func request_ExternalInterface_UpdateAccountSettings_0(ctx context.Context, marshaler runtime.Marshaler, client ExternalInterfaceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq Anki_Vector_external_interface.UpdateAccountSettingsRequest
+		protoReq UpdateAccountSettingsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -1631,7 +1630,7 @@ func request_ExternalInterface_UpdateAccountSettings_0(ctx context.Context, mars
 
 func local_request_ExternalInterface_UpdateAccountSettings_0(ctx context.Context, marshaler runtime.Marshaler, server ExternalInterfaceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq Anki_Vector_external_interface.UpdateAccountSettingsRequest
+		protoReq UpdateAccountSettingsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -1643,7 +1642,7 @@ func local_request_ExternalInterface_UpdateAccountSettings_0(ctx context.Context
 
 func request_ExternalInterface_UpdateUserEntitlements_0(ctx context.Context, marshaler runtime.Marshaler, client ExternalInterfaceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq Anki_Vector_external_interface.UpdateUserEntitlementsRequest
+		protoReq UpdateUserEntitlementsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -1658,7 +1657,7 @@ func request_ExternalInterface_UpdateUserEntitlements_0(ctx context.Context, mar
 
 func local_request_ExternalInterface_UpdateUserEntitlements_0(ctx context.Context, marshaler runtime.Marshaler, server ExternalInterfaceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq Anki_Vector_external_interface.UpdateUserEntitlementsRequest
+		protoReq UpdateUserEntitlementsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {

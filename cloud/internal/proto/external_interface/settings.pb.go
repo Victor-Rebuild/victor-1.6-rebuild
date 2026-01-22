@@ -20,10 +20,9 @@
 // 	protoc        v6.31.1
 // source: settings.proto
 
-package Anki_Vector_external_interface
+package external_interface
 
 import (
-	external_interface "github.com/digital-dream-labs/vector-cloud/internal/proto/external_interface"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -1284,9 +1283,9 @@ func (x *PullJdocsRequest) GetJdocTypes() []JdocType {
 }
 
 type PullJdocsResponse struct {
-	state         protoimpl.MessageState             `protogen:"open.v1"`
-	Status        *external_interface.ResponseStatus `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	NamedJdocs    []*NamedJdoc                       `protobuf:"bytes,2,rep,name=named_jdocs,json=namedJdocs,proto3" json:"named_jdocs,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        *ResponseStatus        `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	NamedJdocs    []*NamedJdoc           `protobuf:"bytes,2,rep,name=named_jdocs,json=namedJdocs,proto3" json:"named_jdocs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1321,7 +1320,7 @@ func (*PullJdocsResponse) Descriptor() ([]byte, []int) {
 	return file_settings_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *PullJdocsResponse) GetStatus() *external_interface.ResponseStatus {
+func (x *PullJdocsResponse) GetStatus() *ResponseStatus {
 	if x != nil {
 		return x.Status
 	}
@@ -1380,10 +1379,10 @@ func (x *UpdateSettingsRequest) GetSettings() *RobotSettingsConfig {
 }
 
 type UpdateSettingsResponse struct {
-	state         protoimpl.MessageState             `protogen:"open.v1"`
-	Status        *external_interface.ResponseStatus `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	Code          ResultCode                         `protobuf:"varint,2,opt,name=code,proto3,enum=Anki.Vector.external_interface.ResultCode" json:"code,omitempty"`
-	Doc           *Jdoc                              `protobuf:"bytes,3,opt,name=doc,proto3" json:"doc,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        *ResponseStatus        `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Code          ResultCode             `protobuf:"varint,2,opt,name=code,proto3,enum=Anki.Vector.external_interface.ResultCode" json:"code,omitempty"`
+	Doc           *Jdoc                  `protobuf:"bytes,3,opt,name=doc,proto3" json:"doc,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1418,7 +1417,7 @@ func (*UpdateSettingsResponse) Descriptor() ([]byte, []int) {
 	return file_settings_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *UpdateSettingsResponse) GetStatus() *external_interface.ResponseStatus {
+func (x *UpdateSettingsResponse) GetStatus() *ResponseStatus {
 	if x != nil {
 		return x.Status
 	}
@@ -1484,10 +1483,10 @@ func (x *UpdateAccountSettingsRequest) GetAccountSettings() *AccountSettingsConf
 }
 
 type UpdateAccountSettingsResponse struct {
-	state         protoimpl.MessageState             `protogen:"open.v1"`
-	Status        *external_interface.ResponseStatus `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	Code          ResultCode                         `protobuf:"varint,2,opt,name=code,proto3,enum=Anki.Vector.external_interface.ResultCode" json:"code,omitempty"`
-	Doc           *Jdoc                              `protobuf:"bytes,3,opt,name=doc,proto3" json:"doc,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        *ResponseStatus        `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Code          ResultCode             `protobuf:"varint,2,opt,name=code,proto3,enum=Anki.Vector.external_interface.ResultCode" json:"code,omitempty"`
+	Doc           *Jdoc                  `protobuf:"bytes,3,opt,name=doc,proto3" json:"doc,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1522,7 +1521,7 @@ func (*UpdateAccountSettingsResponse) Descriptor() ([]byte, []int) {
 	return file_settings_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *UpdateAccountSettingsResponse) GetStatus() *external_interface.ResponseStatus {
+func (x *UpdateAccountSettingsResponse) GetStatus() *ResponseStatus {
 	if x != nil {
 		return x.Status
 	}
@@ -1588,10 +1587,10 @@ func (x *UpdateUserEntitlementsRequest) GetUserEntitlements() *UserEntitlementsC
 }
 
 type UpdateUserEntitlementsResponse struct {
-	state         protoimpl.MessageState             `protogen:"open.v1"`
-	Status        *external_interface.ResponseStatus `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	Code          ResultCode                         `protobuf:"varint,2,opt,name=code,proto3,enum=Anki.Vector.external_interface.ResultCode" json:"code,omitempty"`
-	Doc           *Jdoc                              `protobuf:"bytes,3,opt,name=doc,proto3" json:"doc,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        *ResponseStatus        `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Code          ResultCode             `protobuf:"varint,2,opt,name=code,proto3,enum=Anki.Vector.external_interface.ResultCode" json:"code,omitempty"`
+	Doc           *Jdoc                  `protobuf:"bytes,3,opt,name=doc,proto3" json:"doc,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1626,7 +1625,7 @@ func (*UpdateUserEntitlementsResponse) Descriptor() ([]byte, []int) {
 	return file_settings_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *UpdateUserEntitlementsResponse) GetStatus() *external_interface.ResponseStatus {
+func (x *UpdateUserEntitlementsResponse) GetStatus() *ResponseStatus {
 	if x != nil {
 		return x.Status
 	}
@@ -1827,7 +1826,7 @@ const file_settings_proto_rawDesc = "" +
 	"\n" +
 	"ResultCode\x12\x15\n" +
 	"\x11SETTINGS_ACCEPTED\x10\x00\x12\x1c\n" +
-	"\x18ERROR_UPDATE_IN_PROGRESS\x10\x01B Z\x1eAnki.Vector.external_interfaceb\x06proto3"
+	"\x18ERROR_UPDATE_IN_PROGRESS\x10\x01BNZLgithub.com/digital-dream-labs/vector-cloud/internal/proto/external_interfaceb\x06proto3"
 
 var (
 	file_settings_proto_rawDescOnce sync.Once
@@ -1844,32 +1843,32 @@ func file_settings_proto_rawDescGZIP() []byte {
 var file_settings_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
 var file_settings_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_settings_proto_goTypes = []any{
-	(ApiVersion)(0),                           // 0: Anki.Vector.external_interface.ApiVersion
-	(Volume)(0),                               // 1: Anki.Vector.external_interface.Volume
-	(JdocType)(0),                             // 2: Anki.Vector.external_interface.JdocType
-	(JdocResolveMethod)(0),                    // 3: Anki.Vector.external_interface.JdocResolveMethod
-	(RobotSetting)(0),                         // 4: Anki.Vector.external_interface.RobotSetting
-	(EyeColor)(0),                             // 5: Anki.Vector.external_interface.EyeColor
-	(ButtonWakeWord)(0),                       // 6: Anki.Vector.external_interface.ButtonWakeWord
-	(AccountSetting)(0),                       // 7: Anki.Vector.external_interface.AccountSetting
-	(UserEntitlement)(0),                      // 8: Anki.Vector.external_interface.UserEntitlement
-	(ResultCode)(0),                           // 9: Anki.Vector.external_interface.ResultCode
-	(*CustomEyeColor)(nil),                    // 10: Anki.Vector.external_interface.CustomEyeColor
-	(*RobotSettingsConfig)(nil),               // 11: Anki.Vector.external_interface.RobotSettingsConfig
-	(*AccountSettingsConfig)(nil),             // 12: Anki.Vector.external_interface.AccountSettingsConfig
-	(*UserEntitlementsConfig)(nil),            // 13: Anki.Vector.external_interface.UserEntitlementsConfig
-	(*Jdoc)(nil),                              // 14: Anki.Vector.external_interface.Jdoc
-	(*NamedJdoc)(nil),                         // 15: Anki.Vector.external_interface.NamedJdoc
-	(*PullJdocsRequest)(nil),                  // 16: Anki.Vector.external_interface.PullJdocsRequest
-	(*PullJdocsResponse)(nil),                 // 17: Anki.Vector.external_interface.PullJdocsResponse
-	(*UpdateSettingsRequest)(nil),             // 18: Anki.Vector.external_interface.UpdateSettingsRequest
-	(*UpdateSettingsResponse)(nil),            // 19: Anki.Vector.external_interface.UpdateSettingsResponse
-	(*UpdateAccountSettingsRequest)(nil),      // 20: Anki.Vector.external_interface.UpdateAccountSettingsRequest
-	(*UpdateAccountSettingsResponse)(nil),     // 21: Anki.Vector.external_interface.UpdateAccountSettingsResponse
-	(*UpdateUserEntitlementsRequest)(nil),     // 22: Anki.Vector.external_interface.UpdateUserEntitlementsRequest
-	(*UpdateUserEntitlementsResponse)(nil),    // 23: Anki.Vector.external_interface.UpdateUserEntitlementsResponse
-	(*JdocsChanged)(nil),                      // 24: Anki.Vector.external_interface.JdocsChanged
-	(*external_interface.ResponseStatus)(nil), // 25: Anki.Vector.external_interface.ResponseStatus
+	(ApiVersion)(0),                        // 0: Anki.Vector.external_interface.ApiVersion
+	(Volume)(0),                            // 1: Anki.Vector.external_interface.Volume
+	(JdocType)(0),                          // 2: Anki.Vector.external_interface.JdocType
+	(JdocResolveMethod)(0),                 // 3: Anki.Vector.external_interface.JdocResolveMethod
+	(RobotSetting)(0),                      // 4: Anki.Vector.external_interface.RobotSetting
+	(EyeColor)(0),                          // 5: Anki.Vector.external_interface.EyeColor
+	(ButtonWakeWord)(0),                    // 6: Anki.Vector.external_interface.ButtonWakeWord
+	(AccountSetting)(0),                    // 7: Anki.Vector.external_interface.AccountSetting
+	(UserEntitlement)(0),                   // 8: Anki.Vector.external_interface.UserEntitlement
+	(ResultCode)(0),                        // 9: Anki.Vector.external_interface.ResultCode
+	(*CustomEyeColor)(nil),                 // 10: Anki.Vector.external_interface.CustomEyeColor
+	(*RobotSettingsConfig)(nil),            // 11: Anki.Vector.external_interface.RobotSettingsConfig
+	(*AccountSettingsConfig)(nil),          // 12: Anki.Vector.external_interface.AccountSettingsConfig
+	(*UserEntitlementsConfig)(nil),         // 13: Anki.Vector.external_interface.UserEntitlementsConfig
+	(*Jdoc)(nil),                           // 14: Anki.Vector.external_interface.Jdoc
+	(*NamedJdoc)(nil),                      // 15: Anki.Vector.external_interface.NamedJdoc
+	(*PullJdocsRequest)(nil),               // 16: Anki.Vector.external_interface.PullJdocsRequest
+	(*PullJdocsResponse)(nil),              // 17: Anki.Vector.external_interface.PullJdocsResponse
+	(*UpdateSettingsRequest)(nil),          // 18: Anki.Vector.external_interface.UpdateSettingsRequest
+	(*UpdateSettingsResponse)(nil),         // 19: Anki.Vector.external_interface.UpdateSettingsResponse
+	(*UpdateAccountSettingsRequest)(nil),   // 20: Anki.Vector.external_interface.UpdateAccountSettingsRequest
+	(*UpdateAccountSettingsResponse)(nil),  // 21: Anki.Vector.external_interface.UpdateAccountSettingsResponse
+	(*UpdateUserEntitlementsRequest)(nil),  // 22: Anki.Vector.external_interface.UpdateUserEntitlementsRequest
+	(*UpdateUserEntitlementsResponse)(nil), // 23: Anki.Vector.external_interface.UpdateUserEntitlementsResponse
+	(*JdocsChanged)(nil),                   // 24: Anki.Vector.external_interface.JdocsChanged
+	(*ResponseStatus)(nil),                 // 25: Anki.Vector.external_interface.ResponseStatus
 }
 var file_settings_proto_depIdxs = []int32{
 	5,  // 0: Anki.Vector.external_interface.RobotSettingsConfig.eye_color:type_name -> Anki.Vector.external_interface.EyeColor
@@ -1906,6 +1905,7 @@ func file_settings_proto_init() {
 	if File_settings_proto != nil {
 		return
 	}
+	file_response_status_proto_init()
 	file_settings_proto_msgTypes[1].OneofWrappers = []any{
 		(*RobotSettingsConfig_Clock_24Hour)(nil),
 		(*RobotSettingsConfig_EyeColor)(nil),

@@ -23,7 +23,6 @@
 package external_interface
 
 import (
-	Anki_Vector_external_interface "Anki.Vector.external_interface"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -282,10 +281,10 @@ type ExternalInterfaceClient interface {
 	GetOnboardingState(ctx context.Context, in *OnboardingStateRequest, opts ...grpc.CallOption) (*OnboardingStateResponse, error)
 	SendOnboardingInput(ctx context.Context, in *OnboardingInputRequest, opts ...grpc.CallOption) (*OnboardingInputResponse, error)
 	GetLatestAttentionTransfer(ctx context.Context, in *LatestAttentionTransferRequest, opts ...grpc.CallOption) (*LatestAttentionTransferResponse, error)
-	PullJdocs(ctx context.Context, in *Anki_Vector_external_interface.PullJdocsRequest, opts ...grpc.CallOption) (*Anki_Vector_external_interface.PullJdocsResponse, error)
-	UpdateSettings(ctx context.Context, in *Anki_Vector_external_interface.UpdateSettingsRequest, opts ...grpc.CallOption) (*Anki_Vector_external_interface.UpdateSettingsResponse, error)
-	UpdateAccountSettings(ctx context.Context, in *Anki_Vector_external_interface.UpdateAccountSettingsRequest, opts ...grpc.CallOption) (*Anki_Vector_external_interface.UpdateAccountSettingsResponse, error)
-	UpdateUserEntitlements(ctx context.Context, in *Anki_Vector_external_interface.UpdateUserEntitlementsRequest, opts ...grpc.CallOption) (*Anki_Vector_external_interface.UpdateUserEntitlementsResponse, error)
+	PullJdocs(ctx context.Context, in *PullJdocsRequest, opts ...grpc.CallOption) (*PullJdocsResponse, error)
+	UpdateSettings(ctx context.Context, in *UpdateSettingsRequest, opts ...grpc.CallOption) (*UpdateSettingsResponse, error)
+	UpdateAccountSettings(ctx context.Context, in *UpdateAccountSettingsRequest, opts ...grpc.CallOption) (*UpdateAccountSettingsResponse, error)
+	UpdateUserEntitlements(ctx context.Context, in *UpdateUserEntitlementsRequest, opts ...grpc.CallOption) (*UpdateUserEntitlementsResponse, error)
 	// StartUpdateEngine cycles the update-engine service (to start a new check for an update) and sets up a stream of
 	// UpdateStatusResponse Events.
 	StartUpdateEngine(ctx context.Context, in *CheckUpdateStatusRequest, opts ...grpc.CallOption) (*CheckUpdateStatusResponse, error)
@@ -1112,9 +1111,9 @@ func (c *externalInterfaceClient) GetLatestAttentionTransfer(ctx context.Context
 	return out, nil
 }
 
-func (c *externalInterfaceClient) PullJdocs(ctx context.Context, in *Anki_Vector_external_interface.PullJdocsRequest, opts ...grpc.CallOption) (*Anki_Vector_external_interface.PullJdocsResponse, error) {
+func (c *externalInterfaceClient) PullJdocs(ctx context.Context, in *PullJdocsRequest, opts ...grpc.CallOption) (*PullJdocsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Anki_Vector_external_interface.PullJdocsResponse)
+	out := new(PullJdocsResponse)
 	err := c.cc.Invoke(ctx, ExternalInterface_PullJdocs_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -1122,9 +1121,9 @@ func (c *externalInterfaceClient) PullJdocs(ctx context.Context, in *Anki_Vector
 	return out, nil
 }
 
-func (c *externalInterfaceClient) UpdateSettings(ctx context.Context, in *Anki_Vector_external_interface.UpdateSettingsRequest, opts ...grpc.CallOption) (*Anki_Vector_external_interface.UpdateSettingsResponse, error) {
+func (c *externalInterfaceClient) UpdateSettings(ctx context.Context, in *UpdateSettingsRequest, opts ...grpc.CallOption) (*UpdateSettingsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Anki_Vector_external_interface.UpdateSettingsResponse)
+	out := new(UpdateSettingsResponse)
 	err := c.cc.Invoke(ctx, ExternalInterface_UpdateSettings_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -1132,9 +1131,9 @@ func (c *externalInterfaceClient) UpdateSettings(ctx context.Context, in *Anki_V
 	return out, nil
 }
 
-func (c *externalInterfaceClient) UpdateAccountSettings(ctx context.Context, in *Anki_Vector_external_interface.UpdateAccountSettingsRequest, opts ...grpc.CallOption) (*Anki_Vector_external_interface.UpdateAccountSettingsResponse, error) {
+func (c *externalInterfaceClient) UpdateAccountSettings(ctx context.Context, in *UpdateAccountSettingsRequest, opts ...grpc.CallOption) (*UpdateAccountSettingsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Anki_Vector_external_interface.UpdateAccountSettingsResponse)
+	out := new(UpdateAccountSettingsResponse)
 	err := c.cc.Invoke(ctx, ExternalInterface_UpdateAccountSettings_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -1142,9 +1141,9 @@ func (c *externalInterfaceClient) UpdateAccountSettings(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *externalInterfaceClient) UpdateUserEntitlements(ctx context.Context, in *Anki_Vector_external_interface.UpdateUserEntitlementsRequest, opts ...grpc.CallOption) (*Anki_Vector_external_interface.UpdateUserEntitlementsResponse, error) {
+func (c *externalInterfaceClient) UpdateUserEntitlements(ctx context.Context, in *UpdateUserEntitlementsRequest, opts ...grpc.CallOption) (*UpdateUserEntitlementsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Anki_Vector_external_interface.UpdateUserEntitlementsResponse)
+	out := new(UpdateUserEntitlementsResponse)
 	err := c.cc.Invoke(ctx, ExternalInterface_UpdateUserEntitlements_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -1415,10 +1414,10 @@ type ExternalInterfaceServer interface {
 	GetOnboardingState(context.Context, *OnboardingStateRequest) (*OnboardingStateResponse, error)
 	SendOnboardingInput(context.Context, *OnboardingInputRequest) (*OnboardingInputResponse, error)
 	GetLatestAttentionTransfer(context.Context, *LatestAttentionTransferRequest) (*LatestAttentionTransferResponse, error)
-	PullJdocs(context.Context, *Anki_Vector_external_interface.PullJdocsRequest) (*Anki_Vector_external_interface.PullJdocsResponse, error)
-	UpdateSettings(context.Context, *Anki_Vector_external_interface.UpdateSettingsRequest) (*Anki_Vector_external_interface.UpdateSettingsResponse, error)
-	UpdateAccountSettings(context.Context, *Anki_Vector_external_interface.UpdateAccountSettingsRequest) (*Anki_Vector_external_interface.UpdateAccountSettingsResponse, error)
-	UpdateUserEntitlements(context.Context, *Anki_Vector_external_interface.UpdateUserEntitlementsRequest) (*Anki_Vector_external_interface.UpdateUserEntitlementsResponse, error)
+	PullJdocs(context.Context, *PullJdocsRequest) (*PullJdocsResponse, error)
+	UpdateSettings(context.Context, *UpdateSettingsRequest) (*UpdateSettingsResponse, error)
+	UpdateAccountSettings(context.Context, *UpdateAccountSettingsRequest) (*UpdateAccountSettingsResponse, error)
+	UpdateUserEntitlements(context.Context, *UpdateUserEntitlementsRequest) (*UpdateUserEntitlementsResponse, error)
 	// StartUpdateEngine cycles the update-engine service (to start a new check for an update) and sets up a stream of
 	// UpdateStatusResponse Events.
 	StartUpdateEngine(context.Context, *CheckUpdateStatusRequest) (*CheckUpdateStatusResponse, error)
@@ -1671,16 +1670,16 @@ func (UnimplementedExternalInterfaceServer) SendOnboardingInput(context.Context,
 func (UnimplementedExternalInterfaceServer) GetLatestAttentionTransfer(context.Context, *LatestAttentionTransferRequest) (*LatestAttentionTransferResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLatestAttentionTransfer not implemented")
 }
-func (UnimplementedExternalInterfaceServer) PullJdocs(context.Context, *Anki_Vector_external_interface.PullJdocsRequest) (*Anki_Vector_external_interface.PullJdocsResponse, error) {
+func (UnimplementedExternalInterfaceServer) PullJdocs(context.Context, *PullJdocsRequest) (*PullJdocsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PullJdocs not implemented")
 }
-func (UnimplementedExternalInterfaceServer) UpdateSettings(context.Context, *Anki_Vector_external_interface.UpdateSettingsRequest) (*Anki_Vector_external_interface.UpdateSettingsResponse, error) {
+func (UnimplementedExternalInterfaceServer) UpdateSettings(context.Context, *UpdateSettingsRequest) (*UpdateSettingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSettings not implemented")
 }
-func (UnimplementedExternalInterfaceServer) UpdateAccountSettings(context.Context, *Anki_Vector_external_interface.UpdateAccountSettingsRequest) (*Anki_Vector_external_interface.UpdateAccountSettingsResponse, error) {
+func (UnimplementedExternalInterfaceServer) UpdateAccountSettings(context.Context, *UpdateAccountSettingsRequest) (*UpdateAccountSettingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAccountSettings not implemented")
 }
-func (UnimplementedExternalInterfaceServer) UpdateUserEntitlements(context.Context, *Anki_Vector_external_interface.UpdateUserEntitlementsRequest) (*Anki_Vector_external_interface.UpdateUserEntitlementsResponse, error) {
+func (UnimplementedExternalInterfaceServer) UpdateUserEntitlements(context.Context, *UpdateUserEntitlementsRequest) (*UpdateUserEntitlementsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserEntitlements not implemented")
 }
 func (UnimplementedExternalInterfaceServer) StartUpdateEngine(context.Context, *CheckUpdateStatusRequest) (*CheckUpdateStatusResponse, error) {
@@ -3053,7 +3052,7 @@ func _ExternalInterface_GetLatestAttentionTransfer_Handler(srv interface{}, ctx 
 }
 
 func _ExternalInterface_PullJdocs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Anki_Vector_external_interface.PullJdocsRequest)
+	in := new(PullJdocsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -3065,13 +3064,13 @@ func _ExternalInterface_PullJdocs_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: ExternalInterface_PullJdocs_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExternalInterfaceServer).PullJdocs(ctx, req.(*Anki_Vector_external_interface.PullJdocsRequest))
+		return srv.(ExternalInterfaceServer).PullJdocs(ctx, req.(*PullJdocsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ExternalInterface_UpdateSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Anki_Vector_external_interface.UpdateSettingsRequest)
+	in := new(UpdateSettingsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -3083,13 +3082,13 @@ func _ExternalInterface_UpdateSettings_Handler(srv interface{}, ctx context.Cont
 		FullMethod: ExternalInterface_UpdateSettings_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExternalInterfaceServer).UpdateSettings(ctx, req.(*Anki_Vector_external_interface.UpdateSettingsRequest))
+		return srv.(ExternalInterfaceServer).UpdateSettings(ctx, req.(*UpdateSettingsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ExternalInterface_UpdateAccountSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Anki_Vector_external_interface.UpdateAccountSettingsRequest)
+	in := new(UpdateAccountSettingsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -3101,13 +3100,13 @@ func _ExternalInterface_UpdateAccountSettings_Handler(srv interface{}, ctx conte
 		FullMethod: ExternalInterface_UpdateAccountSettings_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExternalInterfaceServer).UpdateAccountSettings(ctx, req.(*Anki_Vector_external_interface.UpdateAccountSettingsRequest))
+		return srv.(ExternalInterfaceServer).UpdateAccountSettings(ctx, req.(*UpdateAccountSettingsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ExternalInterface_UpdateUserEntitlements_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Anki_Vector_external_interface.UpdateUserEntitlementsRequest)
+	in := new(UpdateUserEntitlementsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -3119,7 +3118,7 @@ func _ExternalInterface_UpdateUserEntitlements_Handler(srv interface{}, ctx cont
 		FullMethod: ExternalInterface_UpdateUserEntitlements_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExternalInterfaceServer).UpdateUserEntitlements(ctx, req.(*Anki_Vector_external_interface.UpdateUserEntitlementsRequest))
+		return srv.(ExternalInterfaceServer).UpdateUserEntitlements(ctx, req.(*UpdateUserEntitlementsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
