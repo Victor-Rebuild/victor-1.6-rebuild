@@ -106,14 +106,14 @@ namespace Anki
 
       float GetRebuildBrightnessForHour(int hour) {
           const float brightness[] = {
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-              0.13f, 0.27f, 0.4f, 0.53f, 0.67f, 0.8f,
-              0.93f, 0.8f, 0.67f, 0.53f, 0.4f, 0.27f,
-              0.13f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+              0.0f, 0.08333334f, 0.16666667f, 0.25f, 0.33333333f, 0.41666667f,
+              0.5f, 0.58333333f, 0.66666667f, 0.75f, 0.83333333f, 0.91666667f,
+              1.0f, 0.91666667f, 0.83333333f, 0.75f, 0.66666667f, 0.58333333f, 0.5f,
+              0.41666667f, 0.33333333f, 0.25f, 0.16666667f,  0.0f
           };
           
           if (hour < 0 || hour > 23) {
-              return 0.5f;
+              return 1.0f;
           }
           
           return brightness[hour];
@@ -134,6 +134,13 @@ namespace Anki
         LOG_INFO("SettingsManager.Destructor", "Stopping Rainbow Eyes thread during shutdown");
         _stopRainbowEyeThread.store(true, std::memory_order_release);
         _rainbowEyeThread.join();
+      }
+
+      if (_rebuildEyeThread.joinable())
+      {
+        LOG_INFO("SettingsManager.Destructor", "Stopping Rebuild Eyes thread during shutdown");
+        _stopRebuildEyeThread.store(true, std::memory_order_release);
+        _rebuildEyeThread.join();
       }
     }
 
@@ -622,6 +629,7 @@ namespace Anki
           // only start the thread if it's not already running
           if (!_rainbowEyeThread.joinable())
           {
+            _robot->SendRobotMessage<RobotInterface::SetFaceSaturation>(1.00);
             _rainbowEyeThread = std::thread([this]()
                                             {
                     float hue = 0.0f;
@@ -692,8 +700,8 @@ namespace Anki
                           _stopRebuildEyeThread.store(true, std::memory_order_release);
                           break;
                       }
-                      // Refresh every 2 seconds
-                      std::this_thread::sleep_for(std::chrono::milliseconds(120));
+                      // Refresh every second
+                      std::this_thread::sleep_for(std::chrono::milliseconds(60));
                   }
               });
           }
