@@ -529,11 +529,11 @@ else
   fi
 fi
 
-# copied from build-v.sh
-cd $TOPLEVEL
-echo "Copying vic-cloud..."
-cp -a bin/* _build/vicos/Release/bin/
-echo "Copying libopus..."
-cp -a EXTERNALS/deps/opus/libopus.so.0.7.0 _build/vicos/Release/lib/libopus.so.0
+# # copied from build-v.sh
+# cd $TOPLEVEL
+# echo "Copying vic-cloud..."
+# cp -a bin/* _build/vicos/Release/bin/
+# echo "Copying libopus..."
+# cp -a EXTERNALS/deps/opus/libopus.so.0.7.0 _build/vicos/Release/lib/libopus.so.0
 
 popd > /dev/null 2>&1
