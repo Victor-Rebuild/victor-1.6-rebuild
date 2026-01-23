@@ -33,6 +33,7 @@
 - Fixed Blackjack so that Vector actually says "Dealer" correctly
 - Added the ability for Vector to say how old Vector is in years once 12 months passes
 - Vector can be named in <vector-ip>:8080 in a web browser, name can be asked for by asking the "What is your name?" Voice command if you're connected to the custom server environment.
+- Timer now works up to 1 day (WireOS commit)
 
 ## Cloud changes
 - vic-cloud that works with wirepod and regular servers
