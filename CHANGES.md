@@ -15,7 +15,7 @@
 - Smoother pre-1.6 eye darts (Last in 1.5, ported to Viccyware and used code from there)
 - Added the previously unused second timer end beep animation
 - Rainbow Eyes!
-- Rebuild Eyes (Changes eye color on the same schedule as the PS3 XMB)!
+- Rebuild Eyes, default and can be set by asking Vector `Change eye color to Cross Media Bar` (Changes eye color on the same schedule as the PS3 XMB)!
 - Petting Lights (Code from WireOS but petting colors are mine)
 - Alt power on eye animations
 - More expressive power on anims
