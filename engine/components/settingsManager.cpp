@@ -52,59 +52,59 @@ namespace Anki
           float saturation;
       };
 
-      RebuildXMBColor GetRebuildColorForDate(int month, int day) {
-          struct ColorEntry {
-              int month;
-              int day;
-              float hue;
-              float saturation;
-          };
+      // RebuildXMBColor GetRebuildColorForDate(int month, int day) {
+      //     struct ColorEntry {
+      //         int month;
+      //         int day;
+      //         float hue;
+      //         float saturation;
+      //     };
           
-          const ColorEntry colors[] = {
-              {1, 15, 0.167f, 0.5f},
-              {1, 24, 0.083f, 0.75f},
-              {2, 15, 0.222f, 0.6f},
-              {2, 24, 0.333f, 1.0f},
-              {3, 15, 0.917f, 0.3f},
-              {3, 24, 0.917f, 0.85f},
-              {4, 15, 0.0f, 0.0f},
-              {4, 24, 0.333f, 1.0f},
-              {5, 15, 0.833f, 0.2f},
-              {5, 24, 0.833f, 1.0f},
-              {6, 15, 0.556f, 0.3f},
-              {6, 24, 0.5f, 1.0f},
-              {7, 15, 0.667f, 1.0f},
-              {7, 24, 0.667f, 1.0f},
-              {8, 15, 0.833f, 1.0f},
-              {8, 24, 0.792f, 1.0f},
-              {9, 15, 0.0f, 0.85f},
-              {9, 24, 0.167f, 0.5f},
-              {10, 15, 0.083f, 0.65f},
-              {10, 24, 0.083f, 0.75f},
-              {11, 15, 0.983f, 0.85f},
-              {11, 24, 0.0f, 1.0f},
-              {12, 15, 0.792f, 0.2f},
-              {12, 24, 0.0f, 0.0f}
-          };
+      //     const ColorEntry colors[] = {
+      //         {1, 15, 0.167f, 0.5f},
+      //         {1, 24, 0.083f, 0.75f},
+      //         {2, 15, 0.222f, 0.6f},
+      //         {2, 24, 0.333f, 1.0f},
+      //         {3, 15, 0.917f, 0.3f},
+      //         {3, 24, 0.917f, 0.85f},
+      //         {4, 15, 0.0f, 0.0f},
+      //         {4, 24, 0.333f, 1.0f},
+      //         {5, 15, 0.833f, 0.2f},
+      //         {5, 24, 0.833f, 1.0f},
+      //         {6, 15, 0.556f, 0.3f},
+      //         {6, 24, 0.5f, 1.0f},
+      //         {7, 15, 0.667f, 1.0f},
+      //         {7, 24, 0.667f, 1.0f},
+      //         {8, 15, 0.833f, 1.0f},
+      //         {8, 24, 0.792f, 1.0f},
+      //         {9, 15, 0.0f, 0.85f},
+      //         {9, 24, 0.167f, 0.5f},
+      //         {10, 15, 0.083f, 0.65f},
+      //         {10, 24, 0.083f, 0.75f},
+      //         {11, 15, 0.983f, 0.85f},
+      //         {11, 24, 0.0f, 1.0f},
+      //         {12, 15, 0.792f, 0.2f},
+      //         {12, 24, 0.0f, 0.0f}
+      //     };
           
-          int bestIdx = 0;
-          int minDiff = 365;
+      //     int bestIdx = 0;
+      //     int minDiff = 365;
           
-          for (int i = 0; i < 24; i++) {
-              int targetDayOfYear = colors[i].month * 30 + colors[i].day;
-              int currentDayOfYear = month * 30 + day;
-              int diff = abs(targetDayOfYear - currentDayOfYear);
+      //     for (int i = 0; i < 24; i++) {
+      //         int targetDayOfYear = colors[i].month * 30 + colors[i].day;
+      //         int currentDayOfYear = month * 30 + day;
+      //         int diff = abs(targetDayOfYear - currentDayOfYear);
               
-              if (diff < minDiff) {
-                  minDiff = diff;
-                  bestIdx = i;
-              }
-          }
+      //         if (diff < minDiff) {
+      //             minDiff = diff;
+      //             bestIdx = i;
+      //         }
+      //     }
           
-          return {colors[bestIdx].hue, colors[bestIdx].saturation};
-      }
+      //     return {colors[bestIdx].hue, colors[bestIdx].saturation};
+      // }
 
-      float GetRebuildBrightnessForHour(int hour, int minute) {
+      float GetRebuildXMBBrightnessForHour(int hour, int minute) {
           const float brightness[] = {
               0.0f, 0.08333334f, 0.16666667f, 0.25f, 0.33333333f, 0.41666667f,
               0.5f, 0.58333333f, 0.66666667f, 0.75f, 0.83333333f, 0.91666667f,
@@ -140,28 +140,92 @@ namespace Anki
           return result;
       }
 
-      RebuildXMBColor GetInterpolatedRebuildColor(int month, int day, int hour, int minute) {
-          RebuildXMBColor currentColor = GetRebuildColorForDate(month, day);
+      RebuildXMBColor GetInterpolatedRebuildXMBColor(int month, int day, int hour, int minute) {
+          struct ColorEntry {
+              int month;
+              int day;
+              float hue;
+              float saturation;
+          };
           
-          int nextDay = day + 1;
-          int nextMonth = month;
-          int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+          const ColorEntry colors[] = {
+              {1, 15, 0.167f, 0.5f},
+              {1, 24, 0.083f, 0.75f},
+              {2, 15, 0.222f, 0.6f},
+              {2, 24, 0.333f, 1.0f},
+              {3, 15, 0.917f, 0.3f},
+              {3, 24, 0.917f, 0.85f},
+              {4, 15, 0.0f, 0.0f},
+              {4, 24, 0.333f, 1.0f},
+              {5, 15, 0.833f, 0.2f},
+              {5, 24, 0.833f, 1.0f},
+              {6, 15, 0.556f, 0.3f},
+              {6, 24, 0.5f, 1.0f},
+              {7, 15, 0.667f, 1.0f},
+              {7, 24, 0.667f, 1.0f},
+              {8, 15, 0.833f, 1.0f},
+              {8, 24, 0.792f, 1.0f},
+              {9, 15, 0.0f, 0.85f},
+              {9, 24, 0.167f, 0.5f},
+              {10, 15, 0.083f, 0.65f},
+              {10, 24, 0.083f, 0.75f},
+              {11, 15, 0.983f, 0.85f},
+              {11, 24, 0.0f, 1.0f},
+              {12, 15, 0.792f, 0.2f},
+              {12, 24, 0.0f, 0.0f}
+          };
           
-          if (nextDay > daysInMonth[month - 1]) {
-              nextDay = 1;
-              nextMonth++;
-              if (nextMonth > 12) {
-                  nextMonth = 1;
-              }
+          RebuildXMBColor fromColor, toColor;
+          float t = 0.0f;
+          
+          if (day >= 1 && day <= 11) {
+              int prevMonth = month - 1;
+              if (prevMonth < 1) prevMonth = 12;
+              int idx = (prevMonth - 1) * 2 + 1;
+              fromColor = {colors[idx].hue, colors[idx].saturation};
+              toColor = fromColor;
+              t = 0.0f;
+          }
+          else if (day >= 12 && day <= 14) {
+              int prevMonth = month - 1;
+              if (prevMonth < 1) prevMonth = 12;
+              int prevIdx = (prevMonth - 1) * 2 + 1;
+              int currIdx = (month - 1) * 2;
+              
+              fromColor = {colors[prevIdx].hue, colors[prevIdx].saturation};
+              toColor = {colors[currIdx].hue, colors[currIdx].saturation};
+              
+              float dayInPeriod = day - 12;
+              float hourProgress = (hour * 60.0f + minute) / (24.0f * 60.0f);
+              t = (dayInPeriod + hourProgress) / 3.0f;
+          }
+          else if (day == 15 || (day >= 16 && day <= 20)) {
+              int idx = (month - 1) * 2;
+              fromColor = {colors[idx].hue, colors[idx].saturation};
+              toColor = fromColor;
+              t = 0.0f;
+          }
+          else if (day >= 21 && day <= 23) {
+              int fromIdx = (month - 1) * 2;
+              int toIdx = (month - 1) * 2 + 1;
+              
+              fromColor = {colors[fromIdx].hue, colors[fromIdx].saturation};
+              toColor = {colors[toIdx].hue, colors[toIdx].saturation};
+              
+              float dayInPeriod = day - 21;
+              float hourProgress = (hour * 60.0f + minute) / (24.0f * 60.0f);
+              t = (dayInPeriod + hourProgress) / 3.0f;
+          }
+          else {
+              int idx = (month - 1) * 2 + 1;
+              fromColor = {colors[idx].hue, colors[idx].saturation};
+              toColor = fromColor;
+              t = 0.0f;
           }
           
-          RebuildXMBColor nextColor = GetRebuildColorForDate(nextMonth, nextDay);
-          
-          float dayProgress = (hour * 60.0f + minute) / (24.0f * 60.0f);
-          
-          float interpolatedHue = InterpolateHue(currentColor.hue, nextColor.hue, dayProgress);
-          float interpolatedSat = currentColor.saturation + 
-                                  (nextColor.saturation - currentColor.saturation) * dayProgress;
+          float interpolatedHue = InterpolateHue(fromColor.hue, toColor.hue, t);
+          float interpolatedSat = fromColor.saturation + 
+                                  (toColor.saturation - fromColor.saturation) * t;
           
           return {interpolatedHue, interpolatedSat};
       }
@@ -726,10 +790,10 @@ namespace Anki
                       int minute = timeinfo->tm_min;
                       
                       // Get XMB color for current date/time
-                      RebuildXMBColor color = GetInterpolatedRebuildColor(month, day, hour, minute);
+                      RebuildXMBColor color = GetInterpolatedRebuildXMBColor(month, day, hour, minute);
                       
                       // Get XMB brightness for current time
-                      float brightness = GetRebuildBrightnessForHour(hour, minute);
+                      float brightness = GetRebuildXMBBrightnessForHour(hour, minute);
                       
                       // Apply brightness to saturation (lower brightness = lower saturation)
                       float adjustedSaturation = color.saturation * brightness;
