@@ -16,5 +16,5 @@
   "RAINBOW_EYES" :
     { "Hue" : 0.97, "Saturation" : 1.00 },
   "REBUILD_EYES" :
-    { "Hue" : 0.00, "Saturation" : 1.00 }
+    { "Hue" : 0.00, "Saturation" : 0.00 }
 }
