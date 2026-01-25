@@ -44,8 +44,8 @@ namespace Anki {
 namespace Vector {
   
 // VIC-13319 remove
-CONSOLE_VAR(bool, kAlexaEnabledInUK, "Alexa", true);
-CONSOLE_VAR(bool, kAlexaEnabledInAU, "Alexa", true);
+// CONSOLE_VAR(bool, kAlexaEnabledInUK, "Alexa", true);
+// CONSOLE_VAR(bool, kAlexaEnabledInAU, "Alexa", true);
   
 namespace {
   const std::string kAlexaPath = "alexa";
@@ -67,9 +67,9 @@ namespace {
     if( locale.GetCountry() == Util::Locale::CountryISO2::US ) {
       return true;
     } else if( locale.GetCountry() == Util::Locale::CountryISO2::GB ) {
-      return kAlexaEnabledInUK;
+      return true;
     } else if( locale.GetCountry() == Util::Locale::CountryISO2::AU ) {
-      return kAlexaEnabledInAU;
+      return true;
     } else {
       return false;
     }
