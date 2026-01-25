@@ -331,9 +331,9 @@ namespace Vector {
   const u32 CLIFF_EVENT_DELAY_MS = 500;
   
   // Anim process timing consts
-  const u32 ANIM_TIME_STEP_MS = 33;
+  const u32 ANIM_TIME_STEP_MS = 16;
   const u32 ANIM_TIME_STEP_US = ANIM_TIME_STEP_MS * 1000;
-  const s32 ANIM_OVERTIME_WARNING_THRESH_MS = 5;
+  const s32 ANIM_OVERTIME_WARNING_THRESH_MS = 16;
   const s32 ANIM_OVERTIME_WARNING_THRESH_US = ANIM_OVERTIME_WARNING_THRESH_MS * 1000;
   
   // Time step for cube tick

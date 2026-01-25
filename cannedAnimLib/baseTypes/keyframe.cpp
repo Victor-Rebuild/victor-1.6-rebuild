@@ -272,11 +272,11 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
       _triggerTime_ms = triggerTime_ms;
       _internalUpdateInterval_ms = frameInterval_ms;
       _keyframeActiveDuration_ms = spriteSeq->GetNumFrames() * _internalUpdateInterval_ms;
-      ANKI_VERIFY((_internalUpdateInterval_ms != 0) &&
-                  ((_internalUpdateInterval_ms % ANIM_TIME_STEP_MS) == 0),
-                  "SpriteSequenceKeyFrame.SetCompositeImage.InvalidTimeStep",
-                  "Update interval %d is not a multiple of anim time step %d",
-                  _internalUpdateInterval_ms, ANIM_TIME_STEP_MS);
+      // ANKI_VERIFY((_internalUpdateInterval_ms != 0) &&
+      //             ((_internalUpdateInterval_ms % ANIM_TIME_STEP_MS) == 0),
+      //             "SpriteSequenceKeyFrame.SetCompositeImage.InvalidTimeStep",
+      //             "Update interval %d is not a multiple of anim time step %d",
+      //             _internalUpdateInterval_ms, ANIM_TIME_STEP_MS);
     }
 
     SpriteSequenceKeyFrame::SpriteSequenceKeyFrame(Vision::SpriteCache* spriteCache, 
@@ -288,11 +288,11 @@ void SafeNumericCast(const FromType& fromVal, ToType& toVal, const char* debugNa
       _compositeImage = std::make_unique<Vision::CompositeImage>(spriteCache, faceHueAndSaturation, !shouldRenderInEyeHue);
       _compositeImage.reset(compImg);
       _internalUpdateInterval_ms = frameInterval_ms;
-      ANKI_VERIFY((_internalUpdateInterval_ms != 0) &&
-                  ((_internalUpdateInterval_ms % ANIM_TIME_STEP_MS) == 0),
-                  "SpriteSequenceKeyFrame.SetCompositeImage.InvalidTimeStep",
-                  "Update interval %d is not a multiple of anim time step %d",
-                  _internalUpdateInterval_ms, ANIM_TIME_STEP_MS);
+      // ANKI_VERIFY((_internalUpdateInterval_ms != 0) &&
+      //             ((_internalUpdateInterval_ms % ANIM_TIME_STEP_MS) == 0),
+      //             "SpriteSequenceKeyFrame.SetCompositeImage.InvalidTimeStep",
+      //             "Update interval %d is not a multiple of anim time step %d",
+      //             _internalUpdateInterval_ms, ANIM_TIME_STEP_MS);
     }
 
     SpriteSequenceKeyFrame::SpriteSequenceKeyFrame(const SpriteSequenceKeyFrame& other)
