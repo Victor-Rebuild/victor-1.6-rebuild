@@ -752,7 +752,7 @@ namespace Anki
                         {
                             hue = 0.0f;
                         }
-                        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+                        std::this_thread::sleep_for(std::chrono::milliseconds(25));
 
                         // Check if "RAINBOW_EYES" mode is still active by checking the setting
                         const std::string rainbowEyesStrInTh = "RAINBOW_EYES";
@@ -813,7 +813,7 @@ namespace Anki
                           break;
                       }
                       // Refresh every second
-                      std::this_thread::sleep_for(std::chrono::milliseconds(60));
+                      std::this_thread::sleep_for(std::chrono::milliseconds(30));
                   }
               });
           }
