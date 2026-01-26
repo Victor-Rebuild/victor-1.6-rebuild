@@ -1,5 +1,5 @@
 # THIS REPOSITORY HAS BEEN ARCHIVED
-As much as thus might be upsetting, 1.6-rebuild's current form is archived, it will soon be rebuilt from the ground up under this new repository:
+As much as this might be upsetting, 1.6-rebuild's current form is archived, it will soon be rebuilt from the ground up under this new repository:
 https://github.com/Victor-Rebuild/victor-1.6-rebuild-2
 
 # victor-1.6-rebuild
